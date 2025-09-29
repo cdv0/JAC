@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router'
 import React from 'react'
+import Search from '../../public/assets/icons/search-icon.svg'
 
 const _layout = () => {
   return (
@@ -9,6 +10,7 @@ const _layout = () => {
             options={{
                 title: "Map",
                 headerShown:false,
+                tabBarIcon: () => (<Search width={30} height={30} />)
             }}
         />
         <Tabs.Screen
