@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Button, Text, TextInput, View } from 'react-native'
+import { Text, TextInput, View } from 'react-native'
+import NormalButton from '../components/NormalButton'
 
 const profile = () => {
   const [name, setName] = useState<string>('')
@@ -10,29 +11,32 @@ const profile = () => {
 
   return (
     <View>
-      <Text>Profile</Text>
-
-      <View className="flex flex-row items-center pl-10 ml-10 text-white">
-        <Text className="text-dangerDarkRed">Name</Text>
+      <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+        <Text className="font-bold text-textBlack">Name</Text>
         <TextInput
           onChangeText={setName}
           value={name}
           placeholder="Type here"
+          className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
         ></TextInput>
-        <Text>Email</Text>
+        <Text className="font-bold text-textBlack">Email</Text>
         <TextInput
           onChangeText={setEmail}
           value={email}
           placeholder="Type here"
+          className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
         ></TextInput>
-        <Text>Password</Text>
+        <Text className="font-bold text-textBlack">Password</Text>
         <TextInput
           onChangeText={setPassword}
           value={password}
           placeholder="Type here"
+          className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
         ></TextInput>
 
-        <Button title="signUp" onPress={signupOnClick}></Button>
+        <View className="items-center">
+          <NormalButton onClick={signupOnClick} text="Sign up" size="24" />
+        </View>
       </View>
     </View>
   )
