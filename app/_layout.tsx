@@ -1,6 +1,6 @@
 import { Amplify, ResourcesConfig } from 'aws-amplify'
 import { Stack } from 'expo-router'
-import './global.css'
+import '../global.css'
 
 // || Amplify Cognito & Backend Connection ||
 const authConfig: ResourcesConfig['Auth'] = {
