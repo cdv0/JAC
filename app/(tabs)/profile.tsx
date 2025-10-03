@@ -1,4 +1,4 @@
-import { registerHandler } from '@/_backend/auth'
+import { registerHandler, verifyAccountHandler } from '@/_backend/auth'
 import React, { JSX, useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
 import NormalButton from '../components/NormalButton'
@@ -8,7 +8,7 @@ const profile = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [verifyCode, setVerifyCode] = useState<string>('')
-  const [profileStatus, setProfileStatus] = useState<string>('NotSigned')
+  const [profileStatus, setProfileStatus] = useState<string>('SignIn')
 
   const signupOnClick = async () => {
     const { nextStep, userId } = await registerHandler(name, email, password)
@@ -18,10 +18,27 @@ const profile = () => {
     }
   }
 
+  const verifyAccountClick = async () => {
+    const result = await verifyAccountHandler(verifyCode, email)
+
+    // handle success account
+    if (result === 'success') {
+      setName('')
+      setEmail('')
+      setPassword('')
+      setVerifyCode('')
+      setProfileStatus('SignIn')
+    } else {
+      // notify user about wrong code or other error
+    }
+  }
+
+  const signinOnClick = async () => {}
+
   let content: JSX.Element = <View />
 
   switch (profileStatus) {
-    case 'NotSigned':
+    case 'SignUp':
       content = (
         <View>
           <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
@@ -45,6 +62,7 @@ const profile = () => {
               value={password}
               placeholder="Type here"
               className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
+              secureTextEntry={true}
             ></TextInput>
 
             <View className="items-center">
@@ -67,11 +85,37 @@ const profile = () => {
               onChangeText={setVerifyCode}
               value={verifyCode}
             ></TextInput>
-            {/* <NormalButton/> */}
+            <NormalButton
+              onClick={verifyAccountClick}
+              text="Submit"
+              size="28"
+            />
           </View>
         </View>
       )
       break
+    case 'SignIn':
+      content = (
+        <View>
+          <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+            <Text className="font-bold text-textBlack">Email</Text>
+            <TextInput
+              onChangeText={setEmail}
+              value={email}
+              placeholder="Type here"
+              className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
+            ></TextInput>
+            <Text className="font-bold text-textBlack">Password</Text>
+            <TextInput
+              onChangeText={setPassword}
+              value={password}
+              placeholder="Type here"
+              className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
+            ></TextInput>
+            <NormalButton />
+          </View>
+        </View>
+      )
     default:
       content = (
         <View>
