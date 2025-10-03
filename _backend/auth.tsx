@@ -1,4 +1,4 @@
-import { confirmSignUp, signUp } from 'aws-amplify/auth'
+import { confirmSignUp, signIn, signUp } from 'aws-amplify/auth'
 
 export const registerHandler = async (
   name: string,
@@ -36,4 +36,10 @@ export const verifyAccountHandler = async (code: string, username: string) => {
     console.log('Error: ', error)
     return 'error'
   }
+}
+
+export const loginHandler = async (email: string, password: string) => {
+  const user = await signIn({ username: email, password })
+
+  return user
 }

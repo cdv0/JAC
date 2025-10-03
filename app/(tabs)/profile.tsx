@@ -1,4 +1,8 @@
-import { registerHandler, verifyAccountHandler } from '@/_backend/auth'
+import {
+  loginHandler,
+  registerHandler,
+  verifyAccountHandler,
+} from '@/_backend/auth'
 import React, { JSX, useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
 import NormalButton from '../components/NormalButton'
@@ -8,7 +12,7 @@ const profile = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [verifyCode, setVerifyCode] = useState<string>('')
-  const [profileStatus, setProfileStatus] = useState<string>('SignIn')
+  const [profileStatus, setProfileStatus] = useState<string>('User')
 
   const signupOnClick = async () => {
     const { nextStep, userId } = await registerHandler(name, email, password)
@@ -33,7 +37,18 @@ const profile = () => {
     }
   }
 
-  const signinOnClick = async () => {}
+  const signinOnClick = async () => {
+    const user = await loginHandler(email, password)
+
+    //handle signing in change
+    console.log('User: ', user)
+    if (user.nextStep.signInStep === 'DONE') {
+      console.log('Signed In')
+      setProfileStatus('LoggedIn')
+    }
+
+    console.log('Profile Status: ', profileStatus)
+  }
 
   let content: JSX.Element = <View />
 
@@ -85,11 +100,13 @@ const profile = () => {
               onChangeText={setVerifyCode}
               value={verifyCode}
             ></TextInput>
-            <NormalButton
-              onClick={verifyAccountClick}
-              text="Submit"
-              size="28"
-            />
+            <View className="items-center">
+              <NormalButton
+                onClick={verifyAccountClick}
+                text="Submit"
+                size="28"
+              />
+            </View>
           </View>
         </View>
       )
@@ -111,41 +128,28 @@ const profile = () => {
               value={password}
               placeholder="Type here"
               className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
+              secureTextEntry={true}
             ></TextInput>
-            <NormalButton />
+            <NormalButton onClick={signinOnClick} text="Log in" size="24" />
           </View>
         </View>
       )
-    default:
+      break
+    case 'User':
       content = (
         <View>
           <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
-            <Text className="font-bold text-textBlack">Name</Text>
-            <TextInput
-              onChangeText={setName}
-              value={name}
-              placeholder="Type here"
-              className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
-            ></TextInput>
-            <Text className="font-bold text-textBlack">Email</Text>
-            <TextInput
-              onChangeText={setEmail}
-              value={email}
-              placeholder="Type here"
-              className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
-            ></TextInput>
-            <Text className="font-bold text-textBlack">Password</Text>
-            <TextInput
-              onChangeText={setPassword}
-              value={password}
-              placeholder="Type here"
-              className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
-            ></TextInput>
-
-            <View className="items-center">
-              <NormalButton onClick={signupOnClick} text="Sign up" size="24" />
-            </View>
+            <Text className="underline text-dangerBrightRed">
+              Signed In to the Account
+            </Text>
           </View>
+        </View>
+      )
+      break
+    default:
+      content = (
+        <View>
+          <Text>Empty View</Text>
         </View>
       )
       break
