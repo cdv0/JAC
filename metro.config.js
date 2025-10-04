@@ -16,5 +16,5 @@ module.exports = withNativeWind(
       sourceExts: [...baseConfig.resolver.sourceExts, "svg"],
     },
   },
-  { input: "./index.css" } // or "./global.css" — whichever you’re using
+  { input: "./global.css" } // or "./global.css" — whichever you’re using
 );
