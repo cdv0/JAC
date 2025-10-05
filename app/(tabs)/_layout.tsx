@@ -30,7 +30,7 @@ const TabIcon = ({focused, Icon}:any)  =>{
     if(focused){
         return(
             <View style = {styles.container}>
-                <images.highlight width= {100} height = "100%" style={styles.background} fill='#3A5779'>
+                <images.highlight width= {100} height = "100%" style={styles.background} color='#3A5779'>
                     
                 </images.highlight>
                 <Icon width= {100} height= "100%"  style = {styles.content} color = "#e8e5e5ff" />
