@@ -4,35 +4,37 @@
 
 @layer components {
     /* Titles */
-    .largeTitle { @apply text-5xl font-semibold text-textBlack; }
+    .largeTitle { @apply text-4xl font-semibold text-textBlack; }
 
-    .mediumTitle { @apply text-4xl font-semibold text-textBlack; }
+    .mediumTitle { @apply text-3xl font-semibold text-textBlack; }
 
-    .smallTitle { @apply text-3xl font-semibold text-textBlack; }
+    .smallTitle { @apply text-2xl font-semibold text-textBlack; }
 
-    .xsTitle { @apply text-2xl font-semibold text-textBlack }
+    .xsTitle { @apply text-xl font-semibold text-textBlack }
 
     /* Text, button text, & font-weights*/
 
     .placeholder { @apply text-xl text-textLightGray; }
 
-    .smallText { @apply text-xl text-textBlack }
+    .smallText { @apply text-lg text-textBlack }
 
-    .smallTextBold { @apply text-xl font-semibold text-textBlack }
+    .smallTextBold { @apply text-lg font-semibold text-textBlack }
 
-    .smallTextGray { @apply text-xl text-subheader }
+    .smallTextGray { @apply text-lg text-subheaderGray }
 
-    .smallTextBlue { @apply text-xl text-primaryBlue }
+    .smallTextBlue { @apply text-lg text-primaryBlue }
 
-    .buttonTextWhite { @apply text-2xl font-semibold text-white }
+    .buttonTextWhite { @apply text-lg font-semibold text-white }
 
-    .buttonTextBlue { @apply text-2xl font-semibold text-primaryBlue }
+    .buttonTextBlue { @apply text-lg font-semibold text-primaryBlue }
 
-    .dangerText { @apply text-2xl font-semibold text-dangerDarkRed }
+    .buttonTextBlue { @apply text-lg font-semibold text-textBlack }
+
+    .dangerText { @apply text-lg font-semibold text-dangerDarkRed }
 
 
     /* Garage only */
-    .carTitle { @apply text-3xl font-semibold text-lightBlueText }
+    .carTitle { @apply text-2xl font-semibold text-lightBlueText }
 
-    .carSubheader { @apply text-2xl text-primaryBlue }
+    .carSubheader { @apply text-xl text-primaryBlue }
 }
