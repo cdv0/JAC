@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
 type NormalButtonProps = {
-  onClick: () => void
+  onClick?: () => void
   text: string
   size: string
 }
@@ -12,10 +12,14 @@ export default function NormalButton({
   text,
   size,
 }: NormalButtonProps) {
+  const rem = 16
+  const width = Number(size) * rem
   return (
-    <TouchableOpacity onPress={onClick}>
+    //Need to add activeOpacity later
+    <TouchableOpacity onPress={onClick} activeOpacity={0.9}>
       <View
-        className={`bg-textBlack w-${size} h-8 items-center justify-center rounded-xl`}
+        style={{ width: width }}
+        className={`bg-primaryBlue stroke-textBlack h-8 items-center justify-center rounded-xl border`}
       >
         <Text className="text-white ">{text}</Text>
       </View>
