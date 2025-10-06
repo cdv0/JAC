@@ -39,7 +39,12 @@ export const verifyAccountHandler = async (code: string, username: string) => {
 }
 
 export const loginHandler = async (email: string, password: string) => {
-  const user = await signIn({ username: email, password })
+  try {
+    const user = await signIn({ username: email, password })
 
-  return user
+    return user
+  } catch (error) {
+    console.log('Error: ', error)
+    return null
+  }
 }

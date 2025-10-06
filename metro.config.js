@@ -1,20 +1,20 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
 
-const baseConfig = getDefaultConfig(__dirname);
+const baseConfig = getDefaultConfig(__dirname)
 
 module.exports = withNativeWind(
   {
     ...baseConfig,
     transformer: {
       ...baseConfig.transformer,
-      babelTransformerPath: require.resolve("react-native-svg-transformer"),
+      babelTransformerPath: require.resolve('react-native-svg-transformer'),
     },
     resolver: {
       ...baseConfig.resolver,
-      assetExts: baseConfig.resolver.assetExts.filter((ext) => ext !== "svg"),
-      sourceExts: [...baseConfig.resolver.sourceExts, "svg"],
+      assetExts: baseConfig.resolver.assetExts.filter((ext) => ext !== 'svg'),
+      sourceExts: [...baseConfig.resolver.sourceExts, 'svg'],
     },
   },
-  { input: "./index.css" } // or "./global.css" — whichever you’re using
-);
+  { input: './global.css' } // or "./global.css" — whichever you’re using
+)

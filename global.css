@@ -2,37 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  overflow: hidden;
+}
+* {
+  box-sizing: border-box;
+}
+
 @layer components {
-    /* Titles */
-    .largeTitle { @apply text-5xl font-semibold text-textBlack; }
+  /* Titles */
+  .largeTitle {
+    @apply text-5xl font-semibold text-textBlack;
+  }
 
-    .mediumTitle { @apply text-4xl font-semibold text-textBlack; }
+  .mediumTitle {
+    @apply text-4xl font-semibold text-textBlack;
+  }
 
-    .smallTitle { @apply text-3xl font-semibold text-textBlack; }
+  .smallTitle {
+    @apply text-3xl font-semibold text-textBlack;
+  }
 
-    .xsTitle { @apply text-2xl font-semibold text-textBlack }
+  .xsTitle {
+    @apply text-2xl font-semibold text-textBlack;
+  }
 
-    /* Text, button text, & font-weights*/
+  /* Text, button text, & font-weights*/
 
-    .placeholder { @apply text-xl text-textLightGray; }
+  .placeholder {
+    @apply text-xl text-textLightGray;
+  }
 
-    .smallText { @apply text-xl text-textBlack }
+  .smallText {
+    @apply text-xl text-textBlack;
+  }
 
-    .smallTextBold { @apply text-xl font-semibold text-textBlack }
+  .smallTextBold {
+    @apply text-xl font-semibold text-textBlack;
+  }
 
-    .smallTextGray { @apply text-xl text-subheader }
+  .smallTextGray {
+    @apply text-xl text-subheader;
+  }
 
-    .smallTextBlue { @apply text-xl text-primaryBlue }
+  .smallTextBlue {
+    @apply text-xl text-primaryBlue;
+  }
 
-    .buttonTextWhite { @apply text-2xl font-semibold text-white }
+  .buttonTextWhite {
+    @apply text-2xl font-semibold text-white;
+  }
 
-    .buttonTextBlue { @apply text-2xl font-semibold text-primaryBlue }
+  .buttonTextBlue {
+    @apply text-2xl font-semibold text-primaryBlue;
+  }
 
-    .dangerText { @apply text-2xl font-semibold text-dangerDarkRed }
+  .dangerText {
+    @apply text-2xl font-semibold text-dangerDarkRed;
+  }
 
+  /* Garage only */
+  .carTitle {
+    @apply text-3xl font-semibold text-lightBlueText;
+  }
 
-    /* Garage only */
-    .carTitle { @apply text-3xl font-semibold text-lightBlueText }
-
-    .carSubheader { @apply text-2xl text-primaryBlue }
+  .carSubheader {
+    @apply text-2xl text-primaryBlue;
+  }
 }
