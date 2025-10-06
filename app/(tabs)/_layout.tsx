@@ -77,7 +77,7 @@ const _layout = () => {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="search"
         options={{
           title: 'Search',
           headerShown: false,
