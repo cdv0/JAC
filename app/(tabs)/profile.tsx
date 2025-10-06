@@ -153,7 +153,6 @@ const profile = () => {
             <NormalButton
               onClick={handleSubmit((data) => signupOnClick(data))}
               text="Sign up"
-              size="5"
             />
           </View>
         </View>
@@ -175,7 +174,6 @@ const profile = () => {
             <NormalButton
               onClick={verifyAccountClick}
               text="Submit"
-              size="28"
             />
           </View>
         </View>
@@ -242,11 +240,11 @@ const profile = () => {
             <NormalButton
               onClick={handleSubmit((data) => signinOnClick(data))}
               text="Log in"
-              size="5"
+              paddingHorizontal={20}
             />
           </View>
 
-          <hr className="w-full h-4 border-t-2 stroke-stroke" />
+          <View className="w-full my-6 h-px bg-stroke" />
 
           {/*TODO: Sign In With Google */}
 

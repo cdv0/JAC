@@ -15,7 +15,7 @@ type NormalButtonProps = {
 export default function NormalButton({
   onClick,
   text,
-  width = 100,
+  width,
   paddingHorizontal = 30,
   paddingVertical = 7,
   variant = "primary",
