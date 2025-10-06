@@ -156,6 +156,17 @@ const profile = () => {
               size="5"
             />
           </View>
+          <View className="flex flex-row justify-center gap-2">
+            <Text className="font-bold text-textBlack">
+              Have an account?
+            </Text>
+            <Text
+              onPress={() => setProfileStatus('SignIn')}
+              className="font-bold text-lightBlueText"
+            >
+              Sign In
+            </Text>
+          </View>
         </View>
       )
       break
