@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  overflow: hidden;
+}
+* {
+  box-sizing: border-box;
+}
+
 @layer components {
     /* Titles */
     .largeTitle { @apply text-4xl font-semibold text-textBlack; }
@@ -12,9 +19,11 @@
 
     .xsTitle { @apply text-xl font-semibold text-textBlack }
 
-    /* Text, button text, & font-weights*/
+  /* Text, button text, & font-weights*/
 
-    .placeholder { @apply text-xl text-textLightGray; }
+  .placeholder {
+    @apply text-xl text-textLightGray;
+  }
 
     .smallText { @apply text-lg text-textBlack }
 

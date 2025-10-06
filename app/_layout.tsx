@@ -8,7 +8,7 @@ const authConfig: ResourcesConfig['Auth'] = {
     userPoolId: 'us-west-2_Uejqr4LnW',
     userPoolClientId: '3r4dhpaqdrq1ap7lcih1lp9t62',
     identityPoolId: 'us-west-2:b8d8a775-c847-4198-85b0-d7000c2694ca',
-    signUpVerificationMethod: 'link',
+    signUpVerificationMethod: 'code',
     loginWith: {
       email: true,
       phone: false,
