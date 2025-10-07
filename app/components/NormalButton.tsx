@@ -65,7 +65,7 @@ export default function NormalButton({
           width,
           paddingHorizontal,
           paddingVertical,
-          height: 40,
+          height: 38,
         }}
       >
         <Text className={`buttonTextWhite ${variantStyles[variant].text}`}>
