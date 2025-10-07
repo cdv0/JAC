@@ -12,3 +12,5 @@ export const addVehicle = () => {
     </SafeAreaView>
   );
 }
+
+export default addVehicle
