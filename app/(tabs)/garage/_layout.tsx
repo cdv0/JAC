@@ -3,7 +3,7 @@ import { icons } from "@/constants/icons";
 import { getCurrentUser } from "aws-amplify/auth";
 import { Stack, router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function GarageLayout() {
@@ -48,11 +48,35 @@ export default function GarageLayout() {
       }}
     >
 
+      {/* Home screen (index) */}
       <Stack.Screen
         name="index"
         options={{
           title: "Garage",
           headerShown: false,
+        }}
+      />
+
+      {/* Add vehicle screen */}
+      <Stack.Screen
+        name="addVehicle"
+        options={{
+          headerTitle: () => (
+            <Text className="buttonTextBlack">Add vehicle</Text>
+          ),
+          headerBackVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.push("/garage")}
+              className="flex-row items-center px-2"
+              hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
+            >
+              <icons.chevBack width={24} height={24} fill="#1B263B" />
+              <Text className="ml-1 text-[#415A77] text-[15px] font-medium">
+                Back
+              </Text>
+            </TouchableOpacity>
+          ),
         }}
       />
     </Stack>

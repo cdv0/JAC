@@ -4,6 +4,7 @@ import map from "@/public/assets/icons/map-icon.svg"
 import profile from "@/public/assets/icons/profile-icon.svg"
 import search from "@/public/assets/icons/search-icon.svg"
 import lock from "@/public/assets/icons/lock.svg"
+import chevBack from "@/public/assets/icons/chevron-back.svg"
 
 export const icons = {
     garage,
@@ -11,5 +12,6 @@ export const icons = {
     map,
     profile,
     search,
-    lock
+    lock,
+    chevBack
 };
