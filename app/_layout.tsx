@@ -5,9 +5,9 @@ import '../global.css'
 // || Amplify Cognito & Backend Connection ||
 const authConfig: ResourcesConfig['Auth'] = {
   Cognito: {
-    userPoolId: 'us-west-2_Uejqr4LnW',
-    userPoolClientId: '3r4dhpaqdrq1ap7lcih1lp9t62',
-    identityPoolId: 'us-west-2:b8d8a775-c847-4198-85b0-d7000c2694ca',
+    userPoolId: 'us-west-1_n5PoqvBKe',
+    userPoolClientId: '7vh2kml0k33akevf29gmnqod73',
+    identityPoolId: 'us-west-1:db1a864e-1308-405c-b084-cfadbf17eca5',
     signUpVerificationMethod: 'code',
     loginWith: {
       email: true,
