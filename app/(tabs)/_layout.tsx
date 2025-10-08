@@ -1,49 +1,18 @@
 import { icons } from '@/constants/icons';
-import { images } from '@/constants/images';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-const styles = StyleSheet.create({
-    container : {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-    },
-    background: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: -1, 
-        
-    },
-    content: {
-        flex :0.9,
-        
-    }
-});
 
-const TabIcon = ({focused, Icon}:any)  =>{
-    if(focused){
-        return(
-            <View style = {styles.container}>
-                <images.highlight width= {100} height = "100%" style={styles.background} color='#3A5779'>
-                    
-                </images.highlight>
-                <Icon width= {100} height= "100%"  style = {styles.content} color = "#e8e5e5ff" />
-            </View>
-        )
-    }
-    else{
-        return(
-            <View style = {styles.container}>
-                <Icon width= {100}   height= "100%" style = {styles.content} color = "#3A5779" />
-            </View>
-        )
-    }
+
+const TabIcon = ({Icon}:any)  =>{
+    return (
+        <View className='flex-1 justify-center items-center '>
+            <Icon classname='w-{65} h-full' />
+        </View>
+            
+    )
+    
 }
 
 const _layout = () => {
@@ -52,7 +21,7 @@ const _layout = () => {
         screenOptions={{
             tabBarShowLabel: false,
             tabBarStyle:{
-                backgroundColor: '#DBDBDB',
+                backgroundColor:'colors-stroke'
                 
             }
         }}
@@ -64,8 +33,7 @@ const _layout = () => {
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
                             <TabIcon 
-                                focused = {focused} 
-                                Icon = {icons.map}    
+                                Icon = {focused? icons.mapH:icons.map}    
                             />
                 )
             }}
@@ -77,8 +45,7 @@ const _layout = () => {
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
                             <TabIcon 
-                                focused = {focused} 
-                                Icon = {icons.search}   
+                                Icon = {focused? icons.seachH:icons.search}   
                             />
                 )
             }}
@@ -89,9 +56,8 @@ const _layout = () => {
                 title: "Garage",
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
-                            <TabIcon 
-                                focused = {focused} 
-                                Icon = {icons.garage}    
+                            <TabIcon  
+                                Icon = {focused? icons.garageH:icons.garage}    
                             />
                 )
             }}
@@ -103,8 +69,8 @@ const _layout = () => {
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
                             <TabIcon 
-                                focused = {focused} 
-                                Icon = {icons.profile}    
+                        
+                                Icon = {focused? icons.profileH:icons.profile}    
                             />
                 )
             }}
