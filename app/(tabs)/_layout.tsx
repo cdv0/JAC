@@ -21,7 +21,7 @@ const _layout = () => {
         screenOptions={{
             tabBarShowLabel: false,
             tabBarStyle:{
-                backgroundColor:'colors-stroke'
+                backgroundColor:'#D9D9D9'
                 
             }
         }}
@@ -68,8 +68,7 @@ const _layout = () => {
                 title: "Profile",
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
-                            <TabIcon 
-                        
+                            <TabIcon          
                                 Icon = {focused? icons.profileH:icons.profile}    
                             />
                 )
