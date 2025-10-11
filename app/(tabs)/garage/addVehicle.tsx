@@ -1,7 +1,9 @@
 import NormalButton from "@/app/components/NormalButton";
 import React, { useState } from "react";
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { createVehicle } from "@/_backend/api/vehicle";
+import { getCurrentUser } from "aws-amplify/auth";
 
 export const addVehicle = () => {
   const [VIN, setVIN] = useState("");
@@ -10,81 +12,106 @@ export const addVehicle = () => {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
 
+  const handleSave = async () => {
+    if (!VIN || !plateNum || !make || !model || !year) {
+      console.log("Add vehicle: Missing fields:", { VIN, plateNum, make, model, year });
+      return;
+    }
+
+    try {
+      const { userId } = await getCurrentUser();
+      const payload = {
+        userId: userId,
+        VIN,
+        plateNum,
+        make,
+        model,
+        year: Number(year),
+      };
+
+      const data = await createVehicle(payload);
+      console.log("Add vehicle: success:", data);
+
+      setVIN("");
+      setPlateNum("");
+      setMake("");
+      setModel("");
+      setYear("");
+
+    } catch (err: any) {
+      console.log("Add vehicle: Error creating vehicle:", err);
+      console.log("Add vehicle: Error message:", err?.message);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <View className="flex-1 mx-5 mt-3 gap-3">
 
-        {/* Form inputs */}
-
-        {/* VIN */}
+        {/* VIN INPUT */}
         <View className="gap-2">
           <Text className="smallTextBold">VIN</Text>
-          <TextInput 
-            value={VIN} 
-            placeholder="Type here" 
-            keyboardType="numeric"
+          <TextInput
+            value={VIN}
+            placeholder="Type here"
+            keyboardType="default"
             onChangeText={setVIN}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
-            />
+          />
         </View>
 
-        {/* Plate number */}
+        {/* PLATE NUMBER INPUT */}
         <View className="gap-2">
           <Text className="smallTextBold">Plate number</Text>
-          <TextInput 
-            value={plateNum} 
-            placeholder="Type here" 
-            keyboardType="default"
+          <TextInput
+            value={plateNum}
+            placeholder="Type here"
             onChangeText={setPlateNum}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
-            />
+          />
         </View>
 
-        {/* Make */}
+        {/* MAKE INPUT */}
         <View className="gap-2">
           <Text className="smallTextBold">Make</Text>
-          <TextInput 
-            value={make} 
-            placeholder="Type here" 
-            keyboardType="default"
+          <TextInput
+            value={make}
+            placeholder="Type here"
             onChangeText={setMake}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
-            />
+          />
         </View>
 
-        {/* Model */}
+        {/* MODEL INPUT */}
         <View className="gap-2">
           <Text className="smallTextBold">Model</Text>
-          <TextInput 
-            value={model} 
-            placeholder="Type here" 
-            keyboardType="default"
+          <TextInput
+            value={model}
+            placeholder="Type here"
             onChangeText={setModel}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
-            />
+          />
         </View>
 
-        {/* Year */}
+        {/* YEAR INPUT */}
         <View className="gap-2">
           <Text className="smallTextBold">Year</Text>
-          <TextInput 
-            value={year} 
-            placeholder="Type here" 
+          <TextInput
+            value={year}
+            placeholder="Type here"
             keyboardType="numeric"
             onChangeText={setYear}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
-            />
+          />
         </View>
 
-        {/* Save button */}
-
-        {/* TODO: Add save functionality (onClick) */}
+        {/* SAVE BUTTON */}
         <View className="mt-5">
-          <NormalButton variant="primary" text="Save"></NormalButton>
+          <NormalButton variant="primary" text="Save" onClick={handleSave} />
         </View>
       </View>
     </SafeAreaView>
   );
-}
+};
 
-export default addVehicle
+export default addVehicle;
