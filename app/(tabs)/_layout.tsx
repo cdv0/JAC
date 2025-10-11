@@ -1,6 +1,5 @@
 import { icons } from '@/constants/icons';
 import { Tabs } from 'expo-router';
-import React from 'react';
 import { View } from 'react-native';
 
 
@@ -66,18 +65,6 @@ const _layout = () => {
             name = "profile"
             options={{
                 title: "Profile",
-                headerShown:false,
-                tabBarIcon: ({focused}) => (
-                            <TabIcon          
-                                Icon = {focused? icons.profileH:icons.profile}    
-                            />
-                )
-            }}
-        />
-        <Tabs.Screen
-            name = "account"
-            options={{
-                title: "Account",
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
                             <TabIcon          

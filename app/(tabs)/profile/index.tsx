@@ -4,6 +4,7 @@ import {
   verifyAccountHandler,
 } from '@/_backend/auth'
 import NormalButton from '@/app/components/NormalButton'
+import { useRouter } from 'expo-router'
 import { JSX, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Text, TextInput, View } from 'react-native'
@@ -53,6 +54,8 @@ const profile = () => {
     }
   }
 
+  const router = useRouter();
+
   const signinOnClick = async (data: FormData) => {
     if (data.email.trim() === '' || data.password.trim() === '') return
 
@@ -63,7 +66,7 @@ const profile = () => {
     //handle signing in change
     if (user?.nextStep.signInStep === 'DONE') {
       console.log('Signed In')
-      setProfileStatus('User')
+      router.replace("/(tabs)/account/logged")
     }
   }
 
@@ -259,15 +262,6 @@ const profile = () => {
               Sign up
             </Text>
           </View>
-        </View>
-      )
-      break
-    case 'User':
-      content = (
-        <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
-          <Text className="underline text-dangerBrightRed">
-            Signed In to the Account
-          </Text>
         </View>
       )
       break
