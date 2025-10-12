@@ -13,7 +13,7 @@ export default function AccountLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Account",
+          title: "Index",
           headerShown: false,
         }}
       />

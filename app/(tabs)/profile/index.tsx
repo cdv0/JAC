@@ -66,7 +66,7 @@ const profile = () => {
     //handle signing in change
     if (user?.nextStep.signInStep === 'DONE') {
       console.log('Signed In')
-      router.replace("/(tabs)/account/logged")
+      setProfileStatus('User')
     }
   }
 
@@ -265,6 +265,13 @@ const profile = () => {
         </View>
       )
       break
+    case 'User':
+        content = (
+            <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+                <Text className="font-bold text-textBlack">User Page</Text>
+            </View>
+        )
+        break
     default:
       content = (
         <View>
