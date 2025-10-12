@@ -25,8 +25,8 @@ const SearchBar = ({placeholder1, value1, onPress1, onChangeText1, placeholder2,
         placeholder={placeholder1}
         value ={value1}
         onChangeText={onChangeText1}
-        placeholderTextColor= "text-subheaderGray"
-        className="flex-1 ml-5 pr-40 text-subheaderGray"  
+        placeholderTextColor= "#9E9E9E"
+        className="flex-1 ml-5 pr-40 text-textBlack"  
       />
       {/* Diveder*/}
       <View className="w-0.5 h-full bg-stroke mx-5"/> 
@@ -37,8 +37,8 @@ const SearchBar = ({placeholder1, value1, onPress1, onChangeText1, placeholder2,
         placeholder={placeholder2}
         value ={value2}
         onChangeText={onChangeText2}
-        placeholderTextColor= "text-subheaderGray"
-        className="flex-1 ml-5 mr-5 text-subheaderGray"  
+        placeholderTextColor= "#9E9E9E"
+        className="flex-1 ml-5 mr-5 text-textBlack"  
       />
     
     </View>
