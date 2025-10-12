@@ -1,16 +1,15 @@
 import { Text, View } from "react-native";
+import SearchBar from "../components/SearchBar";
 
 
 export default function Index() {
   return (
     <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      className="flex-1 justify-center items-center"
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Text >Test</Text>
+      <SearchBar placeholder1="Search" placeholder2="Location"/>
+      <Text className="flex-1">Test</Text>
     </View>
   );
 }
