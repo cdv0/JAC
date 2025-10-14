@@ -1,4 +1,5 @@
 import {
+  handleGoogleSignIn,
   loginHandler,
   registerHandler,
   verifyAccountHandler,
@@ -54,7 +55,7 @@ const profile = () => {
     }
   }
 
-  const router = useRouter();
+  const router = useRouter()
 
   const signinOnClick = async (data: FormData) => {
     if (data.email.trim() === '' || data.password.trim() === '') return
@@ -174,10 +175,7 @@ const profile = () => {
             value={verifyCode}
           ></TextInput>
           <View className="items-center">
-            <NormalButton
-              onClick={verifyAccountClick}
-              text="Submit"
-            />
+            <NormalButton onClick={verifyAccountClick} text="Submit" />
           </View>
         </View>
       )
@@ -247,9 +245,16 @@ const profile = () => {
             />
           </View>
 
-          <View className="w-full my-6 h-px bg-stroke" />
+          <View className="w-full h-px my-6 bg-stroke" />
 
           {/*TODO: Sign In With Google */}
+          <View className="">
+            <NormalButton
+              text="Sign in with Google"
+              variant="outline"
+              onClick={() => handleGoogleSignIn('Google')}
+            />
+          </View>
 
           <View className="flex flex-row justify-center gap-2">
             <Text className="font-bold text-textBlack">
@@ -266,12 +271,12 @@ const profile = () => {
       )
       break
     case 'User':
-        content = (
-            <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
-                <Text className="font-bold text-textBlack">User Page</Text>
-            </View>
-        )
-        break
+      content = (
+        <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+          <Text className="font-bold text-textBlack">User Page</Text>
+        </View>
+      )
+      break
     default:
       content = (
         <View>

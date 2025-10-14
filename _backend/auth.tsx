@@ -1,4 +1,9 @@
-import { confirmSignUp, signIn, signUp } from 'aws-amplify/auth'
+import {
+  confirmSignUp,
+  signIn,
+  signInWithRedirect,
+  signUp,
+} from 'aws-amplify/auth'
 
 export const registerHandler = async (
   name: string,
@@ -46,5 +51,14 @@ export const loginHandler = async (email: string, password: string) => {
   } catch (error) {
     console.log('Error: ', error)
     return null
+  }
+}
+
+type providerTypes = 'Google'
+export const handleGoogleSignIn = async (provider: providerTypes) => {
+  try {
+    await signInWithRedirect({ provider: provider })
+  } catch (error) {
+    console.error('Federated Sign-In Error: ', error)
   }
 }
