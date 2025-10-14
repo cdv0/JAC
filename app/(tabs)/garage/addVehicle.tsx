@@ -4,8 +4,11 @@ import { View, Text, TextInput, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createVehicle } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
+import { router } from "expo-router";
 
 export const addVehicle = () => {
+  const [submitted, setSubmitted] = useState(false);
+
   const [VIN, setVIN] = useState("");
   const [plateNum, setPlateNum] = useState("");
   const [make, setMake] = useState("");
@@ -13,11 +16,15 @@ export const addVehicle = () => {
   const [year, setYear] = useState("");
 
   const handleSave = async () => {
-    if (!VIN || !plateNum || !make || !model || !year) {
+    // Check all inputs are filled
+    setSubmitted(true);
+
+    if (!VIN.trim() || !plateNum.trim() || !make.trim() || !model.trim() || !year.trim()) {
       console.log("Add vehicle: Missing fields:", { VIN, plateNum, make, model, year });
       return;
     }
 
+    // Make API call to create vehicle
     try {
       const { userId } = await getCurrentUser();
       const payload = {
@@ -37,6 +44,8 @@ export const addVehicle = () => {
       setMake("");
       setModel("");
       setYear("");
+
+      router.replace("/(tabs)/garage");
 
     } catch (err: any) {
       console.log("Add vehicle: Error creating vehicle:", err);
@@ -58,6 +67,11 @@ export const addVehicle = () => {
             onChangeText={setVIN}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
           />
+          
+          {/* Error message for empty input */}
+          {submitted && !VIN.trim() ? (
+            <Text className="dangerText mx-2">VIN is required</Text>
+          ): null}
         </View>
 
         {/* PLATE NUMBER INPUT */}
@@ -69,6 +83,11 @@ export const addVehicle = () => {
             onChangeText={setPlateNum}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
           />
+
+          {/* Error message for empty input */}
+          {submitted && !plateNum.trim() ? (
+            <Text className="dangerText mx-2">Plate number is required</Text>
+          ): null}
         </View>
 
         {/* MAKE INPUT */}
@@ -80,6 +99,11 @@ export const addVehicle = () => {
             onChangeText={setMake}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
           />
+
+          {/* Error message for empty input */}
+          {submitted && !make.trim() ? (
+            <Text className="dangerText mx-2">Make is required</Text>
+          ): null}
         </View>
 
         {/* MODEL INPUT */}
@@ -91,6 +115,11 @@ export const addVehicle = () => {
             onChangeText={setModel}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
           />
+
+          {/* Error message for empty input */}
+          {submitted && !model.trim() ? (
+            <Text className="dangerText mx-2">Model is required</Text>
+          ): null}
         </View>
 
         {/* YEAR INPUT */}
@@ -103,6 +132,11 @@ export const addVehicle = () => {
             onChangeText={setYear}
             className="border rounded-full border-stroke px-4 py-2 smallTextGray"
           />
+
+          {/* Error message for empty input */}
+          {submitted && !year.trim() ? (
+            <Text className="dangerText mx-2">Year is required</Text>
+          ): null}
         </View>
 
         {/* SAVE BUTTON */}
