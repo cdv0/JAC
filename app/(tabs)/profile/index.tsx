@@ -7,8 +7,9 @@ import {
 import NormalButton from '@/app/components/NormalButton'
 import GoogleLogo from '@/public/assets/icons/google-logo.svg'
 import AppLogo from '@/public/assets/images/group-name.svg'
+import { getCurrentUser } from 'aws-amplify/auth'
 import { useRouter } from 'expo-router'
-import { JSX, useState } from 'react'
+import { JSX, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Text, TextInput, View } from 'react-native'
 
@@ -298,6 +299,19 @@ const profile = () => {
       )
       break
   }
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        await getCurrentUser()
+        router.navigate('/(tabs)/profile/logged')
+      } catch {
+        router.navigate('/(tabs)/profile')
+      }
+    }
+    checkUser()
+  }, [])
+
   return (
     <View className="w-full overflow-hidden bg-white min-h-dvh">{content}</View>
   )
