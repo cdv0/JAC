@@ -47,10 +47,10 @@ export const loginHandler = async (email: string, password: string) => {
   try {
     const user = await signIn({ username: email, password })
 
-    return user
-  } catch (error) {
-    console.log('Error: ', error)
-    return null
+    return { user: user }
+  } catch (error: any) {
+    const code = error?.name || error?.code
+    return { code: code }
   }
 }
 
