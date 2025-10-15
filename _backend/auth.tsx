@@ -1,10 +1,41 @@
 import {
   confirmSignUp,
+  fetchAuthSession,
+  getCurrentUser,
   signIn,
   signInWithRedirect,
+  signOut,
   signUp,
-} from 'aws-amplify/auth'
+} from 'aws-amplify/auth';
 
+// --- GUARDS ---
+
+export const isSignedIn = async (): Promise<boolean> => {
+  try {
+    const { tokens } = await fetchAuthSession();
+    return !!tokens; 
+  } catch {
+    return false;
+  }
+};
+
+export const guardNotSignedIn = async (): Promise<void> => {
+  if (await isSignedIn()) {
+    throw Object.assign(new Error('User already authenticated'), {
+      name: 'UserAlreadyAuthenticatedException',
+    });
+  }
+};
+
+export const ensureSignedOut = async () => {
+  try {
+    await getCurrentUser(); 
+    await signOut();        
+  } catch {
+  }
+};
+
+// --- HANDLERS ---
 export const registerHandler = async (
   name: string,
   email: string,
