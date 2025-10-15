@@ -5,6 +5,8 @@ import {
   verifyAccountHandler,
 } from '@/_backend/auth'
 import NormalButton from '@/app/components/NormalButton'
+import GoogleLogo from '@/public/assets/icons/google-logo.svg'
+import AppLogo from '@/public/assets/images/group-name.svg'
 import { useRouter } from 'expo-router'
 import { JSX, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -77,6 +79,12 @@ const profile = () => {
     case 'SignUp':
       content = (
         <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+          <AppLogo
+            width={300}
+            height={75}
+            className="justify-center w-full mb-10"
+          />
+
           {/* NAME INPUT */}
           <Text className="font-bold text-textBlack">Name</Text>
           <Controller
@@ -182,7 +190,12 @@ const profile = () => {
       break
     case 'SignIn':
       content = (
-        <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+        <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left ">
+          <AppLogo
+            width={300}
+            height={75}
+            className="justify-center w-full mb-10"
+          />
           <Text className="font-bold text-textBlack">Email</Text>
           <Controller
             control={control}
@@ -247,12 +260,12 @@ const profile = () => {
 
           <View className="w-full h-px my-6 bg-stroke" />
 
-          {/*TODO: Sign In With Google */}
-          <View className="">
+          <View className="relative flex-row items-center justify-center mb-10">
             <NormalButton
               text="Sign in with Google"
               variant="outline"
               onClick={() => handleGoogleSignIn('Google')}
+              icon={<GoogleLogo width={20} height={20} />}
             />
           </View>
 
@@ -285,7 +298,9 @@ const profile = () => {
       )
       break
   }
-  return <View className="w-full overflow-hidden min-h-dvh">{content}</View>
+  return (
+    <View className="w-full overflow-hidden bg-white min-h-dvh">{content}</View>
+  )
 }
 
 export default profile
