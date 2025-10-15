@@ -50,5 +50,21 @@ export async function readVehicle(userId: string, vehicleId: string) {
         throw new Error(text || `HTTP ${response.status}`);
     }
 
-    return (text ? JSON.parse(text): {}) as Promise<Vehicle>;
+    return (text ? JSON.parse(text): {}) as Vehicle;
+}
+
+
+// GET ALL VEHICLES WITH USER ID /vehicle/listVehicles
+export async function listVehicles(userId: string) {
+  const url = `${BASE_URL}/vehicle/listVehicles?userId=${encodeURIComponent(userId)}`
+  const response = await fetch(url, {
+    method: "GET",
+    cache: "no-store"
+  });
+
+  const text = await response.text();
+  if (!response.ok) throw new Error(text || `HTTP ${response.status}`);
+
+  const parsed = text ? JSON.parse(text) : { items: [] };
+  return parsed as { items: Vehicle[] };
 }
