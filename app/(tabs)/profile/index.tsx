@@ -72,7 +72,7 @@ const profile = () => {
     if (result?.user) {
       if (result.user?.nextStep.signInStep === 'DONE') {
         //handle signing in change
-        setProfileStatus('User')
+        router.push('/profile/logged')
       }
     }
 
@@ -345,10 +345,8 @@ const profile = () => {
     const checkUser = async () => {
       try {
         await getCurrentUser()
-        router.navigate('/(tabs)/profile/logged')
-      } catch {
-        router.navigate('/(tabs)/profile')
-      }
+        router.push('/profile/logged')
+      } catch {}
     }
     checkUser()
   }, [])
