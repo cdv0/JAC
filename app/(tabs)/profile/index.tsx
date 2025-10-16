@@ -215,6 +215,8 @@ const profile = () => {
             className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
             onChangeText={setVerifyCode}
             value={verifyCode}
+            maxLength={6}
+            keyboardType="numeric"
           ></TextInput>
           <View className="items-center">
             <NormalButton onClick={verifyAccountClick} text="Submit" />
