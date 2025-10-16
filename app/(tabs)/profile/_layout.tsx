@@ -1,36 +1,34 @@
-import { Stack } from "expo-router";
+import { Stack } from 'expo-router'
 
 export default function AccountLayout() {
-
   return (
     <Stack
       screenOptions={{
-        headerTitleAlign: "center",
+        headerTitleAlign: 'center',
       }}
     >
-
       {/* Account page */}
       <Stack.Screen
         name="index"
         options={{
-          title: "Index",
+          title: 'Index',
           headerShown: false,
         }}
       />
       <Stack.Screen
         name="logged"
         options={{
-          title: "Logged",
+          title: 'Logged',
           headerShown: false,
         }}
       />
       <Stack.Screen
         name="settings"
         options={{
-          title: "Settings",
+          title: 'Settings',
           headerShown: false,
         }}
       />
     </Stack>
-  );
+  )
 }
