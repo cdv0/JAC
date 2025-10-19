@@ -17,7 +17,8 @@ type NormalButtonProps = {
   paddingVertical?: number
   variant?: ButtonVariant
   icon?: ReactNode
-}
+  grow?: boolean
+};
 
 export default function NormalButton({
   onClick,
@@ -27,6 +28,7 @@ export default function NormalButton({
   paddingVertical = 7,
   variant = 'primary',
   icon,
+  grow = false
 }: NormalButtonProps) {
   /*
   Button Types:
@@ -65,9 +67,9 @@ export default function NormalButton({
   }
 
   return (
-    <TouchableOpacity onPress={onClick} activeOpacity={0.8}>
+    <TouchableOpacity onPress={onClick} activeOpacity={0.8} style={grow ? { alignSelf: "stretch", flexGrow: 1 } : undefined }>
       <View
-        className={`${variantStyles[variant].container} items-center justify-center rounded-xl self-center flex flex-row`}
+        className={`${variantStyles[variant].container} items-center justify-center rounded-xl flex flex-row ${grow ? "self-stretch w-full" : "self-center"}`}
         style={{
           width,
           paddingHorizontal,
