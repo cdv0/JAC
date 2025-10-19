@@ -10,6 +10,7 @@ type NormalButtonProps = {
   paddingHorizontal?: number;
   paddingVertical?: number;
   variant?: ButtonVariant;
+  grow?: boolean;
 };
 
 export default function NormalButton({
@@ -19,6 +20,7 @@ export default function NormalButton({
   paddingHorizontal = 30,
   paddingVertical = 7,
   variant = "primary",
+  grow = false
 }: NormalButtonProps) {
 
   /*
@@ -58,9 +60,9 @@ export default function NormalButton({
   };
 
   return (
-    <TouchableOpacity onPress={onClick} activeOpacity={0.8}>
+    <TouchableOpacity onPress={onClick} activeOpacity={0.8} style={grow ? { alignSelf: "stretch", flexGrow: 1 } : undefined }>
       <View
-        className={`${variantStyles[variant].container} items-center justify-center rounded-xl self-center`}
+        className={`${variantStyles[variant].container} items-center justify-center rounded-xl ${grow ? "self-stretch w-full" : "self-center"}`}
         style={{
           width,
           paddingHorizontal,
