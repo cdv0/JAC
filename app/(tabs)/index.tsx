@@ -1,4 +1,5 @@
 import { images } from "@/constants/images";
+import Slider from '@react-native-community/slider';
 import { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,7 +13,11 @@ export default function Index() {
   const [isServicesActive, setisServicesActive] = useState(false);
   const [minP, setminP] = useState('');
   const [maxP, setmaxP] = useState('');
-  
+  const width= 150;
+  const minD = 0;
+  const maxD = 20;
+  const [sliderValue, setSliderValue] = useState(maxD / 2); 
+
   return (
    <SafeAreaView className="flex-1" edges={['right', 'top', 'left']}>
       <View
@@ -47,7 +52,6 @@ export default function Index() {
                   <Text className="justify-start  text-[25px] buttonTextBlack">
                     Filters
                   </Text>
-                  {/* <NormalButton paddingVertical={1} variant="outline" text="X" onClick={()=>{setisFiltersModal(!isFiltersModal)}}/> */}
                   <Pressable onPress={()=>{setisFiltersModal(!isFiltersModal)}}>
                     <View className="w-[35] items-center justify-center ">
                       <Text className="text-[25px] buttonTextBlack">
@@ -66,13 +70,13 @@ export default function Index() {
                 </Text>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
-                  <ToggleButton width={150} text="Relevance" onPress={()=>{}}/>
-                  <ToggleButton width={150} text="Open Now" onPress={()=>{}}/>
+                  <ToggleButton width={width} text="Relevance" onPress={()=>{}}/>
+                  <ToggleButton width={width} text="Open Now" onPress={()=>{}}/>
                 </View>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
-                  <ToggleButton width={150} text="Popular" onPress={()=>{}}/>
-                  <ToggleButton width={150} text="Rating" onPress={()=>{}}/>
+                  <ToggleButton width={width} text="Popular" onPress={()=>{}}/>
+                  <ToggleButton width={width} text="Rating" onPress={()=>{}}/>
                 </View>
 
                 <Text className="text-[20px] buttonTextBlack ml-[5%] mt-[2%] mb-[2%]">
@@ -119,7 +123,34 @@ export default function Index() {
                 <Text className="text-[20px] buttonTextBlack ml-[5%] mt-[2%] mb-[2%]">
                   Distance
                 </Text>
-
+                
+                <View className="h-[10%] ml-[5%] mr-[5%]">
+                    <Text className="self-center">
+                      {sliderValue==maxD?`${sliderValue}+`:sliderValue}
+                    </Text>
+                    <Slider
+                          minimumValue={minD}
+                          maximumValue={maxD}
+                          minimumTrackTintColor="#3A5779"
+                          maximumTrackTintColor="#9E9E9E"
+                          thumbTintColor="#3A5779"
+                          step={1}
+                          value={sliderValue}
+                          onValueChange={(newVal)=>{setSliderValue(newVal)}}
+                      />
+                    <View className="flex-row justify-between">
+                      <Text >
+                        {minD}
+                      </Text>
+                      <Text >
+                        {maxD}+
+                      </Text>
+                    </View>
+                </View>
+                  
+               
+                
+                
             </View>
 
           </View>
