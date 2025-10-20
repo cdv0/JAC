@@ -10,22 +10,14 @@ body {
 }
 
 @layer components {
-  /* Titles */
-  .largeTitle {
-    @apply text-5xl font-semibold text-textBlack;
-  }
+    /* Titles */
+    .largeTitle { @apply text-3xl font-semibold text-textBlack; }
 
-  .mediumTitle {
-    @apply text-4xl font-semibold text-textBlack;
-  }
+    .mediumTitle { @apply text-2xl font-semibold text-textBlack; }
 
-  .smallTitle {
-    @apply text-3xl font-semibold text-textBlack;
-  }
+    .smallTitle { @apply text-xl font-semibold text-textBlack; }
 
-  .xsTitle {
-    @apply text-2xl font-semibold text-textBlack;
-  }
+    .xsTitle { @apply text-lg font-semibold text-textBlack }
 
   /* Text, button text, & font-weights*/
 
@@ -33,40 +25,25 @@ body {
     @apply text-xl text-textLightGray;
   }
 
-  .smallText {
-    @apply text-xl text-textBlack;
-  }
+    .smallText { @apply text-base text-textBlack }
 
-  .smallTextBold {
-    @apply text-xl font-semibold text-textBlack;
-  }
+    .smallTextBold { @apply text-base font-semibold text-textBlack }
 
-  .smallTextGray {
-    @apply text-xl text-subheader;
-  }
+    .smallTextGray { @apply text-base text-subheaderGray }
 
-  .smallTextBlue {
-    @apply text-xl text-primaryBlue;
-  }
+    .smallTextBlue { @apply text-base text-primaryBlue }
 
-  .buttonTextWhite {
-    @apply text-2xl font-semibold text-white;
-  }
+    .buttonTextWhite { @apply text-base font-semibold text-white }
 
-  .buttonTextBlue {
-    @apply text-2xl font-semibold text-primaryBlue;
-  }
+    .buttonTextBlue { @apply text-base font-semibold text-primaryBlue }
 
-  .dangerText {
-    @apply text-2xl font-semibold text-dangerDarkRed;
-  }
+    .buttonTextBlack { @apply text-base font-semibold text-textBlack }
 
-  /* Garage only */
-  .carTitle {
-    @apply text-3xl font-semibold text-lightBlueText;
-  }
+    .dangerText { @apply text-xs font-semibold text-dangerBrightRed }
 
-  .carSubheader {
-    @apply text-2xl text-primaryBlue;
-  }
+
+    /* Garage only */
+    .carTitle { @apply text-xl font-semibold text-lightBlueText }
+
+    .carSubheader { @apply text-lg text-primaryBlue }
 }

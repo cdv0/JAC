@@ -1,12 +1,17 @@
 import {
+  handleGoogleSignIn,
   loginHandler,
   registerHandler,
   verifyAccountHandler,
 } from '@/_backend/auth'
-import React, { JSX, useState } from 'react'
+import NormalButton from '@/app/components/NormalButton'
+import GoogleLogo from '@/public/assets/icons/google-logo.svg'
+import AppLogo from '@/public/assets/images/group-name.svg'
+import { getCurrentUser } from 'aws-amplify/auth'
+import { useRouter } from 'expo-router'
+import { JSX, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Text, TextInput, View } from 'react-native'
-import NormalButton from '../components/NormalButton'
 
 export interface FormData {
   name: string
@@ -24,6 +29,8 @@ const profile = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     getValues,
+    setError,
+    clearErrors,
   } = useForm<FormData>({
     defaultValues: { name: '', email: '', password: '' },
   })
@@ -53,17 +60,50 @@ const profile = () => {
     }
   }
 
+  const router = useRouter()
+
   const signinOnClick = async (data: FormData) => {
     if (data.email.trim() === '' || data.password.trim() === '') return
 
-    const user = await loginHandler(data.email, data.password)
+    clearErrors('root')
 
-    if (user === null) console.log('error encountered logging in')
+    const result = await loginHandler(data.email, data.password)
 
-    //handle signing in change
-    if (user?.nextStep.signInStep === 'DONE') {
-      console.log('Signed In')
-      setProfileStatus('User')
+    if (result?.user) {
+      if (result.user?.nextStep.signInStep === 'DONE') {
+        //handle signing in change
+        router.push('/profile/logged')
+      }
+    }
+
+    if (result?.code) {
+      switch (result.code) {
+        case 'UserNotFoundException':
+          setError('email', {
+            type: 'Cognito',
+            message: 'Email is not registered!',
+          })
+          break
+        case 'UserNotConfirmedException':
+          setError('email', {
+            type: 'validate',
+            message: 'User Email Not Verified',
+          })
+          break
+        case 'NotAuthorizedException':
+          setError('email', {})
+          setError('password', {})
+          setError('root', {
+            type: 'validate',
+            message: 'Incorrect email or password',
+          })
+          break
+        default:
+          setError('root', {
+            type: 'server',
+            message: 'Please try again later',
+          })
+      }
     }
   }
 
@@ -73,6 +113,12 @@ const profile = () => {
     case 'SignUp':
       content = (
         <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+          <AppLogo
+            width={300}
+            height={75}
+            className="justify-center w-full mb-10"
+          />
+
           {/* NAME INPUT */}
           <Text className="font-bold text-textBlack">Name</Text>
           <Controller
@@ -153,7 +199,6 @@ const profile = () => {
             <NormalButton
               onClick={handleSubmit((data) => signupOnClick(data))}
               text="Sign up"
-              size="5"
             />
           </View>
           <View className="flex flex-row justify-center gap-2">
@@ -181,20 +226,30 @@ const profile = () => {
             className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
             onChangeText={setVerifyCode}
             value={verifyCode}
+            maxLength={6}
+            keyboardType="numeric"
           ></TextInput>
           <View className="items-center">
-            <NormalButton
-              onClick={verifyAccountClick}
-              text="Submit"
-              size="28"
-            />
+            <NormalButton onClick={verifyAccountClick} text="Submit" />
           </View>
         </View>
       )
       break
     case 'SignIn':
       content = (
-        <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+        <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left ">
+          <AppLogo
+            width={300}
+            height={75}
+            className="justify-center w-full mb-10"
+          />
+
+          {errors.root && (
+            <Text className="text-2xl text-center text-dangerBrightRed">
+              {errors.root.message}
+            </Text>
+          )}
+
           <Text className="font-bold text-textBlack">Email</Text>
           <Controller
             control={control}
@@ -208,7 +263,10 @@ const profile = () => {
             }}
             render={({ field: { onChange, value } }) => (
               <TextInput
-                onChangeText={onChange}
+                onChangeText={(text) => {
+                  onChange(text)
+                  if (errors.email) clearErrors('email')
+                }}
                 value={value}
                 placeholder="Type here"
                 className={`p-3 bg-white border rounded-2xl text-textLightGray ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
@@ -231,7 +289,10 @@ const profile = () => {
             }}
             render={({ field: { onChange, value } }) => (
               <TextInput
-                onChangeText={onChange}
+                onChangeText={(text) => {
+                  onChange(text)
+                  if (errors.password) clearErrors('password')
+                }}
                 value={value}
                 placeholder="Type here"
                 secureTextEntry
@@ -253,13 +314,20 @@ const profile = () => {
             <NormalButton
               onClick={handleSubmit((data) => signinOnClick(data))}
               text="Log in"
-              size="5"
+              paddingHorizontal={20}
             />
           </View>
 
-          <hr className="w-full h-4 border-t-2 stroke-stroke" />
+          <View className="w-full h-px my-6 bg-stroke" />
 
-          {/*TODO: Sign In With Google */}
+          <View className="relative flex-row items-center justify-center mb-10">
+            <NormalButton
+              text="Sign in with Google"
+              variant="outline"
+              onClick={() => handleGoogleSignIn('Google')}
+              icon={<GoogleLogo width={20} height={20} />}
+            />
+          </View>
 
           <View className="flex flex-row justify-center gap-2">
             <Text className="font-bold text-textBlack">
@@ -275,15 +343,6 @@ const profile = () => {
         </View>
       )
       break
-    case 'User':
-      content = (
-        <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
-          <Text className="underline text-dangerBrightRed">
-            Signed In to the Account
-          </Text>
-        </View>
-      )
-      break
     default:
       content = (
         <View>
@@ -292,7 +351,20 @@ const profile = () => {
       )
       break
   }
-  return <View className="w-full overflow-hidden min-h-dvh">{content}</View>
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        await getCurrentUser()
+        router.push('/profile/logged')
+      } catch {}
+    }
+    checkUser()
+  }, [])
+
+  return (
+    <View className="w-full overflow-hidden bg-white min-h-dvh">{content}</View>
+  )
 }
 
 export default profile

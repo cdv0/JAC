@@ -1,111 +1,78 @@
-import { icons } from '@/constants/icons'
-import { images } from '@/constants/images'
-import { Tabs } from 'expo-router'
-import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { icons } from '@/constants/icons';
+import { Tabs } from 'expo-router';
+import { View } from 'react-native';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  background: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: -1,
-  },
-  content: {
-    flex: 0.9,
-  },
-})
 
-const TabIcon = ({ focused, Icon }: any) => {
-  if (focused) {
+
+const TabIcon = ({Icon}:any)  =>{
     return (
-      <View style={styles.container}>
-        <images.highlight
-          width={100}
-          height="100%"
-          style={styles.background}
-          color="#3A5779"
-        ></images.highlight>
-        <Icon
-          width={100}
-          height="100%"
-          style={styles.content}
-          color="#e8e5e5ff"
-        />
-      </View>
+        <View className='flex-1 justify-center items-center '>
+            <Icon classname='w-{65} h-full' />
+        </View>
+            
     )
-  } else {
-    return (
-      <View style={styles.container}>
-        <Icon
-          width={100}
-          height="100%"
-          style={styles.content}
-          color="#3A5779"
-        />
-      </View>
-    )
-  }
+    
 }
 
 const _layout = () => {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          backgroundColor: '#DBDBDB',
-        },
-      }}
+    <Tabs 
+        screenOptions={{
+            tabBarShowLabel: false,
+            tabBarStyle:{
+                backgroundColor:'#D9D9D9'
+                
+            }
+        }}
     >
-      <Tabs.Screen
-        name="map"
-        options={{
-          title: 'Map',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} Icon={icons.map} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: 'Search',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} Icon={icons.search} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="garage"
-        options={{
-          title: 'Garage',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} Icon={icons.garage} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} Icon={icons.profile} />
-          ),
-        }}
-      />
+        <Tabs.Screen
+            name = "map"
+            options={{
+                title: "Map",
+                headerShown:false,
+                tabBarIcon: ({focused}) => (
+                            <TabIcon 
+                                Icon = {focused? icons.mapH:icons.map}    
+                            />
+                )
+            }}
+        />
+        <Tabs.Screen
+            name = "index"
+            options={{
+                title: "Search",
+                headerShown:false,
+                tabBarIcon: ({focused}) => (
+                            <TabIcon 
+                                Icon = {focused? icons.seachH:icons.search}   
+                            />
+                )
+            }}
+        />
+        <Tabs.Screen
+            name = "garage"
+            options={{
+                title: "Garage",
+                headerShown:false,
+                tabBarIcon: ({focused}) => (
+                            <TabIcon  
+                                Icon = {focused? icons.garageH:icons.garage}    
+                            />
+                )
+            }}
+        />
+        <Tabs.Screen
+            name = "profile"
+            options={{
+                title: "Profile",
+                headerShown:false,
+                tabBarIcon: ({focused}) => (
+                            <TabIcon          
+                                Icon = {focused? icons.profileH:icons.profile}    
+                            />
+                )
+            }}
+        />
     </Tabs>
   )
 }

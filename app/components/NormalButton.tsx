@@ -1,27 +1,84 @@
-import React from 'react'
+import { ReactNode } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
+type ButtonVariant =
+  | 'primary'
+  | 'outline'
+  | 'cancel'
+  | 'danger'
+  | 'lightBlue'
+  | 'black'
+
 type NormalButtonProps = {
-  onClick?: () => void
+  onClick: () => void
   text: string
-  size: string
+  width?: number | string
+  paddingHorizontal?: number
+  paddingVertical?: number
+  variant?: ButtonVariant
+  icon?: ReactNode
 }
 
 export default function NormalButton({
   onClick,
   text,
-  size,
+  width,
+  paddingHorizontal = 30,
+  paddingVertical = 7,
+  variant = 'primary',
+  icon,
 }: NormalButtonProps) {
-  const rem = 16
-  const width = Number(size) * rem
+  /*
+  Button Types:
+  - Primary: Blue BG + White text
+  - Outline: White BG + Blue stroke + Blue text
+  - Cancel: Gray BG + Black text
+  - Danger: Red BG + White text
+  - LightBlue: Light blue BG + White text (only for Garage)
+  - Black: Black BG + Whtie text
+  */
+  const variantStyles = {
+    primary: {
+      container: 'bg-primaryBlue border border-textBlack',
+      text: 'buttonTextWhite',
+    },
+    outline: {
+      container: 'bg-white border border-primaryBlue',
+      text: 'buttonTextBlue',
+    },
+    danger: {
+      container: 'bg-dangerBrightRed border border-dangerDarkRed',
+      text: 'buttonTextWhite',
+    },
+    cancel: {
+      container: 'bg-secondary border border-grayBorder',
+      text: 'buttonTextBlue',
+    },
+    lightBlue: {
+      container: 'bg-lightBlueButton border border-lightBlueText',
+      text: 'buttonTextWhite',
+    },
+    black: {
+      container: 'bg-textBlack',
+      text: 'buttonWhiteText',
+    },
+  }
+
   return (
-    //Need to add activeOpacity later
-    <TouchableOpacity onPress={onClick} activeOpacity={0.9}>
+    <TouchableOpacity onPress={onClick} activeOpacity={0.8}>
       <View
-        style={{ width: width }}
-        className={`bg-primaryBlue stroke-textBlack h-8 items-center justify-center rounded-xl border`}
+        className={`${variantStyles[variant].container} items-center justify-center rounded-xl self-center flex flex-row`}
+        style={{
+          width,
+          paddingHorizontal,
+          paddingVertical,
+          height: 38,
+        }}
       >
-        <Text className="text-white ">{text}</Text>
+        {icon && <View className="mr-2">{icon}</View>}
+        <Text className={`buttonTextWhite ${variantStyles[variant].text}`}>
+          {text}
+        </Text>
       </View>
     </TouchableOpacity>
   )

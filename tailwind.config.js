@@ -11,6 +11,7 @@ module.exports = {
         textBlack: '#1B263B',
         subheaderGray: '#9E9E9E',
         secondary: '#EEEEEE',  // Light gray for background, nav bar, other contrast
+        grayBorder: '#C3C3C3',
         white: '#FFFFFF',
         textLightGray: '#9EA3AE',  // Placeholder
         stroke: '#D9D9D9',
