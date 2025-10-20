@@ -15,10 +15,10 @@ const ToggleButton = ({text, onPress}:Props) => {
 
   return (
     <Pressable onPress={handlePress} 
-    className={`px-8 h-10 items-center justify-center rounded-xl self-center
+    className={`px-[30] py-[7] h-[38] items-center justify-center rounded-xl self-center
     ${isToggled? `bg-primaryBlue border border-textBlack`: `bg-white border border-primaryBlue`}
     `}>
-        <Text className={` ${isToggled?`buttonTextWhite`:`buttonTextBlack`}`}>
+        <Text className={` ${isToggled?`buttonTextWhite`:`buttonTextBlue`}`}>
             {text}
         </Text>
     </Pressable>
