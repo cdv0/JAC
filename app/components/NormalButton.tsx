@@ -83,5 +83,5 @@ export default function NormalButton({
         </Text>
       </View>
     </TouchableOpacity>
-  )
+  );
 }
