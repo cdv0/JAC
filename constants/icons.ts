@@ -9,7 +9,7 @@ import profile from "@/public/assets/icons/profile-icon.svg"
 import profileH from "@/public/assets/icons/profileH-icon.svg"
 import search from "@/public/assets/icons/search-icon.svg"
 import seachH from "@/public/assets/icons/searchH-icon.svg"
-import noImage from "@/public/assets/icons/no-image-svgrepo-com.svg"
+import noImage from "@/public/assets/icons/noImage.svg"
 
 export const icons = {
     garage,
