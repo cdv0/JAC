@@ -1,52 +1,132 @@
-import NormalButton from "@/app/components/NormalButton";
-import { signOut } from "aws-amplify/auth";
-import { useRouter } from "expo-router";
-import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { signOut } from 'aws-amplify/auth'
+import { useRouter } from 'expo-router'
+import { Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Settings() {
-  const router = useRouter();
+  const router = useRouter()
 
   return (
-    <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
-      <View className="flex-1 justify-start">
-        <View className="flex-1 mx-5 mt-6">
-          {/* Banner */}
-          <View
-            style={{
-              position: "relative",
-              height: 200,
-              backgroundColor: "#a1abb6ff",
-              justifyContent: "start",
-              alignItems: "center",
-              borderRadius: 16,
-              overflow: "hidden",
-            }}
+    <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
+      <View className="justify-start flex-1">
+        {/* Banner */}
+        <View
+          // style={{
+          //   position: 'relative',
+          //   height: 200,
+          //   backgroundColor: '#a1abb6ff',
+          //   justifyContent: 'start',
+          //   alignItems: 'center',
+          //   borderRadius: 16,
+          //   overflow: 'hidden',
+          // }}
+          className="top-0 flex flex-row justify-start pb-2 bg-white"
+        >
+          <Pressable
+            className="flex flex-row items-center justify-center h-6 pb-2 pl-2 mt-4"
+            onPointerDown={() => router.back()}
           >
-            <View className="flex-row justify-start mt-4">
-            <NormalButton text="< Back" onClick={() => router.back()} />
-            </View>
-            <Text className="mt-6 text-base">Settings</Text>
+            {/* <NormalButton text="< Back" onClick={() => router.back()} /> */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2.5"
+              stroke="currentColor"
+              className="w-6 h-6 font-bold text-primaryBlue"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              />
+            </svg>
+
+            <Text className="text-lg font-semibold align-middle text-primaryBlue">
+              Back
+            </Text>
+          </Pressable>
+          <Text className="justify-center pl-24 mt-2 text-xl font-semibold align-middle">
+            Settings
+          </Text>
+        </View>
+
+        <View className="h-full px-2 pt-3">
+          <View className="bg-white rounded-2xl">
+            {/* Account */}
+            <Pressable className="flex-row justify-between px-6 pt-3 pb-2 mt-2 ">
+              <Text className="font-bold text-textBlack">Account</Text>
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 2 24 24"
+                stroke-width="2.5"
+                stroke="currentColor"
+                className="w-6 h-6 font-extrabold text-textBlack"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </Pressable>
+
+            {/* Contact US */}
+            <Pressable className="flex-row justify-between px-6 pt-3 pb-2 mt-2 ">
+              <Text className="font-bold text-textBlack">Contact us</Text>
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 2 24 24"
+                stroke-width="2.5"
+                stroke="currentColor"
+                className="w-6 h-6 font-extrabold text-textBlack"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </Pressable>
           </View>
 
           {/* Sign out */}
-          <View className="flex-row justify-center mt-5">
-            <NormalButton
-              text="Sign Out"
-              paddingHorizontal={10}
-              variant="primary"
-              onClick={async () => {
-                try {
-                  await signOut();
-                  router.replace("/profile"); // go to your public/profile route
-                } catch (error) {
-                  console.error("Error signing out:", error);
-                }
-              }}
-            />
-          </View>
+          <Pressable
+            className="flex-row justify-between px-6 pt-3 pb-2 mt-2 align-middle bg-white rounded-2xl"
+            onPointerDown={async () => {
+              try {
+                await signOut()
+                router.replace('/profile') // go to your public/profile route
+              } catch (error) {
+                console.error('Error signing out:', error)
+              }
+            }}
+          >
+            <Text className="font-extrabold align-middle text-dangerDarkRed">
+              Sign out
+            </Text>
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 2 24 24"
+              stroke-width="2.5"
+              stroke="currentColor"
+              className="w-6 h-6 font-extrabold text-dangerDarkRed"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              />
+            </svg>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
-  );
+  )
 }
