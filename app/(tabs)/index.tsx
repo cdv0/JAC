@@ -24,8 +24,8 @@ export default function Index() {
         <SearchBar placeholder1="Search" placeholder2="Location"/>
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
-          <NormalButton onClick={()=>{}} text="Filters"/>
-          <NormalButton onClick={()=>{}} text="Services"/>
+          <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersActive(!isFiltersActive)}} text="Filters"/>
+          <NormalButton variant={`${isServicesActive?`primary`:`outline`}`} onClick={()=>{setisServicesActive(!isServicesActive)}} text="Services"/>
           <ToggleButton onPress={()=>{}} text="Oil Change"/>
           <ToggleButton onPress={()=>{}} text="Tire Rotation"/>
           <ToggleButton onPress={()=>{}} text="Smog Check"/>
