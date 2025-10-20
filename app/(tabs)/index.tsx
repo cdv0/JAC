@@ -15,7 +15,7 @@ export default function Index() {
       <View
       className="flex-1 bg-white "
       >
-        <View className="justify-center w-full h-[135px]">
+        <View className="justify-center w-full h-[17%]">
           <images.searchBackground width="100%" height="100%" style={{ position: 'absolute', zIndex: 0 }} />
           <View className="ml-[50%]">
             <NormalButton onClick={()=>{}} text={"Enter Garage"}/>
