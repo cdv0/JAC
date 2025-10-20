@@ -10,6 +10,9 @@ import profileH from "@/public/assets/icons/profileH-icon.svg"
 import search from "@/public/assets/icons/search-icon.svg"
 import seachH from "@/public/assets/icons/searchH-icon.svg"
 import noImage from "@/public/assets/icons/noImage.svg"
+import pencil from "@/public/assets/icons/edit.svg"
+import arrowDown from "@/public/assets/icons/arrowDown.svg"
+import arrowUp from "@/public/assets/icons/arrowUp.svg"
 
 export const icons = {
     garage,
@@ -23,5 +26,8 @@ export const icons = {
     lock,
     chevBack,
     seachH,
-    noImage
+    noImage,
+    pencil,
+    arrowDown,
+    arrowUp
 };
