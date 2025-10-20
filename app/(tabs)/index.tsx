@@ -1,10 +1,15 @@
 import { images } from "@/constants/images";
+import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
 export default function Index() {
+
+  const [isFiltersActive, setisFiltersActive] = useState(false);
+  const [isServicesActive, setisServicesActive] = useState(false);
+  
   return (
    <SafeAreaView className="flex-1" edges={['right', 'top', 'left']}>
       <View
@@ -19,8 +24,8 @@ export default function Index() {
         <SearchBar placeholder1="Search" placeholder2="Location"/>
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
-          <ToggleButton onPress={()=>{}} text="Filters"/>
-          <ToggleButton onPress={()=>{}} text="Services"/>
+          <NormalButton onClick={()=>{}} text="Filters"/>
+          <NormalButton onClick={()=>{}} text="Services"/>
           <ToggleButton onPress={()=>{}} text="Oil Change"/>
           <ToggleButton onPress={()=>{}} text="Tire Rotation"/>
           <ToggleButton onPress={()=>{}} text="Smog Check"/>
