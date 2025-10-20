@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
+import ToggleButton from "../components/ToggleButton";
 export default function Index() {
   return (
    <SafeAreaView className="flex-1" edges={['right', 'top', 'left']}>
@@ -18,13 +19,13 @@ export default function Index() {
         <SearchBar placeholder1="Search" placeholder2="Location"/>
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
-          <NormalButton onClick={()=>{}} text="Filters"/>
-          <NormalButton onClick={()=>{}} text="Services"/>
-          <NormalButton onClick={()=>{}} text="Oil Change"/>
-          <NormalButton onClick={()=>{}} text="Tire Rotation"/>
-          <NormalButton onClick={()=>{}} text="Smog Check"/>
-          <NormalButton onClick={()=>{}} text="Transmission Repair"/>
-          <NormalButton onClick={()=>{}} text="Wheel Alignment"/>
+          <ToggleButton onPress={()=>{}} text="Filters"/>
+          <ToggleButton onPress={()=>{}} text="Services"/>
+          <ToggleButton onPress={()=>{}} text="Oil Change"/>
+          <ToggleButton onPress={()=>{}} text="Tire Rotation"/>
+          <ToggleButton onPress={()=>{}} text="Smog Check"/>
+          <ToggleButton onPress={()=>{}} text="Transmission Repair"/>
+          <ToggleButton onPress={()=>{}} text="Wheel Alignment"/>
         </ScrollView>
         </View>
         
