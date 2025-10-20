@@ -67,14 +67,7 @@ export default function NormalButton({
   return (
     <TouchableOpacity onPress={onClick} activeOpacity={0.8}>
       <View
-        className={`${variantStyles[variant].container} items-center justify-center rounded-xl self-center flex flex-row`}
-        style={{
-          width,
-          paddingHorizontal,
-          paddingVertical,
-          height: 38,
-        }}
-      >
+        className={`${variantStyles[variant].container} items-center justify-center rounded-xl self-center flex flex-row`}>
         {icon && <View className="mr-2">{icon}</View>}
         <Text className={`buttonTextWhite ${variantStyles[variant].text}`}>
           {text}
