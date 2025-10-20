@@ -27,10 +27,10 @@ const search = () => {
       
         <View><Text>Search Bar thingies haven't decided how to implement</Text> </View>
         <ScrollView horizontal= {true}>
-            <NormalButton text={'Filters'} size={'28'} />
-            <NormalButton text={'Services'} size={'28'} />
-            <NormalButton text={'Oil Change'} size={'28'} />
-            <NormalButton text={'Tire Rotation'} size={'28'} />
+            <NormalButton text={'Filters'} width= {"28"} onClick = {}/>
+            <NormalButton text={'Services'} width={'28'} onClick = {}/>
+            <NormalButton text={'Oil Change'} width={'28'} onClick = {} />
+            <NormalButton text={'Tire Rotation'} width={'28'} onClick = {}/>
         </ScrollView>
         <View>
             {mechanics.map((item) => (
