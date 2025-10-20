@@ -1,25 +1,117 @@
-import React from "react";
-import { View, Text } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, Text, FlatList, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NormalButton from "@/app/components/NormalButton";
 import { useRouter } from "expo-router";
+import { listVehicles, type Vehicle } from "@/_backend/api/vehicle";
+import { getCurrentUser } from "aws-amplify/auth";
+import { icons } from "@/constants/icons";
 
 export const garage = () => {
   const router = useRouter();
+  const [items, setItems] = useState<Vehicle[]>([]);  // List of vehicles
+  const [loading, setLoading] = useState(false);
+
+  const numColumns = 2;
+
+  // Load: Retrieve userId and call API to list vehicles
+  const load = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { userId } = await getCurrentUser();
+      const data = await listVehicles(userId);
+      setItems(data.items || []);
+    } catch (e: any) {
+      console.log("Garage vehicle list error:", e?.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // Align the vehicle card at the start of the row if there's only one vehicle card in the row
+  const formatData = (items: any[], numColumns: number) => {
+    const data = [...items];
+    const numberOfFullRows = Math.floor(data.length / numColumns);
+
+    let numberOfElementsLastRow = data.length - numberOfFullRows * numColumns;
+    while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+      data.push({ key: `blank-${numberOfElementsLastRow}`, empty: true });
+      numberOfElementsLastRow = numberOfElementsLastRow + 1;
+    }
+    return data;
+  };
 
   return (
-    <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
-      <View className="flex-row justify-between items-end mx-5 mt-6">
-        <Text className="mediumTitle">Garage</Text>
-        <NormalButton
-          text="Add vehicle"
-          paddingHorizontal={10}
-          variant="primary"
-          onClick={() => router.push("/garage/addVehicle")}
+    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <View className="flex-1 mx-5">
+
+        {/* Top bar */}
+        <View className="flex-row justify-between items-end mt-6">
+          <Text className="mediumTitle">Garage</Text>
+          <NormalButton
+            text="Add vehicle"
+            paddingHorizontal={10}
+            variant="primary"
+            onClick={() => router.push("/garage/addVehicle")}
+          />
+        </View>
+
+        {/* Main content: Vehicles list */}
+        <FlatList
+          className="mt-3"
+          data={formatData(items, numColumns)}
+          keyExtractor={(v: any) => (v.empty ? v.key : v.vehicleId)}
+          numColumns={numColumns}
+          columnWrapperStyle={{ marginBottom: 16, gap: 16 }}
+          ListEmptyComponent={
+            <View className="mt-10 items-center">
+              <Text className="smallTextGray">{loading ? "Loading..." : "No vehicles yet."}</Text>
+            </View>
+          }
+
+          renderItem={({ item }: { item: any }) => {
+            if (item.empty) {
+              return (
+                <View style={{ flex: 1 }}>
+                  <View style={{ opacity: 0 }} className="border border-stroke rounded-lg p-4 mb-3" />
+                </View>
+              );
+            }
+
+            return (
+              <Pressable onPress={() => router.push(`/garage/vehicle/${item.vehicleId}`)} style={{ flex: 1 }}>
+                {/* Vehicle card */}
+                <View className="border border-stroke rounded-lg p-4 mb-3 gap-4 ">
+                  {/* Vehicle image */}
+                  <View className="items-center justify-center h-24">
+                    <icons.noImage height={50} width={70}/>
+                  </View>
+                  {/* Vehicle card's text */}
+                  <View>
+                    <Text className="buttonTextBlue text-center">{item.model}</Text>
+                    <Text className="smallThinTextBlue text-center">{item.make} {item.year}</Text>
+                  </View>
+                  {/* Vehicle card's select button */}
+                  <View className="mx-1.5">
+                    <NormalButton 
+                      text="Select"
+                      variant="lightBlue"
+                      onClick={() => router.push(`/garage/vehicle/${item.vehicleId}`)}
+                      grow
+                    />
+                  </View>
+                </View>
+              </Pressable>
+            );
+          }}
         />
       </View>
     </SafeAreaView>
   );
-}
+};
 
-export default garage
+export default garage;

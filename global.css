@@ -33,6 +33,8 @@ body {
 
     .smallTextBlue { @apply text-base text-primaryBlue }
 
+    .smallThinTextBlue { @apply text-base text-primaryBlue font-light}
+
     .buttonTextWhite { @apply text-base font-semibold text-white }
 
     .buttonTextBlue { @apply text-base font-semibold text-primaryBlue }
