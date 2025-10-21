@@ -61,7 +61,8 @@ export default function VehicleDetail() {
         </View>
 
         {/* Lower section */}
-        <View className="flex-1 mt-6 px-5">
+        <View className="flex-1 mt-2.5 mx-2.5 mb-5 gap-2.5">
+
           {/* Details card */}
           <View className="bg-white rounded-lg px-4 py-5">
             {/* Detail card top bar */}
@@ -75,7 +76,6 @@ export default function VehicleDetail() {
                 </Pressable>
               </View>
             </View>
-
 
             {detailsExpanded && (
               <View className="mt-4 gap-3.5">
@@ -104,7 +104,7 @@ export default function VehicleDetail() {
           </View>
 
           {/* Services card */}
-          <View className="bg-white rounded-lg px-4 py-5 mt-4">
+          <View className="bg-white rounded-lg px-4 py-5">
             <View className="flex-row items-center justify-between">
               <Text className="smallTitle">Services</Text>
               <Pressable

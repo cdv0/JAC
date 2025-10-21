@@ -58,7 +58,7 @@ export const addVehicle = () => {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <ScrollView>
-        <View className="flex-1 mx-5 mt-3 gap-3 mb-3">
+        <View className="flex-1 mx-5 mt-3 gap-3 mb-5">
 
           {/* VIN INPUT */}
           <View className="gap-2">

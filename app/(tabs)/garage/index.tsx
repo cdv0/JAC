@@ -95,7 +95,7 @@ export const garage = () => {
         <View className="flex-1 mx-5">
 
           {/* Top bar */}
-          <View className="flex-row justify-between items-end mt-6">
+          <View className="flex-row justify-between items-end mt-6 mb-5">
             <Text className="mediumTitle">Garage</Text>
             <NormalButton
               text="Add vehicle"
@@ -130,7 +130,7 @@ export const garage = () => {
               return (
                 <Pressable onPress={() => router.push(`/garage/vehicle/${item.vehicleId}`)} style={{ flex: 1 }}>
                   {/* Vehicle card */}
-                  <View className="border border-stroke rounded-lg p-4 mb-3 gap-4 ">
+                  <View className="border border-stroke rounded-lg p-4 gap-4 ">
                     {/* Vehicle image */}
                     <View className="items-center justify-center h-24">
                       <icons.noImage height={50} width={70}/>
