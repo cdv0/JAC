@@ -1,13 +1,15 @@
 import NormalButton from "@/app/components/NormalButton";
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert } from "react-native";
+import { View, Text, TextInput, Alert, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createVehicle } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { router } from "expo-router";
+import { icons } from "@/constants/icons"
 
 export const addVehicle = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const [VIN, setVIN] = useState("");
   const [plateNum, setPlateNum] = useState("");
@@ -59,7 +61,10 @@ export const addVehicle = () => {
 
         {/* VIN INPUT */}
         <View className="gap-2">
-          <Text className="smallTextBold">VIN</Text>
+          <View className="flex-1 flex-row">
+            <Text className="smallTextBold">VIN</Text>
+            <Text className="dangerText"> *</Text>
+          </View>
           <TextInput
             value={VIN}
             placeholder="Type here"
@@ -76,7 +81,10 @@ export const addVehicle = () => {
 
         {/* PLATE NUMBER INPUT */}
         <View className="gap-2">
-          <Text className="smallTextBold">Plate number</Text>
+          <View className="flex-1 flex-row">
+            <Text className="smallTextBold">Plate number</Text>
+            <Text className="dangerText"> *</Text>
+          </View>
           <TextInput
             value={plateNum}
             placeholder="Type here"
@@ -92,7 +100,10 @@ export const addVehicle = () => {
 
         {/* MAKE INPUT */}
         <View className="gap-2">
-          <Text className="smallTextBold">Make</Text>
+          <View className="flex-1 flex-row">
+            <Text className="smallTextBold">Make</Text>
+            <Text className="dangerText"> *</Text>
+          </View>
           <TextInput
             value={make}
             placeholder="Type here"
@@ -108,7 +119,10 @@ export const addVehicle = () => {
 
         {/* MODEL INPUT */}
         <View className="gap-2">
-          <Text className="smallTextBold">Model</Text>
+          <View className="flex-1 flex-row">
+            <Text className="smallTextBold">Model</Text>
+            <Text className="dangerText"> *</Text>
+          </View>
           <TextInput
             value={model}
             placeholder="Type here"
@@ -124,7 +138,10 @@ export const addVehicle = () => {
 
         {/* YEAR INPUT */}
         <View className="gap-2">
-          <Text className="smallTextBold">Year</Text>
+          <View className="flex-1 flex-row">
+            <Text className="smallTextBold">Year</Text>
+            <Text className="dangerText"> *</Text>
+          </View>
           <TextInput
             value={year}
             placeholder="Type here"
