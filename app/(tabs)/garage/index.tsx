@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, FlatList, Pressable } from "react-native";
+import { View, Text, FlatList, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NormalButton from "@/app/components/NormalButton";
 import { useRouter } from "expo-router";
@@ -91,69 +91,71 @@ export const garage = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <View className="flex-1 mx-5">
+      <ScrollView>
+        <View className="flex-1 mx-5">
 
-        {/* Top bar */}
-        <View className="flex-row justify-between items-end mt-6">
-          <Text className="mediumTitle">Garage</Text>
-          <NormalButton
-            text="Add vehicle"
-            paddingHorizontal={10}
-            variant="primary"
-            onClick={() => router.push("/garage/addVehicle")}
-          />
-        </View>
-
-        {/* Main content: Vehicles list */}
-        <FlatList
-          className="mt-3"
-          data={formatData(items, numColumns)}
-          keyExtractor={(v: any) => (v.empty ? v.key : v.vehicleId)}
-          numColumns={numColumns}
-          columnWrapperStyle={{ marginBottom: 16, gap: 16 }}
-          ListEmptyComponent={
-            <View className="mt-10 items-center">
-              <Text className="smallTextGray">{loading ? "Loading..." : "No vehicles yet."}</Text>
-            </View>
-          }
-
-          renderItem={({ item }: { item: any }) => {
-            if (item.empty) {
-              return (
-                <View style={{ flex: 1 }}>
-                  <View style={{ opacity: 0 }} className="border border-stroke rounded-lg p-4 mb-3" />
-                </View>
-              );
+          {/* Top bar */}
+          <View className="flex-row justify-between items-end mt-6">
+            <Text className="mediumTitle">Garage</Text>
+            <NormalButton
+              text="Add vehicle"
+              paddingHorizontal={10}
+              variant="primary"
+              onClick={() => router.push("/garage/addVehicle")}
+            />
+          </View>
+          
+          {/* Main content: Vehicles list */}
+          <FlatList
+            className="mt-3"
+            data={formatData(items, numColumns)}
+            keyExtractor={(v: any) => (v.empty ? v.key : v.vehicleId)}
+            numColumns={numColumns}
+            columnWrapperStyle={{ marginBottom: 16, gap: 16 }}
+            ListEmptyComponent={
+              <View className="mt-10 items-center">
+                <Text className="smallTextGray">{loading ? "Loading..." : "No vehicles yet."}</Text>
+              </View>
             }
 
-            return (
-              <Pressable onPress={() => router.push(`/garage/vehicle/${item.vehicleId}`)} style={{ flex: 1 }}>
-                {/* Vehicle card */}
-                <View className="border border-stroke rounded-lg p-4 mb-3 gap-4 ">
-                  {/* Vehicle image */}
-                  <View className="items-center justify-center h-24">
-                    <icons.noImage height={50} width={70}/>
+            renderItem={({ item }: { item: any }) => {
+              if (item.empty) {
+                return (
+                  <View style={{ flex: 1 }}>
+                    <View style={{ opacity: 0 }} className="border border-stroke rounded-lg p-4 mb-3" />
                   </View>
-                  {/* Vehicle card's text */}
-                  <View>
-                    <Text className="buttonTextBlue text-center">{item.model}</Text>
-                    <Text className="smallThinTextBlue text-center">{item.make} {item.year}</Text>
+                );
+              }
+
+              return (
+                <Pressable onPress={() => router.push(`/garage/vehicle/${item.vehicleId}`)} style={{ flex: 1 }}>
+                  {/* Vehicle card */}
+                  <View className="border border-stroke rounded-lg p-4 mb-3 gap-4 ">
+                    {/* Vehicle image */}
+                    <View className="items-center justify-center h-24">
+                      <icons.noImage height={50} width={70}/>
+                    </View>
+                    {/* Vehicle card's text */}
+                    <View>
+                      <Text className="buttonTextBlue text-center">{item.model}</Text>
+                      <Text className="smallThinTextBlue text-center">{item.make} {item.year}</Text>
+                    </View>
+                    {/* Vehicle card's select button */}
+                    <View className="mx-1.5">
+                      <NormalButton 
+                        text="Select"
+                        variant="lightBlue"
+                        onClick={() => router.push(`/garage/vehicle/${item.vehicleId}`)}
+                        grow
+                      />
+                    </View>
                   </View>
-                  {/* Vehicle card's select button */}
-                  <View className="mx-1.5">
-                    <NormalButton 
-                      text="Select"
-                      variant="lightBlue"
-                      onClick={() => router.push(`/garage/vehicle/${item.vehicleId}`)}
-                      grow
-                    />
-                  </View>
-                </View>
-              </Pressable>
-            );
-          }}
-        />
-      </View>
+                </Pressable>
+              );
+            }}
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

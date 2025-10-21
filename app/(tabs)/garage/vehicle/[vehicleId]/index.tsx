@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Pressable } from "react-native";
+import { View, Text, ActivityIndicator, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import { readVehicle, type Vehicle } from "@/_backend/api/vehicle";
@@ -132,7 +132,9 @@ export default function VehicleDetail() {
 
   return (
     <SafeAreaView className="flex-1 bg-secondary" edges={["top", "bottom"]}>
-      <View className="flex-1">{content}</View>
+      <ScrollView>
+        <View className="flex-1">{content}</View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
