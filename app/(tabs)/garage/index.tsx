@@ -6,13 +6,26 @@ import { useRouter } from "expo-router";
 import { listVehicles, type Vehicle } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
+import { Hub } from "aws-amplify/utils";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const garage = () => {
   const router = useRouter();
   const [items, setItems] = useState<Vehicle[]>([]);  // List of vehicles
   const [loading, setLoading] = useState(false);
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
 
   const numColumns = 2;
+
+  // Check user authentication
+  const checkAuth = useCallback(async() => {
+    try {
+      await getCurrentUser();
+      setIsAuthed(true);
+    } catch {
+      setIsAuthed(false);
+    }
+  }, []);
 
   // Load: Retrieve userId and call API to list vehicles
   const load = useCallback(async () => {
@@ -23,14 +36,42 @@ export const garage = () => {
       setItems(data.items || []);
     } catch (e: any) {
       console.log("Garage vehicle list error:", e?.message);
+      setItems([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // Initial authentication check
   useEffect(() => {
-    load();
-  }, [load]);
+    checkAuth();
+  }, [checkAuth]);  // Add checkAuth as a dependency since the function is dependent on it
+
+  // Reload when the screen is focused again
+  useFocusEffect(
+    useCallback(() => {
+      // Only try to load once we know auth state
+      if (isAuthed !== null) load();
+    }, [load, isAuthed])  // Add load and isAuthed as a dependency becuase the function is dependent on it
+  );
+
+  useEffect(() => {
+    const sub = Hub.listen("auth", ({ payload }) => {
+      switch (payload.event) {
+        case "signedIn":
+          setIsAuthed(true);
+          load();
+          break;
+        case "signedOut":
+          setIsAuthed(false);
+          setItems([]);
+          break;
+        default:
+          break;
+      }
+    });
+    return () => sub();
+  }, [load]);  // Add load as a dependency in case the function changes since it's being used in the function
 
   // Align the vehicle card at the start of the row if there's only one vehicle card in the row
   const formatData = (items: any[], numColumns: number) => {

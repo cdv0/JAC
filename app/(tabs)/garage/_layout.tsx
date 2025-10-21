@@ -1,9 +1,10 @@
 import NormalButton from "@/app/components/NormalButton";
 import { icons } from "@/constants/icons";
 import { getCurrentUser } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 import { Stack, router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Text, View, Pressable } from "react-native";
+import { Text, View, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function GarageLayout() {
@@ -21,6 +22,23 @@ export default function GarageLayout() {
     checkUser();
   }, []);
 
+  useEffect(() => {
+    const unsub = Hub.listen("auth", ({ payload }) => {
+      if (payload.event === "signedIn") setIsAuthenticated(true);
+      if (payload.event === "signedOut") setIsAuthenticated(false);
+    });
+    return () => unsub();
+  }, []);
+
+  if (isAuthenticated === null) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center" edges={["top","bottom"]}>
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
+  // Unauthenticated user view
   if (isAuthenticated === false) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center" edges={["top", "bottom"]}>
