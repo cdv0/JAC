@@ -33,7 +33,10 @@ export const garage = () => {
       setLoading(true);
       const { userId } = await getCurrentUser();
       const data = await listVehicles(userId);
-      setItems(data.items || []);
+      const sorted = (data.items || []).slice().sort((a, b) =>
+        (a.model).localeCompare(b.model)
+      );
+      setItems(sorted);
     } catch (e: any) {
       console.log("Garage vehicle list error:", e?.message);
       setItems([]);
