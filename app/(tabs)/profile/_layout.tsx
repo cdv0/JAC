@@ -1,4 +1,6 @@
-import { Stack } from 'expo-router'
+import { icons } from '@/constants/icons'
+import { Stack, router } from 'expo-router'
+import { Pressable, Text } from 'react-native'
 
 export default function AccountLayout() {
   return (
@@ -25,8 +27,20 @@ export default function AccountLayout() {
       <Stack.Screen
         name="settings"
         options={{
-          title: 'Settings',
-          headerShown: false,
+          headerTitle: () => <Text className="buttonTextBlack">Settings</Text>,
+          headerBackVisible: false,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => router.back()}
+              className="flex-row items-center px-2"
+              hitSlop={2}
+            >
+              <icons.chevBack width={24} height={24} fill="#1B263B" />
+              <Text className="ml-1 text-primaryBlue text-[15px] font-medium">
+                Back
+              </Text>
+            </Pressable>
+          ),
         }}
       />
     </Stack>
