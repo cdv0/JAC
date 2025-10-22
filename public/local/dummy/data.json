@@ -1,0 +1,21 @@
+{
+ "mechanics" :[
+    {
+        "name": "Mechanic A",
+        "type": "Franchise",
+        "rating": "5",
+        "reviews": 2839,
+        "image": "/local/images/mechanic-image.svg",
+        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services"]
+    },
+    {
+        "name": "Mechanic B",
+        "type": "Independent",
+        "rating": "3.5",
+        "reviews": 100,
+        "image": "",
+        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services", "Electronics", "General Services"]
+    }
+
+]
+}
