@@ -10,12 +10,33 @@ export default function Index() {
 
   const [isFiltersActive, setisFiltersActive] = useState(false);
   const [isFiltersModal, setisFiltersModal] = useState(false);
+
+  const [isOilChangeActive, setIsOiltChangeActive] = useState(false);
+  const [isTireActive, setIsTireActive] = useState(false);
+  const [isSmogActive, setIsSmogActive] = useState(false);
+  const [isTransmissionActive, setIsTransmissionActive] = useState(false);
+  const [isWheelActive, setIsWheelActive] = useState(false);
+
   const [isServicesActive, setisServicesActive] = useState(false);
+
+  const [isRelevanceActive, setisRelevanceActive] = useState(false);
+  const [isRelevanceApplied, setisRelevanceApplied] = useState(false);
+
+  const [isOpenNowActive, setisOpenNowActive] = useState(false);
+  const [isOpenNowApplied, setisOpenNowApplied] = useState(false);
+
+  const [isPopularActive, setisPopularActive] = useState(false); 
+  const [isPopularApplied, setisPopularApplied] = useState(false); 
+  
+  const [isRatingActive, setisRatingActive] = useState(false);
+  const [isRatingApplied, setisRatingApplied] = useState(false);
+  
   const [minP, setminP] = useState('');
   const [maxP, setmaxP] = useState('');
-  const width= 150;
+  const width= '45%';
   const minD = 0;
   const maxD = 20;
+  
   const [sliderValue, setSliderValue] = useState(maxD / 2); 
 
   return (
@@ -34,17 +55,18 @@ export default function Index() {
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
             <NormalButton variant={`${isServicesActive?`primary`:`outline`}`} onClick={()=>{setisServicesActive(!isServicesActive)}} text="Services"/>
-            <ToggleButton onPress={()=>{}} text="Oil Change"/>
-            <ToggleButton onPress={()=>{}} text="Tire Rotation"/>
-            <ToggleButton onPress={()=>{}} text="Smog Check"/>
-            <ToggleButton onPress={()=>{}} text="Transmission Repair"/>
-            <ToggleButton onPress={()=>{}} text="Wheel Alignment"/>
+            <ToggleButton flag = {isOilChangeActive} onPress={(newF)=>{setIsOiltChangeActive(newF)}} text="Oil Change" />
+            <ToggleButton flag = {isTireActive} onPress={(newf)=>{setIsTireActive(newf)}} text="Tire Rotation"/>
+            <ToggleButton flag = {isSmogActive} onPress={(newf)=>{setIsSmogActive(newf)}} text="Smog Check"/>
+            <ToggleButton flag ={isTransmissionActive} onPress={(newf)=>{setIsTransmissionActive(newf)}} text="Transmission Repair"/>
+            <ToggleButton flag = {isWheelActive} onPress={(newf)=>{setIsWheelActive(newf)}} text="Wheel Alignment"/>
           </ScrollView>
         </View>
         
         <View className="mt-[10] ml-2">
             <Text className="text-[25px]">Find Nearby</Text>
         </View>
+
         {/*Expand filters */}
         <Modal visible={isFiltersModal}>
           <View className="flex-1">
@@ -52,13 +74,26 @@ export default function Index() {
                   <Text className="justify-start  text-[25px] buttonTextBlack">
                     Filters
                   </Text>
-                  <Pressable onPress={()=>{setisFiltersModal(!isFiltersModal)}}>
-                    <View className="w-[35] items-center justify-center ">
-                      <Text className="text-[25px] buttonTextBlack">
-                        X
-                      </Text>
-                    </View>
+
+                  <Pressable 
+                    onPress={()=> 
+                      {
+                        setisRelevanceActive(isRelevanceApplied);
+                        setisOpenNowActive(isOpenNowApplied);
+                        setisPopularActive(isPopularApplied)
+                        setisRatingActive(isRatingApplied);
+
+                        setisFiltersModal(!isFiltersModal);
+                      }}>
                     
+                    
+                    
+                    
+                      <View className="w-[35] items-center justify-center ">
+                        <Text className="text-[25px] buttonTextBlack">
+                          X
+                        </Text>
+                      </View>
                   </Pressable>
 
               </View>
@@ -70,13 +105,13 @@ export default function Index() {
                 </Text>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
-                  <ToggleButton width={width} text="Relevance" onPress={()=>{}}/>
-                  <ToggleButton width={width} text="Open Now" onPress={()=>{}}/>
+                  <ToggleButton width={width} text="Relevance" flag={isRelevanceActive} onPress={(newf)=>{setisRelevanceActive(newf)}}/>
+                  <ToggleButton width={width} text="Open Now" flag={isOpenNowActive} onPress={(newf)=>{setisOpenNowActive(newf)}}/>
                 </View>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
-                  <ToggleButton width={width} text="Popular" onPress={()=>{}}/>
-                  <ToggleButton width={width} text="Rating" onPress={()=>{}}/>
+                  <ToggleButton width={width} text="Popular" flag={isPopularActive} onPress={(newf)=>{setisPopularActive(newf)}}/>
+                  <ToggleButton width={width} text="Rating" flag={isRatingActive} onPress={(newf)=>{setisRatingActive(newf)}}/>
                 </View>
 
                 <Text className="text-[20px] buttonTextBlack ml-[5%] mt-[2%] mb-[2%]">
@@ -90,14 +125,12 @@ export default function Index() {
 
                   <View className="border border-textBlack w-[25%] rounded-xl">
                     <TextInput value={minP} keyboardType='numeric' 
-                              onChangeText={(newP)=>{
-                                              if (newP == '')
-                                                setminP(`${newP}`); //if there's nothing don't add dollar sign
-                                              else
-                                              {
+                              onChangeText={(newP)=>{       
                                                 newP = newP.split('$').join('');
-                                                setminP(`$${newP}`);
-                                              }
+                                                if(newP == '')
+                                                  setminP('');
+                                                else
+                                                  setminP(`$${newP}`);        
                                             }}/>
                   </View> 
 
@@ -107,14 +140,12 @@ export default function Index() {
 
                   <View className="border border-textBlack w-[25%] rounded-xl">
                     <TextInput value={maxP} keyboardType='numeric'
-                              onChangeText={(newP)=>{
+                              onChangeText={(newP)=>{ 
+                                              newP = newP.split('$').join('');
                                               if (newP == '')
-                                                setmaxP(`${newP}`); //if there's nothing don't add dollar sign
+                                                setmaxP('')
                                               else
-                                              {
-                                                newP = newP.split('$').join('');
                                                 setmaxP(`$${newP}`);
-                                              }
                                             }}/>
                   </View> 
 
@@ -128,6 +159,7 @@ export default function Index() {
                     <Text className="self-center">
                       {sliderValue==maxD?`${sliderValue}+`:sliderValue}
                     </Text>
+
                     <Slider
                           minimumValue={minD}
                           maximumValue={maxD}
@@ -138,6 +170,7 @@ export default function Index() {
                           value={sliderValue}
                           onValueChange={(newVal)=>{setSliderValue(newVal)}}
                       />
+
                     <View className="flex-row justify-between">
                       <Text >
                         {minD}
@@ -147,16 +180,31 @@ export default function Index() {
                       </Text>
                     </View>
                 </View>
-                  
-               
-                
-                
+                                 
             </View>
 
           </View>
 
+          {/*Apply these filters only when apply button is pressed*/}
           <View className="items-end mt-[2%] mb-[2%]">
-            <NormalButton text="Apply" onClick={()=>{setisFiltersModal(!isFiltersModal)}}/>
+            <NormalButton text="Apply" 
+                  onClick={()=>{
+                                  if(isRelevanceActive || isOpenNowActive || isPopularActive 
+                                    || isRatingActive || minP != ''|| maxP != '' || sliderValue != maxD /2){
+                                    setisFiltersActive(true)
+                                  }
+                                  else{
+                                    setisFiltersActive(false)
+                                  }
+                                  //filter logic goes here
+                                  
+                                  setisRelevanceApplied(isRelevanceActive);
+                                  setisOpenNowApplied(isOpenNowActive);
+                                  setisPopularApplied(isPopularActive);
+                                  setisRatingApplied(isRatingActive);
+
+                                  setisFiltersModal(!isFiltersModal)
+                                }}/>
           </View>
 
         </Modal>
