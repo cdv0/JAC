@@ -9,48 +9,6 @@ export default function Settings() {
   return (
     <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
       <View className="justify-start flex-1">
-        {/* Banner */}
-        <View
-          // style={{
-          //   position: 'relative',
-          //   height: 200,
-          //   backgroundColor: '#a1abb6ff',
-          //   justifyContent: 'start',
-          //   alignItems: 'center',
-          //   borderRadius: 16,
-          //   overflow: 'hidden',
-          // }}
-          className="top-0 flex flex-row justify-start pb-2 bg-white"
-        >
-          <Pressable
-            className="flex flex-row items-center justify-center h-6 pb-2 pl-2 mt-4"
-            onPointerDown={() => router.back()}
-          >
-            {/* <NormalButton text="< Back" onClick={() => router.back()} /> */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2.5"
-              stroke="currentColor"
-              className="w-6 h-6 font-bold text-primaryBlue"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              />
-            </svg>
-
-            <Text className="text-lg font-semibold align-middle text-primaryBlue">
-              Back
-            </Text>
-          </Pressable>
-          <Text className="justify-center pl-24 mt-2 text-xl font-semibold align-middle">
-            Settings
-          </Text>
-        </View>
-
         <View className="h-full px-2 pt-3">
           <View className="bg-white rounded-2xl">
             {/* Account */}

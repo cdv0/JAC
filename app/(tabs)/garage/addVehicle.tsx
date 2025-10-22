@@ -1,32 +1,44 @@
-import NormalButton from "@/app/components/NormalButton";
-import React, { useState } from "react";
-import { View, Text, TextInput, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { createVehicle } from "@/_backend/api/vehicle";
-import { getCurrentUser } from "aws-amplify/auth";
-import { router } from "expo-router";
+import { createVehicle } from '@/_backend/api/vehicle'
+import NormalButton from '@/app/components/NormalButton'
+import { getCurrentUser } from 'aws-amplify/auth'
+import { router } from 'expo-router'
+import { useState } from 'react'
+import { Text, TextInput, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export const addVehicle = () => {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false)
 
-  const [VIN, setVIN] = useState("");
-  const [plateNum, setPlateNum] = useState("");
-  const [make, setMake] = useState("");
-  const [model, setModel] = useState("");
-  const [year, setYear] = useState("");
+  const [VIN, setVIN] = useState('')
+  const [plateNum, setPlateNum] = useState('')
+  const [make, setMake] = useState('')
+  const [model, setModel] = useState('')
+  const [year, setYear] = useState('')
 
   const handleSave = async () => {
     // Check all inputs are filled
-    setSubmitted(true);
+    setSubmitted(true)
 
-    if (!VIN.trim() || !plateNum.trim() || !make.trim() || !model.trim() || !year.trim()) {
-      console.log("Add vehicle: Missing fields:", { VIN, plateNum, make, model, year });
-      return;
+    if (
+      !VIN.trim() ||
+      !plateNum.trim() ||
+      !make.trim() ||
+      !model.trim() ||
+      !year.trim()
+    ) {
+      console.log('Add vehicle: Missing fields:', {
+        VIN,
+        plateNum,
+        make,
+        model,
+        year,
+      })
+      return
     }
 
     // Make API call to create vehicle
     try {
-      const { userId } = await getCurrentUser();
+      const { userId } = await getCurrentUser()
       const payload = {
         userId: userId,
         VIN,
@@ -34,29 +46,27 @@ export const addVehicle = () => {
         make,
         model,
         year: Number(year),
-      };
+      }
 
-      const data = await createVehicle(payload);
-      console.log("Add vehicle: success:", data);
+      const data = await createVehicle(payload)
+      console.log('Add vehicle: success:', data)
 
-      setVIN("");
-      setPlateNum("");
-      setMake("");
-      setModel("");
-      setYear("");
+      setVIN('')
+      setPlateNum('')
+      setMake('')
+      setModel('')
+      setYear('')
 
-      router.replace("/(tabs)/garage");
-
+      router.replace('/(tabs)/garage')
     } catch (err: any) {
-      console.log("Add vehicle: Error creating vehicle:", err);
-      console.log("Add vehicle: Error message:", err?.message);
+      console.log('Add vehicle: Error creating vehicle:', err)
+      console.log('Add vehicle: Error message:', err?.message)
     }
-  };
+  }
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <View className="flex-1 mx-5 mt-3 gap-3">
-
+    <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
+      <View className="flex-1 gap-3 mx-5 mt-3">
         {/* VIN INPUT */}
         <View className="gap-2">
           <Text className="smallTextBold">VIN</Text>
@@ -65,13 +75,13 @@ export const addVehicle = () => {
             placeholder="Type here"
             keyboardType="default"
             onChangeText={setVIN}
-            className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+            className="px-4 py-2 border rounded-full border-stroke smallTextGray"
           />
-          
+
           {/* Error message for empty input */}
           {submitted && !VIN.trim() ? (
-            <Text className="dangerText mx-2">VIN is required</Text>
-          ): null}
+            <Text className="mx-2 dangerText">VIN is required</Text>
+          ) : null}
         </View>
 
         {/* PLATE NUMBER INPUT */}
@@ -81,13 +91,13 @@ export const addVehicle = () => {
             value={plateNum}
             placeholder="Type here"
             onChangeText={setPlateNum}
-            className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+            className="px-4 py-2 border rounded-full border-stroke smallTextGray"
           />
 
           {/* Error message for empty input */}
           {submitted && !plateNum.trim() ? (
-            <Text className="dangerText mx-2">Plate number is required</Text>
-          ): null}
+            <Text className="mx-2 dangerText">Plate number is required</Text>
+          ) : null}
         </View>
 
         {/* MAKE INPUT */}
@@ -97,13 +107,13 @@ export const addVehicle = () => {
             value={make}
             placeholder="Type here"
             onChangeText={setMake}
-            className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+            className="px-4 py-2 border rounded-full border-stroke smallTextGray"
           />
 
           {/* Error message for empty input */}
           {submitted && !make.trim() ? (
-            <Text className="dangerText mx-2">Make is required</Text>
-          ): null}
+            <Text className="mx-2 dangerText">Make is required</Text>
+          ) : null}
         </View>
 
         {/* MODEL INPUT */}
@@ -113,13 +123,13 @@ export const addVehicle = () => {
             value={model}
             placeholder="Type here"
             onChangeText={setModel}
-            className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+            className="px-4 py-2 border rounded-full border-stroke smallTextGray"
           />
 
           {/* Error message for empty input */}
           {submitted && !model.trim() ? (
-            <Text className="dangerText mx-2">Model is required</Text>
-          ): null}
+            <Text className="mx-2 dangerText">Model is required</Text>
+          ) : null}
         </View>
 
         {/* YEAR INPUT */}
@@ -130,13 +140,13 @@ export const addVehicle = () => {
             placeholder="Type here"
             keyboardType="numeric"
             onChangeText={setYear}
-            className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+            className="px-4 py-2 border rounded-full border-stroke smallTextGray"
           />
 
           {/* Error message for empty input */}
           {submitted && !year.trim() ? (
-            <Text className="dangerText mx-2">Year is required</Text>
-          ): null}
+            <Text className="mx-2 dangerText">Year is required</Text>
+          ) : null}
         </View>
 
         {/* SAVE BUTTON */}
@@ -145,7 +155,7 @@ export const addVehicle = () => {
         </View>
       </View>
     </SafeAreaView>
-  );
-};
+  )
+}
 
-export default addVehicle;
+export default addVehicle
