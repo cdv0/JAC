@@ -1,25 +1,24 @@
-import React, { useState } from 'react';
-import { Pressable, Text } from 'react-native';
+import React from 'react';
+import { DimensionValue, Pressable, Text } from 'react-native';
 interface Props{
     text :string;
-    width?: number; /* optional fixed width*/
+    width?: DimensionValue; // optional fixed width
+    flag: boolean; // flag to update
     onPress: (isToggled:boolean) => void;
 }
 
-const ToggleButton = ({text, onPress, width}:Props) => {
-  const [isToggled, setIsToggled] = useState(false);
+const ToggleButton = ({text, onPress, width, flag = false}:Props) => {
 
   const handlePress= () =>{
-    setIsToggled(!isToggled);
-    onPress(!isToggled); 
+    onPress(!flag); 
   }
 
   return (
     <Pressable onPress={handlePress} 
-    className={`${width?`w-[${width}]`:`px-[30]`} py-[7] h-[38] items-center justify-center rounded-xl self-center
-    ${isToggled? `bg-primaryBlue border border-textBlack`: `bg-white border border-primaryBlue`}
-    `}>
-        <Text className={` ${isToggled?`buttonTextWhite`:`buttonTextBlue`} `}>
+    className={`py-[7] h-[38] items-center justify-center rounded-xl self-center
+    ${flag? `bg-primaryBlue border border-textBlack`: `bg-white border border-primaryBlue`}
+    `} style = {width?{width: width}:{paddingHorizontal:30}}>
+        <Text className={` ${flag?`buttonTextWhite`:`buttonTextBlue`} `}>
             {text}
         </Text>
     </Pressable>
