@@ -43,7 +43,7 @@ export default function Index() {
   
   const [sliderValue, setSliderValue] = useState(maxD / 2); 
   const [tempSliderValue, setTempSliderValue] = useState(sliderValue);
-
+  const [warning, setWarning] = useState(false);
   return (
    <SafeAreaView className="flex-1" edges={['right', 'top', 'left']}>
       <View
@@ -90,6 +90,7 @@ export default function Index() {
                         setIsRatingActive(isRatingApplied);
                         setTempMinP(minP);
                         setTempMaxP(maxP);
+                        setWarning(false);
                         setTempSliderValue(sliderValue);
                         setisFiltersModal(!isFiltersModal);
                       }}>
@@ -115,7 +116,7 @@ export default function Index() {
                   <ToggleButton width={width} text="Open Now" flag={isOpenNowActive} onPress={(newf)=>{setIsOpenNowActive(newf)}}/>
                 </View>
 
-                <View className="flex-row justify-between ml-[5%] mr-[5%] mt-[-5%]">
+                <View className="flex-row justify-between ml-[5%] mr-[5%] mt-[-2%]">
                   <ToggleButton width={width} text="Popular" flag={isPopularActive} onPress={(newf)=>{setIsPopularActive(newf)}}/>
                   <ToggleButton width={width} text="Rating" flag={isRatingActive} onPress={(newf)=>{setIsRatingActive(newf)}}/>
                 </View>
@@ -123,31 +124,32 @@ export default function Index() {
                 <Text className="text-[20px] buttonTextBlack ml-[5%] ">
                   Price
                 </Text>
-
                 <View className="flex-row ml-[5%] mr-[5%] gap-[2%] items-center">
                   <Text className="buttonTextBlack ">
                     Minimum:
                   </Text>
 
-                  <View className="border border-textBlack w-[30%] rounded-xl">
+                  <View className={`border ${warning?'border-dangerBrightRed':'border-textBlack'} w-[30%] rounded-xl`}>
                     <TextInput value={tempMinP} keyboardType='numeric'                  
                               onChangeText={(newP)=>{              
-                                                newP = newP.split('$').join('');  
+                                                newP = newP.split('$').join('');
+                                                newP = newP.replace(/[-,.]/g,'');
                                                 if(newP == '')
                                                   setTempMinP('');
                                                 else
                                                   setTempMinP(`$${newP}`);        
-                                }}/>
+                                               }}/>
                   </View> 
 
                   <Text className="buttonTextBlack">
                     Maximum:
                   </Text>
 
-                  <View className="border border-textBlack w-[30%] rounded-xl">
+                  <View className={`border ${warning?'border-dangerBrightRed':'border-textBlack'} w-[30%] rounded-xl`}>
                     <TextInput value={tempMaxP} keyboardType='numeric'
                               onChangeText={(newP)=>{ 
                                               newP = newP.split('$').join('');
+                                              newP = newP.replace(/[-,.]/g,'');
                                               if (newP == '')
                                                 setTempMaxP('')
                                               else
@@ -156,6 +158,8 @@ export default function Index() {
                   </View> 
 
                 </View>
+
+                {warning&&<Text className="text-[10px] ml-[5%] buttonTextBlack text-dangerBrightRed mb-[-5%]">*Minimum cannot be over Maxmimum</Text>}
                 
                 <Text className="text-[20px] buttonTextBlack ml-[5%] mt-[2%] ">
                   Distance
@@ -195,25 +199,34 @@ export default function Index() {
           <View className="items-end mt-[2%] mb-[2%] mr-[2%]">
             <NormalButton text="Apply" 
                   onClick={()=>{
-                                  if(isRelevanceActive || isOpenNowActive || isPopularActive 
-                                    || isRatingActive || tempMinP != ''|| tempMaxP != '' || tempSliderValue != maxD /2){
-                                    setisFiltersActive(true)
-                                  }
-                                  else{
-                                    setisFiltersActive(false)
-                                  }
+                   let min = (tempMinP.split('$').join('')=='')?0: parseInt(tempMinP.split('$').join(''), 10);
+                   let max = (tempMaxP.split('$').join('')=='')?0: parseInt(tempMaxP.split('$').join(''), 10);
+                   if(min<=max)
+                   {
+                      setWarning(false);
+                      if(isRelevanceActive || isOpenNowActive || isPopularActive 
+                        || isRatingActive || tempMinP != ''|| tempMaxP != '' || tempSliderValue != maxD /2){
+                        setisFiltersActive(true)
+                      }
+                      else{
+                        setisFiltersActive(false)
+                      }
 
-                                  //filter logic goes here
+                      //filter logic goes here
 
-                                  setIsRelevanceApplied(isRelevanceActive);
-                                  setIsOpenNowApplied(isOpenNowActive);
-                                  setIsPopularApplied(isPopularActive);
-                                  setIsRatingApplied(isRatingActive);
-                                  setminP(tempMinP);
-                                  setmaxP(tempMaxP);
-                                  setSliderValue(tempSliderValue);
-                                  setisFiltersModal(!isFiltersModal)
-                                }}/>
+                      setIsRelevanceApplied(isRelevanceActive);
+                      setIsOpenNowApplied(isOpenNowActive);
+                      setIsPopularApplied(isPopularActive);
+                      setIsRatingApplied(isRatingActive);
+                      setminP(tempMinP);
+                      setmaxP(tempMaxP);
+                      setSliderValue(tempSliderValue);
+                      setisFiltersModal(!isFiltersModal)
+                    }
+                    else
+                      setWarning(true);
+                  }}/>
+                                
           </View>
 
         </Modal>
