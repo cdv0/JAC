@@ -1,4 +1,4 @@
-export const BASE_URL = "https://5xmnezhtdj.execute-api.us-west-1.amazonaws.com/dev";
+export const BASE_URL = "https://ynwemrq0m2.execute-api.us-west-1.amazonaws.com/dev";
 
 export type Vehicle = {
     userId: string;
