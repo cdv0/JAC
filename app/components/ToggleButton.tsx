@@ -7,7 +7,7 @@ interface Props{
     onPress: (isToggled:boolean) => void;
 }
 
-const ToggleButton = ({text, onPress, width, flag = false}:Props) => {
+const ToggleButton = ({text, onPress, width, flag }:Props) => {
 
   const handlePress= () =>{
     onPress(!flag); 
