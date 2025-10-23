@@ -24,6 +24,7 @@ body {
   .placeholder {
     @apply text-xl text-textLightGray;
   }
+    .xsText { @apply text-sm text-textBlack }
 
     .smallText { @apply text-base text-textBlack }
 
