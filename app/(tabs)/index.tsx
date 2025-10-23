@@ -1,7 +1,7 @@
 import { images } from "@/constants/images";
 import Slider from '@react-native-community/slider';
 import { router } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NormalButton from "../components/NormalButton";
@@ -9,12 +9,33 @@ import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
 export default function Index() {
 
-  
+  //TODO create a string array of categories to filter
+  const [categories, setCategories] = useState<string[]>([]);
+
+  //#region helper functions
+  const insertCategory= (newCategory:string) => {
+    setCategories(arr =>[...arr, newCategory]);
+  };
+
+  const removeCategory = (Category:string) =>{
+    setCategories(categories.filter(item => item!=Category));
+  };
+  //#endregion
+
+  //use this to enter categories to filter
+  const handleCategories = (flag:boolean, Category:string) => {
+    if (flag)
+      insertCategory(Category);
+    else
+      removeCategory(Category)
+  }
+
   //#region constants
   const [isFiltersActive, setisFiltersActive] = useState(false);
   const [isFiltersModal, setisFiltersModal] = useState(false);
 
-  //quick Filter
+  //#region quick Filter
+  
   //0 -> oil change, 1 -> tire, 2-> Smog, 3->Transmission, 4->Wheel
   const [quickFilterStates, setQuickFilterStates] = useState(Array(5).fill(false));
 
@@ -24,13 +45,85 @@ export default function Index() {
         )
       );
   };
+  //#endregion
   
-  //services filter
+  //#region services filter
   const [isServicesActive, setIsServicesActive] = useState(false);
   const [isServicesModal, setIsServicesModal] = useState(false);
   const [ActiveTab, setISActiveTab] = useState('1');
 
-  //expanded Filters
+  const updateServices =(i:number, value:boolean, setFunc:React.Dispatch<React.SetStateAction<any[]>>) =>{
+    setFunc(arr =>
+      arr.map((item, index) =>(index ===i)?value:item)
+    );
+  };
+
+  const [AC_Heat, setAC_Heat] = useState(Array(5).fill(false));
+  const [Bat_Elec, setBat_Elec] = useState(Array(5).fill(false));
+  const servicesView = (id:string) =>{
+    switch(id){
+      case '1':
+        return(
+          <View>
+            <ScrollView className="gap-[5%]">
+              <Text className={` ${AC_Heat[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateServices(0, !AC_Heat[0], setAC_Heat)}}
+              >
+                AC recharge
+              </Text>
+              <Text className={` ${AC_Heat[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateServices(1, !AC_Heat[1], setAC_Heat)}}
+              >
+                Compressor replacement
+              </Text>
+              <Text className={` ${AC_Heat[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateServices(2, !AC_Heat[2], setAC_Heat)}}>
+                Radiator service
+              </Text>
+              <Text className={` ${AC_Heat[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateServices(3, !AC_Heat[3], setAC_Heat)}}>
+                Heater Core repair
+              </Text>
+              <Text className={` ${AC_Heat[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateServices(4, !AC_Heat[4], setAC_Heat)}}>
+                Thermostat/water pump
+              </Text>
+            </ScrollView>
+          </View>
+        );   
+      case '2':
+        return(
+          <ScrollView className="gap-[5%]">
+            <Text className={` ${Bat_Elec[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateServices(0, !Bat_Elec[0], setBat_Elec)}}>
+              Battery Replacement
+            </Text>
+            <Text className="buttonTextBlue w-full border-b py-[5%] border-stroke text-center">
+              Alternator/Starter Repair
+            </Text>
+            <Text className="buttonTextBlue w-full border-b py-[5%] border-stroke text-center">
+              Wiring & Fuses
+            </Text>
+            <Text className="buttonTextBlue w-full border-b py-[5%] border-stroke text-center">
+               Check Engine Light Diagnostics
+            </Text>
+            <Text className="buttonTextBlue w-full border-b py-[5%] border-stroke text-center">
+              Lighting/Electronics
+            </Text>
+          </ScrollView>
+        );      
+      default:
+        return(
+          <Text>
+            Hello
+          </Text>
+        );
+      
+    }
+  };
+  //#endregion
+
+  //#region expanded Filters
   //0-> relevance, 1-> open now, 2->popular, 3-> rating
   const [expFilterStates, setExpFilterStates] = useState(Array(4).fill(false));
 
@@ -63,6 +156,8 @@ export default function Index() {
   const [warning, setWarning] = useState(false);
   
   const width= '45%';
+  //#endregion
+  
   //#endregion
 
   return (
@@ -140,6 +235,7 @@ export default function Index() {
                 <View className="flex-row justify-between ml-[5%] mr-[5%] mt-[-2%]">
                   <ToggleButton width={width} text="Popular" flag={expFilterStates[2]} onPress={(newf)=>{updateExpFilterStates(2, newf)}}/>
                   <ToggleButton width={width} text="Rating" flag={expFilterStates[3]} onPress={(newf)=>{{updateExpFilterStates(3, newf)}}}/>
+               
                 </View>
 
                 <Text className="text-[20px] buttonTextBlack ml-[5%] ">
@@ -220,13 +316,13 @@ export default function Index() {
           <View className="items-end mt-[2%] mb-[2%] mr-[2%]">
             <NormalButton text="Apply" 
                   onClick={()=>{
-                   let min = (tempMinP.split('$').join('')=='')?0: parseInt(tempMinP.split('$').join(''), 10);
-                   let max = (tempMaxP.split('$').join('')=='')?0: parseInt(tempMaxP.split('$').join(''), 10);
-                   if(min<=max)
+                   let min = (tempMinP.split('$').join('')=='')?null: parseInt(tempMinP.split('$').join(''), 10);
+                   let max = (tempMaxP.split('$').join('')=='')?null: parseInt(tempMaxP.split('$').join(''), 10);
+                   {/*TODO handle when min =='' and max!='' and vice versa*/}
+                   if(min==null || max ==null ||min<=max)
                    {
                       setWarning(false);
-                      if(expFilterStates[0] || expFilterStates[1] || expFilterStates[2] 
-                        || expFilterStates[3] || tempMinP != ''|| tempMaxP != '' || tempSliderValue != maxD /2){
+                      if(expFilterStates.some(flag => flag) || tempMinP != ''|| tempMaxP != '' || tempSliderValue != maxD /2){
                         setisFiltersActive(true)
                       }
                       else{
@@ -255,8 +351,8 @@ export default function Index() {
         {/*Expand Services*/}
         <Modal visible={isServicesModal}>
           <View className="flex-1">
-              <View className="flex flex-row justify-between ml-[2%] mr-[2%] mt-[5%] mb-[5%]">
-                <Text className="justify-start  text-[25px] buttonTextBlack">
+              <View className="flex-row justify-between ml-[2%] mr-[2%] mt-[5%] mb-[5%]">
+                <Text className="justify-start text-[25px] buttonTextBlack">
                   Services
                 </Text>
 
@@ -275,26 +371,60 @@ export default function Index() {
                 </Pressable>
               </View>
 
-              <View className="h-full flex-row border border-stroke">
+              <View className="flex-1 flex-row ">
                 <View className="w-[30%]">
                   <ScrollView>
                     
                     <Text onPress={()=>{setISActiveTab('1')}} 
-                        className={`bg ${ActiveTab == '1'?'bg-stroke':''} py-[10%] buttonTextBlue text-[20px] text-center`}> Hi</Text>
+                        className={`bg ${ActiveTab == '1'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-t border-stroke`}
+                        > A/C & Heating
+                    </Text>
                     <Text onPress={()=>{setISActiveTab('2')}} 
-                        className={`bg ${ActiveTab == '2'?'bg-stroke':''} py-[10%] buttonTextBlue text-[20px] text-center`}>Hello</Text>
-                    
-  
+                        className={`bg ${ActiveTab == '2'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-stroke`}
+                        >Battery & Electrical
+                    </Text>
+                    <Text onPress={()=>{setISActiveTab('3')}} 
+                        className={`bg ${ActiveTab == '3'?'bg-stroke':''} py-[15%]  buttonTextBlack text-[15px] text-center border-b border-stroke`}
+                        >Engine Services
+                    </Text>
+                    <Text onPress={()=>{setISActiveTab('4')}} 
+                        className={`bg ${ActiveTab == '4'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-stroke`}
+                        >Suspension & Steering
+                    </Text>
+                    <Text onPress={()=>{setISActiveTab('5')}} 
+                        className={`bg ${ActiveTab == '5'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-stroke`}
+                        >Brakes
+                    </Text>
+                    <Text onPress={()=>{setISActiveTab('6')}} 
+                        className={`bg ${ActiveTab == '6'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-stroke`}
+                        >Exhaust & Muffler
+                    </Text>
+                    <Text onPress={()=>{setISActiveTab('7')}} 
+                        className={`bg ${ActiveTab == '7'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-stroke`}
+                        >Tires & Wheels
+                    </Text>
+                    <Text onPress={()=>{setISActiveTab('8')}} 
+                        className={`bg ${ActiveTab == '8'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-stroke`}
+                        >Fluids
+                    </Text>
+                    <Text onPress={()=>{setISActiveTab('9')}} 
+                        className={`bg ${ActiveTab == '9'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-stroke`}
+                        >Other
+                    </Text>
                   </ScrollView>
                 </View>
                 
 
-                <View className="w-full border border-stroke">
-                    <Text>
-                      Hi
-                    </Text>
+                <View className=" w-[70%] border-l border-t border-stroke">
+                    {servicesView(ActiveTab)}
+                    
                 </View>
               </View>
+            <View className="border border-stroke py-[2%]">
+              <View className="self-end mr-[5%]">
+                <NormalButton text="Apply" onClick={() => {}}/>
+              </View>
+            </View>
           </View>
         </Modal>
         
