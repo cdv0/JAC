@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router'
 import { JSX, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Text, TextInput, View } from 'react-native'
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export interface FormData {
   name: string
@@ -116,90 +117,109 @@ const profile = () => {
           <AppLogo
             width={300}
             height={75}
-            className="justify-center w-full mb-10"
+            className="self-center mb-10"
           />
 
-          {/* NAME INPUT */}
-          <Text className="font-bold text-textBlack">Name</Text>
-          <Controller
-            control={control}
-            name="name"
-            rules={{
-              required: 'Name is required',
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                onChangeText={onChange}
-                value={value}
-                placeholder="Type here"
-                className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
-              />
+          {/* SIGN UP: NAME INPUT */}
+          <View className="gap-2">
+            <Text className="smallTextBold">Name</Text>
+            <Controller
+              control={control}
+              name="name"
+              rules={{
+                required: 'Name is required',
+              }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Type here"
+                  className="p-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
+                />
+              )}
+            />
+          </View>
+
+          {/* SIGN UP: EMAIL INPUT */}
+          <View className="gap-2">
+            <Text className="smallTextBold">Email</Text>
+            <Controller
+              control={control}
+              name="email"
+              rules={{
+                required: 'Email is required',
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: 'Please enter a valid email',
+                },
+              }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Type here"
+                  className={`p-3 bg-white border rounded-full smallTextGray h-fit ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
+                />
+              )}
+            />
+            {errors.email && (
+              <Text className="dangerText mx-2">
+                {errors.email.message}
+              </Text>
             )}
-          />
+          </View>
 
-          {/* EMAIL INPUT */}
-          <Text className="font-bold text-textBlack">Email</Text>
-          <Controller
-            control={control}
-            name="email"
-            rules={{
-              required: 'Email is required',
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: 'Please enter a valid email',
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                onChangeText={onChange}
-                value={value}
-                placeholder="Type here"
-                className={`p-3 bg-white border rounded-2xl text-textLightGray ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
-              />
+          {/* SIGN UP: PASSWORD INPUT */}
+          <View className="gap-2">
+            <Text className="smallTextBold">Password</Text>
+            <Controller
+              control={control}
+              name="password"
+              rules={{
+                required: 'Password is required',
+                pattern: {
+                  value:
+                    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                  message:
+                    'Please enter password at least 8 characters with 1 uppercase, 1 number, 1 special case',
+                },
+                minLength: 8,
+              }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Type here"
+                  secureTextEntry
+                  className={`p-3 bg-white border rounded-full smallTextGray h-fit ${errors.password ? 'border-dangerBrightRed' : 'border-stroke'}`}
+                />
+              )}
+            />
+            {errors.password && (
+              <Text className="dangerText mx-2">
+                {errors.password.message}
+              </Text>
             )}
-          />
-          {errors.email && (
-            <Text className="text-sm text-dangerBrightRed">
-              {errors.email.message}
-            </Text>
-          )}
+          </View>
 
-          {/* PASSWORD INPUT */}
-          <Text className="font-bold text-textBlack">Password</Text>
-          <Controller
-            control={control}
-            name="password"
-            rules={{
-              required: 'Password is required',
-              pattern: {
-                value:
-                  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                message:
-                  'Please enter password at least 8 characters with 1 uppercase, 1 number, 1 special case',
-              },
-              minLength: 8,
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                onChangeText={onChange}
-                value={value}
-                placeholder="Type here"
-                secureTextEntry
-                className={`p-3 bg-white border rounded-2xl text-textLightGray ${errors.password ? 'border-dangerBrightRed' : 'border-stroke'}`}
-              />
-            )}
-          />
-          {errors.password && (
-            <Text className="text-sm text-dangerBrightRed">
-              {errors.password.message}
-            </Text>
-          )}
-
-          <View className="items-center">
+          <View className="items-center mt-5 mb-10">
             <NormalButton
               onClick={handleSubmit((data) => signupOnClick(data))}
               text="Sign up"
             />
+          </View>
+
+          {/* SIGN UP: Sign in navigation */}
+          <View className="flex flex-row justify-center gap-1.5">
+            <Text className="font-semibold text-textBlack">
+              Already have an account?
+            </Text>
+            <Text
+              onPress={() => setProfileStatus('SignIn')}
+              className="font-bold text-lightBlueText"
+            >
+             Sign in
+            </Text>
           </View>
         </View>
       )
@@ -207,12 +227,12 @@ const profile = () => {
     case 'VerifyAccount':
       content = (
         <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
-          <Text className="font-bold text-textBlack">
+          <Text className="smallTextBold">
             Enter Verification Code
           </Text>
           <TextInput
             placeholder="Type here"
-            className="p-3 bg-white border rounded-2xl text-textLightGray border-stroke"
+            className="p-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
             onChangeText={setVerifyCode}
             value={verifyCode}
             maxLength={6}
@@ -230,76 +250,84 @@ const profile = () => {
           <AppLogo
             width={300}
             height={75}
-            className="justify-center w-full mb-10"
+            className="self-center mb-10"
           />
 
           {errors.root && (
-            <Text className="text-2xl text-center text-dangerBrightRed">
+            <Text className="text-lg text-center dangerText mt-2">
               {errors.root.message}
             </Text>
           )}
 
-          <Text className="font-bold text-textBlack">Email</Text>
-          <Controller
-            control={control}
-            name="email"
-            rules={{
-              required: 'Email is required',
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: 'Please enter a valid email',
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                onChangeText={(text) => {
-                  onChange(text)
-                  if (errors.email) clearErrors('email')
-                }}
-                value={value}
-                placeholder="Type here"
-                className={`p-3 bg-white border rounded-2xl text-textLightGray ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
-              />
+          {/* SIGN IN: Email input */}
+          <View className="gap-2">
+            <Text className="smallTextBold">Email</Text>
+            <Controller
+              control={control}
+              name="email"
+              rules={{
+                required: 'Email is required',
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: 'Please enter a valid email',
+                },
+              }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  onChangeText={(text) => {
+                    onChange(text)
+                    if (errors.email) clearErrors('email')
+                  }}
+                  value={value}
+                  placeholder="Type here"
+                  className={`p-3 bg-white border rounded-full smallTextGray h-fit ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
+                />
+              )}
+            />
+            {errors.email && (
+              <Text className="dangerText mx-2">
+                {errors.email.message}
+              </Text>
             )}
-          />
-          {errors.email && (
-            <Text className="text-sm text-dangerBrightRed">
-              {errors.email.message}
-            </Text>
-          )}
+          </View>
 
-          <Text className="font-bold text-textBlack">Password</Text>
-          <Controller
-            control={control}
-            name="password"
-            rules={{
-              required: 'Password is required',
-              minLength: 8,
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                onChangeText={(text) => {
-                  onChange(text)
-                  if (errors.password) clearErrors('password')
-                }}
-                value={value}
-                placeholder="Type here"
-                secureTextEntry
-                className={`p-3 bg-white border rounded-2xl text-textLightGray ${errors.password ? 'border-dangerBrightRed' : 'border-stroke'}`}
-              />
+          {/* SIGN IN: Password input */}
+          <View className="gap-2">
+            <Text className="smallTextBold">Password</Text>
+            <Controller
+              control={control}
+              name="password"
+              rules={{
+                required: 'Password is required',
+                minLength: 8,
+              }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  onChangeText={(text) => {
+                    onChange(text)
+                    if (errors.password) clearErrors('password')
+                  }}
+                  value={value}
+                  placeholder="Type here"
+                  secureTextEntry
+                  className={`p-3 bg-white border rounded-full smallTextGray h-fit ${errors.password ? 'border-dangerBrightRed' : 'border-stroke'}`}
+                />
+              )}
+            />
+            {errors.password && (
+              <Text className="dangerText mx-2">
+                {errors.password.message}
+              </Text>
             )}
-          />
-          {errors.password && (
-            <Text className="text-sm text-dangerBrightRed">
-              {errors.password.message}
-            </Text>
-          )}
+          </View>
 
-          <Text className="flex justify-end font-bold text-lightBlueText">
+          {/* SIGN IN: Forgot password */}
+          <Text className="flex text-right font-bold text-lightBlueText mx-2">
             Forgot password?
           </Text>
 
-          <View className="flex items-center justify-center">
+          {/* SIGN IN: Log in button */}
+          <View className="flex items-center justify-center mt-5">
             <NormalButton
               onClick={handleSubmit((data) => signinOnClick(data))}
               text="Log in"
@@ -307,8 +335,10 @@ const profile = () => {
             />
           </View>
 
+          {/* hr */}
           <View className="w-full h-px my-6 bg-stroke" />
 
+          {/* SIGN IN: Sign in with Google */}
           <View className="relative flex-row items-center justify-center mb-10">
             <NormalButton
               text="Sign in with Google"
@@ -318,15 +348,16 @@ const profile = () => {
             />
           </View>
 
-          <View className="flex flex-row justify-center gap-2">
-            <Text className="font-bold text-textBlack">
+          {/* SIGN IN: Sign up navigation */}
+          <View className="flex flex-row justify-center gap-1.5">
+            <Text className="font-semibold text-textBlack">
               Don't have an account?
             </Text>
             <Text
               onPress={() => setProfileStatus('SignUp')}
               className="font-bold text-lightBlueText"
             >
-              Sign up
+             Sign up
             </Text>
           </View>
         </View>
@@ -352,7 +383,12 @@ const profile = () => {
   }, [])
 
   return (
-    <View className="w-full overflow-hidden bg-white min-h-dvh">{content}</View>
+    <SafeAreaView 
+      edges={["top", "bottom"]} 
+      className="w-full overflow-hidden bg-white h-full justify-center"
+    >
+      <View>{content}</View>
+    </SafeAreaView>
   )
 }
 
