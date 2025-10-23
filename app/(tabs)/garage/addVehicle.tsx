@@ -11,24 +11,36 @@ export const addVehicle = () => {
   const [submitted, setSubmitted] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const [VIN, setVIN] = useState("");
-  const [plateNum, setPlateNum] = useState("");
-  const [make, setMake] = useState("");
-  const [model, setModel] = useState("");
-  const [year, setYear] = useState("");
+  const [VIN, setVIN] = useState('')
+  const [plateNum, setPlateNum] = useState('')
+  const [make, setMake] = useState('')
+  const [model, setModel] = useState('')
+  const [year, setYear] = useState('')
 
   const handleSave = async () => {
     // Check all inputs are filled
-    setSubmitted(true);
+    setSubmitted(true)
 
-    if (!VIN.trim() || !plateNum.trim() || !make.trim() || !model.trim() || !year.trim()) {
-      console.log("Add vehicle: Missing fields:", { VIN, plateNum, make, model, year });
-      return;
+    if (
+      !VIN.trim() ||
+      !plateNum.trim() ||
+      !make.trim() ||
+      !model.trim() ||
+      !year.trim()
+    ) {
+      console.log('Add vehicle: Missing fields:', {
+        VIN,
+        plateNum,
+        make,
+        model,
+        year,
+      })
+      return
     }
 
     // Make API call to create vehicle
     try {
-      const { userId } = await getCurrentUser();
+      const { userId } = await getCurrentUser()
       const payload = {
         userId: userId,
         VIN,
@@ -36,24 +48,23 @@ export const addVehicle = () => {
         make,
         model,
         year: Number(year),
-      };
+      }
 
-      const data = await createVehicle(payload);
-      console.log("Add vehicle: success:", data);
+      const data = await createVehicle(payload)
+      console.log('Add vehicle: success:', data)
 
-      setVIN("");
-      setPlateNum("");
-      setMake("");
-      setModel("");
-      setYear("");
+      setVIN('')
+      setPlateNum('')
+      setMake('')
+      setModel('')
+      setYear('')
 
-      router.replace("/(tabs)/garage");
-
+      router.replace('/(tabs)/garage')
     } catch (err: any) {
-      console.log("Add vehicle: Error creating vehicle:", err);
-      console.log("Add vehicle: Error message:", err?.message);
+      console.log('Add vehicle: Error creating vehicle:', err)
+      console.log('Add vehicle: Error message:', err?.message)
     }
-  };
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
@@ -222,7 +233,7 @@ export const addVehicle = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
-export default addVehicle;
+export default addVehicle
