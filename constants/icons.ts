@@ -13,6 +13,7 @@ import noImage from "@/public/assets/icons/noImage.svg"
 import pencil from "@/public/assets/icons/edit.svg"
 import arrowDown from "@/public/assets/icons/arrowDown.svg"
 import arrowUp from "@/public/assets/icons/arrowUp.svg"
+import upload from "@/public/assets/icons/upload.svg"
 
 export const icons = {
     garage,
@@ -29,5 +30,6 @@ export const icons = {
     noImage,
     pencil,
     arrowDown,
-    arrowUp
+    arrowUp,
+    upload
 };

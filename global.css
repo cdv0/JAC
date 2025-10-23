@@ -26,6 +26,8 @@ body {
   }
     .xsText { @apply text-sm text-textBlack }
 
+    .xsTextGray { @apply text-sm text-subheaderGray }
+
     .smallText { @apply text-base text-textBlack }
 
     .smallTextBold { @apply text-base font-semibold text-textBlack }

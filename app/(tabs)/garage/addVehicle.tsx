@@ -1,11 +1,11 @@
 import NormalButton from "@/app/components/NormalButton";
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert, ScrollView } from "react-native";
+import { View, Text, TextInput, Pressable, Modal, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createVehicle } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { router } from "expo-router";
-import { icons } from "@/constants/icons"
+import { icons } from "@/constants/icons";
 
 export const addVehicle = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -156,6 +156,64 @@ export const addVehicle = () => {
               <Text className="dangerText mx-2">Year is required</Text>
             ): null}
           </View>
+
+          {/* Vehicle image file/photo uploader */}
+          <View className="gap-2">
+            <Text className="smallTextBold">Upload vehicle image</Text>
+            <Text className="xsTextGray">Up to 5MB per file in HEIC, HEIF, JPEG, JPG, PNG</Text>
+            <Pressable
+              onPress={() => setModalVisible(!modalVisible)}
+              className="flex-1 flex-row gap-2 border border-dashed border-grayBorder rounded-lg px-2 py-3"
+            >
+              <icons.upload/>
+              <View className="flex-1 justify-center gap-0.5">
+                <Text className="xsTextGray">Upload</Text>
+                {/* TODO: ADD DIMENSION HERE e.g. 1024(w) X 128(h) */}
+                <Text className="xsTextGray"></Text>
+              </View>
+            </Pressable>
+          </View>
+
+          {/* File/photo uploader modal */}
+          <Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            {/* Fullscreen */}
+            <View className="flex-1 justify-end px-2">
+              {/* Shadow background */}
+              <Pressable 
+                className="absolute inset-0 bg-black/40"
+                onPress={() => setModalVisible(false)}>
+              </Pressable>
+
+              {/* Bottom popup */}
+              <View className="w-full mb-3 gap-2 mx-3 self-center">
+
+                {/* Select source buttons */}
+                <View className="bg-white px-4 py-3 rounded-lg">
+                  <Text className="smallTextGray">Choose source</Text>
+                  <Pressable className="py-3 border-b border-stroke">
+                    <Text className="smallText">Choose a file</Text>
+                  </Pressable>
+                  <Pressable className="py-3">
+                    <Text className="smallText">Choose from photos</Text>
+                  </Pressable>
+                </View>
+
+                {/* Cancel button */}
+                <View className="bg-white rounded-lg">
+                  <Pressable 
+                    onPress={() => setModalVisible(false)}
+                    className="px-4 py-3"
+                  >
+                    <Text className="text-center smallTextBold">Cancel</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
 
           {/* SAVE BUTTON */}
           <View className="mt-5">
