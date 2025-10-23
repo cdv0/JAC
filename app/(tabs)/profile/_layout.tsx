@@ -31,7 +31,7 @@ export default function AccountLayout() {
           headerBackVisible: false,
           headerLeft: () => (
             <Pressable
-              onPress={() => router.back()}
+              onPress={() => router.push('/(tabs)/profile/logged')}
               className="flex-row items-center px-2"
               hitSlop={2}
             >

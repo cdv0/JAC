@@ -10,15 +10,17 @@ export default function Settings() {
     <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
       <View className="justify-start flex-1">
         <View className="h-full px-2 pt-3">
-          <View className="bg-white rounded-2xl">
+
+          {/* First container */}
+          <View className="bg-white rounded-xl">
             {/* Account */}
-            <Pressable className="flex-row justify-between px-6 pt-3 pb-2 mt-2 ">
-              <Text className="font-bold text-textBlack">Account</Text>
+            <Pressable className="flex-row justify-between px-5 pb-3 pt-5">
+              <Text className="font-semibold text-textBlack">Account</Text>
 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
-                viewBox="0 2 24 24"
+                viewBox="0 2 28 28"
                 stroke-width="2.5"
                 stroke="currentColor"
                 className="w-6 h-6 font-extrabold text-textBlack"
@@ -31,14 +33,14 @@ export default function Settings() {
               </svg>
             </Pressable>
 
-            {/* Contact US */}
-            <Pressable className="flex-row justify-between px-6 pt-3 pb-2 mt-2 ">
-              <Text className="font-bold text-textBlack">Contact us</Text>
+            {/* Contact us */}
+            <Pressable className="flex-row justify-between px-5 py-3">
+              <Text className="font-semibold text-textBlack">Contact us</Text>
 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
-                viewBox="0 2 24 24"
+                viewBox="0 2 28 28"
                 stroke-width="2.5"
                 stroke="currentColor"
                 className="w-6 h-6 font-extrabold text-textBlack"
@@ -54,7 +56,7 @@ export default function Settings() {
 
           {/* Sign out */}
           <Pressable
-            className="flex-row justify-between px-6 pt-3 pb-2 mt-2 align-middle bg-white rounded-2xl"
+            className="flex-row justify-between px-5 pb-3 pt-4 mt-2.5 align-middle bg-white rounded-xl"
             onPointerDown={async () => {
               try {
                 await signOut()
@@ -64,17 +66,17 @@ export default function Settings() {
               }
             }}
           >
-            <Text className="font-extrabold align-middle text-dangerDarkRed">
+            <Text className="font-bold align-middle text-dangerBrightRed">
               Sign out
             </Text>
 
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
-              viewBox="0 2 24 24"
+              viewBox="0 2 28 28"
               stroke-width="2.5"
               stroke="currentColor"
-              className="w-6 h-6 font-extrabold text-dangerDarkRed"
+              className="w-6 h-6 font-extrabold text-dangerBrightRed"
             >
               <path
                 stroke-linecap="round"
