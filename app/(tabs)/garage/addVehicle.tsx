@@ -17,6 +17,13 @@ export const addVehicle = () => {
   const [model, setModel] = useState('')
   const [year, setYear] = useState('')
 
+  // Check for empty input upon submission
+  const isVINInvalid = submitted && !VIN.trim();
+  const isPlateInvalid = submitted && !plateNum.trim();
+  const isMakeInvalid = submitted && !make.trim();
+  const isModelInvalid = submitted && !model.trim();
+  const isYearInvalid = submitted && !year.trim();
+
   const handleSave = async () => {
     // Check all inputs are filled
     setSubmitted(true)
@@ -82,11 +89,11 @@ export const addVehicle = () => {
               placeholder="Type here"
               keyboardType="default"
               onChangeText={setVIN}
-              className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+              className={`border rounded-full px-4 py-2 smallTextGray ${isVINInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
             />
             
             {/* Error message for empty input */}
-            {submitted && !VIN.trim() ? (
+            {isVINInvalid ? (
               <Text className="dangerText mx-2">VIN is required</Text>
             ): null}
           </View>
@@ -101,11 +108,11 @@ export const addVehicle = () => {
               value={plateNum}
               placeholder="Type here"
               onChangeText={setPlateNum}
-              className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+              className={`border rounded-full px-4 py-2 smallTextGray ${isPlateInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
             />
 
             {/* Error message for empty input */}
-            {submitted && !plateNum.trim() ? (
+            {isPlateInvalid ? (
               <Text className="dangerText mx-2">Plate number is required</Text>
             ): null}
           </View>
@@ -120,11 +127,11 @@ export const addVehicle = () => {
               value={make}
               placeholder="Type here"
               onChangeText={setMake}
-              className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+              className={`border rounded-full px-4 py-2 smallTextGray ${isMakeInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
             />
 
             {/* Error message for empty input */}
-            {submitted && !make.trim() ? (
+            {isMakeInvalid ? (
               <Text className="dangerText mx-2">Make is required</Text>
             ): null}
           </View>
@@ -139,11 +146,11 @@ export const addVehicle = () => {
               value={model}
               placeholder="Type here"
               onChangeText={setModel}
-              className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+              className={`border rounded-full px-4 py-2 smallTextGray ${isModelInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
             />
 
             {/* Error message for empty input */}
-            {submitted && !model.trim() ? (
+            {isModelInvalid ? (
               <Text className="dangerText mx-2">Model is required</Text>
             ): null}
           </View>
@@ -159,11 +166,11 @@ export const addVehicle = () => {
               placeholder="Type here"
               keyboardType="numeric"
               onChangeText={setYear}
-              className="border rounded-full border-stroke px-4 py-2 smallTextGray"
+              className={`border rounded-full px-4 py-2 smallTextGray ${isYearInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
             />
 
             {/* Error message for empty input */}
-            {submitted && !year.trim() ? (
+            {isYearInvalid ? (
               <Text className="dangerText mx-2">Year is required</Text>
             ): null}
           </View>

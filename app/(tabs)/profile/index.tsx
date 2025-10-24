@@ -134,7 +134,7 @@ const profile = () => {
                   onChangeText={onChange}
                   value={value}
                   placeholder="Type here"
-                  className="p-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
+                  className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
                 />
               )}
             />
@@ -158,7 +158,7 @@ const profile = () => {
                   onChangeText={onChange}
                   value={value}
                   placeholder="Type here"
-                  className={`p-3 bg-white border rounded-full smallTextGray h-fit ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
+                  className={`px-4 py-3 bg-white border rounded-full smallTextGray h-fit ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
                 />
               )}
             />
@@ -191,7 +191,7 @@ const profile = () => {
                   value={value}
                   placeholder="Type here"
                   secureTextEntry
-                  className={`p-3 bg-white border rounded-full smallTextGray h-fit ${errors.password ? 'border-dangerBrightRed' : 'border-stroke'}`}
+                  className={`px-4 py-3 bg-white border rounded-full smallTextGray h-fit ${errors.password ? 'border-dangerBrightRed' : 'border-stroke'}`}
                 />
               )}
             />
@@ -232,7 +232,7 @@ const profile = () => {
           </Text>
           <TextInput
             placeholder="Type here"
-            className="p-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
+            className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
             onChangeText={setVerifyCode}
             value={verifyCode}
             maxLength={6}
@@ -280,7 +280,7 @@ const profile = () => {
                   }}
                   value={value}
                   placeholder="Type here"
-                  className={`p-3 bg-white border rounded-full smallTextGray h-fit ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
+                  className={`px-4 py-3 bg-white border rounded-full smallTextGray h-fit ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
                 />
               )}
             />
@@ -310,7 +310,7 @@ const profile = () => {
                   value={value}
                   placeholder="Type here"
                   secureTextEntry
-                  className={`p-3 bg-white border rounded-full smallTextGray h-fit ${errors.password ? 'border-dangerBrightRed' : 'border-stroke'}`}
+                  className={`px-4 py-3 bg-white border rounded-full smallTextGray h-fit ${errors.password ? 'border-dangerBrightRed' : 'border-stroke'}`}
                 />
               )}
             />
