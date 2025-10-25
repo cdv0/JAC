@@ -16,7 +16,7 @@ export const account = () => {
     (async () => {
     try {
       const { userId } = await getCurrentUser();
-      const attrs = await fetchUserAttributes();
+      const attrs = await fetchUserAttributes(); //Invalid identity pool configuration, possible cause is IAM role permissions. or amplify containing identity pool.
       console.log("TESTING")
       const email = attrs.email;
       if (!email) {
