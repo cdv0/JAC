@@ -335,7 +335,10 @@ const profile = () => {
             <NormalButton
               text="Sign in with Google"
               variant="outline"
-              onClick={() => handleGoogleSignIn('Google')}
+              onClick={() => {
+                reset()
+                handleGoogleSignIn('Google')
+              }}
               icon={<GoogleLogo width={20} height={20} />}
             />
           </View>
