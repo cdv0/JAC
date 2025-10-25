@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router'
 import { JSX, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Text, TextInput, View } from 'react-native'
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export interface FormData {
   name: string
@@ -114,11 +114,7 @@ const profile = () => {
     case 'SignUp':
       content = (
         <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
-          <AppLogo
-            width={300}
-            height={75}
-            className="self-center mb-10"
-          />
+          <AppLogo width={300} height={75} className="self-center mb-10" />
 
           {/* SIGN UP: NAME INPUT */}
           <View className="gap-2">
@@ -139,6 +135,9 @@ const profile = () => {
               )}
             />
           </View>
+          {errors.name && (
+            <Text className="mx-2 dangerText">{errors.name.message}</Text>
+          )}
 
           {/* SIGN UP: EMAIL INPUT */}
           <View className="gap-2">
@@ -163,9 +162,7 @@ const profile = () => {
               )}
             />
             {errors.email && (
-              <Text className="dangerText mx-2">
-                {errors.email.message}
-              </Text>
+              <Text className="mx-2 dangerText">{errors.email.message}</Text>
             )}
           </View>
 
@@ -196,9 +193,7 @@ const profile = () => {
               )}
             />
             {errors.password && (
-              <Text className="dangerText mx-2">
-                {errors.password.message}
-              </Text>
+              <Text className="mx-2 dangerText">{errors.password.message}</Text>
             )}
           </View>
 
@@ -218,7 +213,7 @@ const profile = () => {
               onPress={() => setProfileStatus('SignIn')}
               className="font-bold text-lightBlueText"
             >
-             Sign in
+              Sign in
             </Text>
           </View>
         </View>
@@ -227,9 +222,7 @@ const profile = () => {
     case 'VerifyAccount':
       content = (
         <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
-          <Text className="smallTextBold">
-            Enter Verification Code
-          </Text>
+          <Text className="smallTextBold">Enter Verification Code</Text>
           <TextInput
             placeholder="Type here"
             className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
@@ -247,14 +240,10 @@ const profile = () => {
     case 'SignIn':
       content = (
         <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left ">
-          <AppLogo
-            width={300}
-            height={75}
-            className="self-center mb-10"
-          />
+          <AppLogo width={300} height={75} className="self-center mb-10" />
 
           {errors.root && (
-            <Text className="text-lg text-center dangerText mt-2">
+            <Text className="mt-2 text-lg text-center dangerText">
               {errors.root.message}
             </Text>
           )}
@@ -285,9 +274,7 @@ const profile = () => {
               )}
             />
             {errors.email && (
-              <Text className="dangerText mx-2">
-                {errors.email.message}
-              </Text>
+              <Text className="mx-2 dangerText">{errors.email.message}</Text>
             )}
           </View>
 
@@ -315,14 +302,12 @@ const profile = () => {
               )}
             />
             {errors.password && (
-              <Text className="dangerText mx-2">
-                {errors.password.message}
-              </Text>
+              <Text className="mx-2 dangerText">{errors.password.message}</Text>
             )}
           </View>
 
           {/* SIGN IN: Forgot password */}
-          <Text className="flex text-right font-bold text-lightBlueText mx-2">
+          <Text className="flex mx-2 font-bold text-right text-lightBlueText">
             Forgot password?
           </Text>
 
@@ -357,7 +342,7 @@ const profile = () => {
               onPress={() => setProfileStatus('SignUp')}
               className="font-bold text-lightBlueText"
             >
-             Sign up
+              Sign up
             </Text>
           </View>
         </View>
@@ -383,9 +368,9 @@ const profile = () => {
   }, [])
 
   return (
-    <SafeAreaView 
-      edges={["top", "bottom"]} 
-      className="w-full overflow-hidden bg-white h-full justify-center"
+    <SafeAreaView
+      edges={['top', 'bottom']}
+      className="justify-center w-full h-full overflow-hidden bg-white"
     >
       <View>{content}</View>
     </SafeAreaView>
