@@ -22,8 +22,11 @@ const authConfig: ResourcesConfig['Auth'] = {
       oauth: {
         domain: 'us-west-1n5poqvbke.auth.us-west-1.amazoncognito.com',
         scopes: ['email', 'aws.cognito.signin.user.admin', 'openid', 'profile'],
-        redirectSignIn: [redirectSignIn],
-        redirectSignOut: [redirectSignOut],
+        redirectSignIn: [
+          'http://localhost:8081/profile/logged',
+          'jac://profile/logged',
+        ],
+        redirectSignOut: ['jac://profile', 'http://localhost:8081/profile'],
         responseType: 'code',
       },
     },
