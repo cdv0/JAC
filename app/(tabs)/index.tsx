@@ -9,6 +9,7 @@ import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
 export default function Index() {
 
+  //TODO: Apply filtering
   const [categories, setCategories] = useState<string[]>([]);
 
   //#region helper functions
@@ -29,7 +30,7 @@ export default function Index() {
       removeCategory(Category)
   };
 
-    const updateStates =(i:number, value:boolean, setFunc:React.Dispatch<React.SetStateAction<any[]>>) =>{
+  const updateStates =(i:number, value:boolean, setFunc:React.Dispatch<React.SetStateAction<any[]>>) =>{
     setFunc(arr =>
       arr.map((item, index) =>(index ===i)?value:item)
     );
@@ -38,14 +39,15 @@ export default function Index() {
   //#region constants
   const [isFiltersActive, setisFiltersActive] = useState(false);
   const [isFiltersModal, setisFiltersModal] = useState(false);
+  const width= '45%';//for toggle button
 
   //#region quick Filter
-  
   //0 -> oil change, 1 -> tire, 2-> Smog, 3->Transmission, 4->Wheel
   const [quickFilterStates, setQuickFilterStates] = useState(Array(5).fill(false));
 
   //#endregion
   
+
   //#region services filter
   const [isServicesActive, setIsServicesActive] = useState(false);
   const [isServicesModal, setIsServicesModal] = useState(false);
@@ -53,12 +55,20 @@ export default function Index() {
 
   const [AC_Heat, setAC_Heat] = useState(Array(5).fill(false));
   const [Bat_Elec, setBat_Elec] = useState(Array(5).fill(false));
+  const [Eng_Serv, setEng_Serv] = useState(Array(5).fill(false));
+  const [Suspen_Steer, setSuspen_Steer] = useState(Array(4).fill(false));
+  const [Brakes, setBrakes] = useState(Array(5).fill(false));
+  const [Exh_Muff, setExh_Muff] = useState(Array(4).fill(false));
+  const [Tires, setTires] = useState(Array(4).fill(false));
+  const [Fluids, setFluids] = useState(Array(6).fill(false));
+  const [Other, setOther] = useState(Array(5).fill(false));
+
+  //Render the sub-categories depending on the current main-category viewed
   const servicesView = (id:string) =>{
     switch(id){
       case '1':
         return(
-          <View>
-            <ScrollView className="gap-[5%]">
+          <>
               <Text className={` ${AC_Heat[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
                     onPress={()=>{updateStates(0, !AC_Heat[0], setAC_Heat)}}
               >
@@ -80,38 +90,207 @@ export default function Index() {
               <Text className={` ${AC_Heat[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
                     onPress={()=>{updateStates(4, !AC_Heat[4], setAC_Heat)}}>
                 Thermostat/water pump
-              </Text>
-            </ScrollView>
-          </View>
+              </Text>   
+          </>
         );   
       case '2':
         return(
-          <ScrollView className="gap-[5%]">
+          <>
             <Text className={` ${Bat_Elec[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
                     onPress={()=>{updateStates(0, !Bat_Elec[0], setBat_Elec)}}>
               Battery Replacement
             </Text>
-            <Text className="buttonTextBlue w-full border-b py-[5%] border-stroke text-center">
+            <Text className={` ${Bat_Elec[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(1, !Bat_Elec[1], setBat_Elec)}}>
               Alternator/Starter Repair
             </Text>
-            <Text className="buttonTextBlue w-full border-b py-[5%] border-stroke text-center">
+            <Text className={` ${Bat_Elec[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(2, !Bat_Elec[2], setBat_Elec)}}>
               Wiring & Fuses
             </Text>
-            <Text className="buttonTextBlue w-full border-b py-[5%] border-stroke text-center">
-               Check Engine Light Diagnostics
+            <Text className={` ${Bat_Elec[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(3, !Bat_Elec[3], setBat_Elec)}}>
+               Radio
             </Text>
-            <Text className="buttonTextBlue w-full border-b py-[5%] border-stroke text-center">
-              Lighting/Electronics
+            <Text className={` ${Bat_Elec[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(4, !Bat_Elec[4], setBat_Elec)}}>
+              Lighting
             </Text>
-          </ScrollView>
-        );      
-      default:
+          </>
+        );     
+      case '3':
         return(
-          <Text>
-            Hello
-          </Text>
+          <>
+            <Text className={` ${Eng_Serv[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(0, !Eng_Serv[0], setEng_Serv)}}>
+              Engine Diagnosts/Check Engine lights
+            </Text>
+            <Text className={` ${Eng_Serv[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(1, !Eng_Serv[1], setEng_Serv)}}>
+              Engine Repair
+            </Text>
+            <Text className={` ${Eng_Serv[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(2, !Eng_Serv[2], setEng_Serv)}}>
+              Ignition System
+            </Text>
+            <Text className={` ${Eng_Serv[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(3, !Eng_Serv[3], setEng_Serv)}}>
+              Fuel System
+            </Text>
+            <Text className={` ${Eng_Serv[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(4, !Eng_Serv[4], setEng_Serv)}}>
+              Engine Performance Check
+            </Text>
+          </>
         );
-      
+      case '4':
+        return(
+          <>
+            <Text className={` ${Suspen_Steer[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(0, !Suspen_Steer[0], setSuspen_Steer)}}>
+              Steering Wheel adjustment
+            </Text>
+            <Text className={` ${Suspen_Steer[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(1, !Suspen_Steer[1], setSuspen_Steer)}}>
+              Shock and Strut replacement
+            </Text>
+            <Text className={` ${Suspen_Steer[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(2, !Suspen_Steer[2], setSuspen_Steer)}}>
+              Power Streering repair
+            </Text>
+            <Text className={` ${Suspen_Steer[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(3, !Suspen_Steer[3], setSuspen_Steer)}}>
+              Steering/Suspension Component Replacement
+            </Text>
+          </>
+        );
+      case '5':
+        return(
+          <>
+            <Text className={` ${Brakes[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(0, !Brakes[0], setBrakes)}}>
+              Brake Pad Replacement
+            </Text>
+            <Text className={` ${Brakes[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(1, !Brakes[1], setBrakes)}}>
+              Rotor and drum replacement
+            </Text>
+            <Text className={` ${Brakes[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(2, !Brakes[2], setBrakes)}}>
+              Brake caliper
+            </Text>
+            <Text className={` ${Brakes[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(3, !Brakes[3], setBrakes)}}>
+              Anti-Lock Braking Diagnostics and Repair
+            </Text>
+            <Text className={` ${Brakes[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(4, !Brakes[4], setBrakes)}}>
+              Parking/Emergency Brake Repair
+            </Text>
+          </>
+        );
+      case '6':
+        return(
+          <>
+            <Text className={` ${Exh_Muff[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(0, !Exh_Muff[0], setExh_Muff)}}>
+              Muffler Replacement
+            </Text>
+            <Text className={` ${Exh_Muff[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(1, !Exh_Muff[1], setExh_Muff)}}>
+              Catalytic Converter Replacement
+            </Text>
+            <Text className={` ${Exh_Muff[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(2, !Exh_Muff[2], setExh_Muff)}}>
+              Exhaust Pipe Repair
+            </Text>
+            <Text className={` ${Exh_Muff[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(3, !Exh_Muff[3], setExh_Muff)}}>
+              Exhaust Pipe Alignment
+            </Text>
+          </>
+        );
+      case '7':
+        return(
+          <>
+            <Text className={` ${Tires[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(0, !Tires[0], setTires)}}>
+              Tire rotation
+            </Text>
+            <Text className={` ${Tires[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(1, !Tires[1], setTires)}}>
+              Tire Repair
+            </Text>
+            <Text className={` ${Tires[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(2, !Tires[2], setTires)}}>
+              Tire Replacement
+            </Text>
+            <Text className={` ${Tires[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(3, !Tires[3], setTires)}}>
+              Tire Rim Repair
+            </Text>
+          </>
+        );
+      case '8':
+        return(
+          <>
+            <Text className={` ${Fluids[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(0, !Fluids[0], setFluids)}}>
+              Oil/Filter Replacement
+            </Text>
+            <Text className={` ${Fluids[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(1, !Fluids[1], setFluids)}}>
+              Coolant Replacement
+            </Text>
+            <Text className={` ${Fluids[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(2, !Fluids[2], setFluids)}}>
+             Transmission Replacement
+            </Text>
+            <Text className={` ${Fluids[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(3, !Fluids[3], setFluids)}}>
+             Power Steering Fluid Replacement
+            </Text>
+            <Text className={` ${Fluids[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(4, !Fluids[4], setFluids)}}>
+              Brake Fluid Replacement
+            </Text>
+            <Text className={` ${Fluids[5]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(5, !Fluids[5], setFluids)}}>
+              Differential Fluid Replacement
+            </Text>
+          </>
+        );
+      case '9':
+        return(
+          <>
+            <Text className={` ${Other[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                      onPress={()=>{updateStates(0, !Other[0], setOther)}}>
+              Emission Check
+            </Text>
+            <Text className={` ${Other[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                      onPress={()=>{updateStates(1, !Other[1], setOther)}}>
+              SeatBelt Replacement
+            </Text>
+            <Text className={` ${Other[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(2, !Other[2], setOther)}}>
+              Door Handle Replacement
+            </Text>
+            <Text className={` ${Other[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(3, !Other[3], setOther)}}>
+              Wiper Replacement
+            </Text>
+            <Text className={` ${Other[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
+                    onPress={()=>{updateStates(4, !Other[4], setOther)}}>
+              Seat Replacement
+            </Text>
+          </>    
+        );
+        default:
+          return(
+            <Text>
+              This should not be seen
+            </Text>
+          ); 
     }
   };
   //#endregion
@@ -119,7 +298,6 @@ export default function Index() {
   //#region expanded Filters
   //0-> relevance, 1-> open now, 2->popular, 3-> rating
   const [expFilterStates, setExpFilterStates] = useState(Array(4).fill(false));
-
   const [expFilterApplied, setExpFilterApplied] = useState(Array(4).fill(false));
 
   const [minP, setminP] = useState('');
@@ -134,7 +312,6 @@ export default function Index() {
   const [tempSliderValue, setTempSliderValue] = useState(sliderValue);
   const [warning, setWarning] = useState(false);
   
-  const width= '45%';
   //#endregion
   
   //#endregion
@@ -338,6 +515,9 @@ export default function Index() {
                 <Pressable 
                   onPress={()=> 
                     {
+                      setIsServicesActive(AC_Heat.some(x =>x) || 
+                        Bat_Elec.some(x=>x) || Eng_Serv.some(x=>x) || Suspen_Steer.some(x=>x) || Brakes.some(x=>x)||
+                        Exh_Muff.some(x=>x)|| Tires.some(x=>x) || Fluids.some(x=>x) || Other.some(x=>x))
                       setIsServicesModal(!isServicesModal);
                     }}>
         
@@ -352,7 +532,7 @@ export default function Index() {
 
               <View className="flex-1 flex-row ">
                 <View className="w-[30%]">
-                  <ScrollView>
+                  <ScrollView showsHorizontalScrollIndicator={false}>
                     
                     <Text onPress={()=>{setISActiveTab('1')}} 
                         className={`bg ${ActiveTab == '1'?'bg-stroke':''} py-[15%] buttonTextBlack text-[15px] text-center border-b border-t border-stroke`}
@@ -395,8 +575,9 @@ export default function Index() {
                 
 
                 <View className=" w-[70%] border-l border-t border-stroke">
-                    {servicesView(ActiveTab)}
-                    
+                    <ScrollView className="gap-[5%]" showsHorizontalScrollIndicator={false}>
+                      {servicesView(ActiveTab)}    
+                    </ScrollView> 
                 </View>
               </View>
           </View>
