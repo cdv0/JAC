@@ -32,6 +32,7 @@ const profile = () => {
     getValues,
     setError,
     clearErrors,
+    reset,
   } = useForm<FormData>({
     defaultValues: { name: '', email: '', password: '' },
   })
@@ -55,6 +56,7 @@ const profile = () => {
     // handle success account
     if (result === 'success') {
       setVerifyCode('')
+      reset()
       setProfileStatus('SignIn')
     } else {
       // notify user about wrong code or other error
@@ -73,6 +75,7 @@ const profile = () => {
     if (result?.user) {
       if (result.user?.nextStep.signInStep === 'DONE') {
         //handle signing in change
+        reset()
         router.push('/profile/logged')
       }
     }
@@ -106,6 +109,7 @@ const profile = () => {
           })
       }
     }
+    reset()
   }
 
   let content: JSX.Element = <View />
