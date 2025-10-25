@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, FlatList, Pressable, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import NormalButton from "@/app/components/NormalButton";
-import { useRouter } from "expo-router";
 import { listVehicles, type Vehicle } from "@/_backend/api/vehicle";
-import { getCurrentUser } from "aws-amplify/auth";
+import NormalButton from "@/app/components/NormalButton";
 import { icons } from "@/constants/icons";
-import { Hub } from "aws-amplify/utils";
 import { useFocusEffect } from "@react-navigation/native";
+import { getCurrentUser } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
+import { useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const garage = () => {
   const router = useRouter();
