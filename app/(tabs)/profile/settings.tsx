@@ -34,8 +34,9 @@ export default function Settings() {
             </Pressable>
 
             {/* Contact us */}
-            <Pressable className="flex-row justify-between px-5 py-3">
+            <Pressable className="flex-row justify-between px-5 py-3" onPress={() => router.push('profile/contact')}>
               <Text className="font-semibold text-textBlack">Contact us</Text>
+              
 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
