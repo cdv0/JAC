@@ -214,7 +214,10 @@ const profile = () => {
               Already have an account?
             </Text>
             <Text
-              onPress={() => setProfileStatus('SignIn')}
+              onPress={() => {
+                reset()
+                setProfileStatus('SignIn')
+              }}
               className="font-bold text-lightBlueText"
             >
               Sign in
@@ -343,7 +346,10 @@ const profile = () => {
               Don't have an account?
             </Text>
             <Text
-              onPress={() => setProfileStatus('SignUp')}
+              onPress={() => {
+                reset()
+                setProfileStatus('SignUp')
+              }}
               className="font-bold text-lightBlueText"
             >
               Sign up
