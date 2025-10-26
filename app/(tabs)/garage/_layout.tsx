@@ -1,9 +1,10 @@
 import NormalButton from "@/app/components/NormalButton";
 import { icons } from "@/constants/icons";
 import { getCurrentUser } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 import { Stack, router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Text, View, TouchableOpacity } from "react-native";
+import { Text, View, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function GarageLayout() {
@@ -21,6 +22,23 @@ export default function GarageLayout() {
     checkUser();
   }, []);
 
+  useEffect(() => {
+    const unsub = Hub.listen("auth", ({ payload }) => {
+      if (payload.event === "signedIn") setIsAuthenticated(true);
+      if (payload.event === "signedOut") setIsAuthenticated(false);
+    });
+    return () => unsub();
+  }, []);
+
+  if (isAuthenticated === null) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center" edges={["top","bottom"]}>
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
+  // Unauthenticated user view
   if (isAuthenticated === false) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center" edges={["top", "bottom"]}>
@@ -66,18 +84,24 @@ export default function GarageLayout() {
           ),
           headerBackVisible: false,
           headerLeft: () => (
-            <TouchableOpacity
+            <Pressable
               onPress={() => router.push("/garage")}
               className="flex-row items-center px-2"
-              hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
+              hitSlop={2}
             >
               <icons.chevBack width={24} height={24} fill="#1B263B" />
-              <Text className="ml-1 text-[#415A77] text-[15px] font-medium">
+              <Text className="ml-1 text-primaryBlue text-[15px] font-medium">
                 Back
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ),
         }}
+      />
+
+      {/* Don't show the top bar from the parent _layout file. Show it in the nested _layout file */}
+      <Stack.Screen
+        name="vehicle/[vehicleId]"
+        options={{ headerShown: false }}
       />
     </Stack>
   );

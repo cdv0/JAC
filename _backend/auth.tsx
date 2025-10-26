@@ -1,5 +1,40 @@
-import { confirmSignUp, signIn, signUp } from 'aws-amplify/auth'
+import {
+  confirmSignUp,
+  fetchAuthSession,
+  getCurrentUser,
+  signIn,
+  signInWithRedirect,
+  signOut,
+  signUp,
+} from 'aws-amplify/auth'
 
+// --- GUARDS ---
+
+export const isSignedIn = async (): Promise<boolean> => {
+  try {
+    const { tokens } = await fetchAuthSession()
+    return !!tokens
+  } catch {
+    return false
+  }
+}
+
+export const guardNotSignedIn = async (): Promise<void> => {
+  if (await isSignedIn()) {
+    throw Object.assign(new Error('User already authenticated'), {
+      name: 'UserAlreadyAuthenticatedException',
+    })
+  }
+}
+
+export const ensureSignedOut = async () => {
+  try {
+    await getCurrentUser()
+    await signOut()
+  } catch {}
+}
+
+// --- HANDLERS ---
 export const registerHandler = async (
   name: string,
   email: string,
@@ -42,9 +77,23 @@ export const loginHandler = async (email: string, password: string) => {
   try {
     const user = await signIn({ username: email, password })
 
-    return user
-  } catch (error) {
-    console.log('Error: ', error)
-    return null
+    return { user: user }
+  } catch (error: any) {
+    const code = error?.name || error?.code
+    return { code: code }
+  }
+}
+
+type providerTypes = 'Google'
+export const handleGoogleSignIn = async (provider: providerTypes) => {
+  try {
+    const result = await signInWithRedirect({ provider: provider })
+  } catch (error: any) {
+    if (
+      error.name === 'AuthError' &&
+      error.message.includes('already exists')
+    ) {
+      return { message: 'SignedIn' }
+    }
   }
 }
