@@ -64,7 +64,7 @@ export default function Settings() {
             className="flex-row justify-between px-5 pb-3 pt-4 mt-2.5 align-middle bg-white rounded-xl"
             onPress={async () => {
               try {
-                await signOut()
+                await signOut({ global: false })
                 router.replace('/profile') // go to your public/profile route
               } catch (error) {
                 console.error('Error signing out:', error)

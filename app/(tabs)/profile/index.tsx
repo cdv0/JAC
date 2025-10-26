@@ -8,8 +8,9 @@ import NormalButton from '@/app/components/NormalButton'
 import GoogleLogo from '@/public/assets/icons/google-logo.svg'
 import AppLogo from '@/public/assets/images/group-name.svg'
 import { getCurrentUser } from 'aws-amplify/auth'
-import { useRouter } from 'expo-router'
-import { JSX, useEffect, useState } from 'react'
+import { Hub } from 'aws-amplify/utils'
+import { useFocusEffect, useRouter } from 'expo-router'
+import { JSX, useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -335,9 +336,12 @@ const profile = () => {
             <NormalButton
               text="Sign in with Google"
               variant="outline"
-              onClick={() => {
+              onClick={async () => {
                 reset()
-                handleGoogleSignIn('Google')
+                const result = await handleGoogleSignIn('Google')
+                if (result?.message === 'SignedIn') {
+                  router.push('/profile/logged')
+                }
               }}
               icon={<GoogleLogo width={20} height={20} />}
             />
@@ -370,16 +374,37 @@ const profile = () => {
       break
   }
 
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        await getCurrentUser()
-        router.push('/profile/logged')
-      } catch (error) {
-        console.log('Check User Error: ', error)
+  useFocusEffect(
+    useCallback(() => {
+      const checkUser = async () => {
+        try {
+          await getCurrentUser()
+          router.push('/profile/logged')
+        } catch (error) {
+          console.log('Check User Error: ', error)
+        }
       }
-    }
-    checkUser()
+      checkUser()
+    }, [])
+  )
+
+  useEffect(() => {
+    const listener = Hub.listen('auth', (data) => {
+      const { event } = data.payload
+
+      switch (event) {
+        case 'signedIn':
+          router.push('/profile/logged')
+          break
+        case 'signInWithRedirect':
+          router.push('/profile/logged')
+          break
+        default:
+          break
+      }
+    })
+
+    return () => listener()
   }, [])
 
   return (
