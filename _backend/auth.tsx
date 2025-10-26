@@ -6,34 +6,33 @@ import {
   signInWithRedirect,
   signOut,
   signUp,
-} from 'aws-amplify/auth';
+} from 'aws-amplify/auth'
 
 // --- GUARDS ---
 
 export const isSignedIn = async (): Promise<boolean> => {
   try {
-    const { tokens } = await fetchAuthSession();
-    return !!tokens; 
+    const { tokens } = await fetchAuthSession()
+    return !!tokens
   } catch {
-    return false;
+    return false
   }
-};
+}
 
 export const guardNotSignedIn = async (): Promise<void> => {
   if (await isSignedIn()) {
     throw Object.assign(new Error('User already authenticated'), {
       name: 'UserAlreadyAuthenticatedException',
-    });
+    })
   }
-};
+}
 
 export const ensureSignedOut = async () => {
   try {
-    await getCurrentUser(); 
-    await signOut();        
-  } catch {
-  }
-};
+    await getCurrentUser()
+    await signOut()
+  } catch {}
+}
 
 // --- HANDLERS ---
 export const registerHandler = async (
@@ -88,8 +87,13 @@ export const loginHandler = async (email: string, password: string) => {
 type providerTypes = 'Google'
 export const handleGoogleSignIn = async (provider: providerTypes) => {
   try {
-    await signInWithRedirect({ provider: provider })
-  } catch (error) {
-    console.error('Federated Sign-In Error: ', error)
+    const result = await signInWithRedirect({ provider: provider })
+  } catch (error: any) {
+    if (
+      error.name === 'AuthError' &&
+      error.message.includes('already exists')
+    ) {
+      return { message: 'SignedIn' }
+    }
   }
 }
