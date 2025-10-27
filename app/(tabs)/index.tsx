@@ -1,12 +1,15 @@
 import { images } from "@/constants/images";
 import Slider from '@react-native-community/slider';
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import MechanicView from '../components/MechanicView';
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
+
+
 export default function Index() {
 
   //TODO: Apply filtering
@@ -38,6 +41,19 @@ export default function Index() {
 
   //#region constants
   const [isFiltersActive, setisFiltersActive] = useState(false);
+  const [mechanics, setMechanics] = useState([]);
+  useEffect(() => {
+          const data = async () => {
+              try {
+                  const file = await fetch("/local/dummy/data.json");
+                  const mechanicsData = await file.json();
+                  setMechanics(mechanicsData.mechanics);
+              } catch (error) {
+                  console.error("Error loading mechanics data:", error);
+              }
+          }
+          data();
+      }, []);
   const [isFiltersModal, setisFiltersModal] = useState(false);
   const width= '45%';//for toggle button
 
@@ -343,6 +359,22 @@ export default function Index() {
         <View className="mt-[10] ml-2">
             <Text className="text-[25px]">Find Nearby</Text>
         </View>
+        <View>
+                    {
+                        mechanics.map((mechanic:any) => {
+                            return (
+                                <MechanicView 
+                                    name={mechanic.name}
+                                    type={mechanic.type}
+                                    rating={mechanic.rating}
+                                    reviews={mechanic.reviews}
+                                    image={mechanic.image}
+                                    services={mechanic.services}
+                                />
+                            )
+                    })
+                    }
+                </View>
 
         {/*Expand filters */}
         <Modal visible={isFiltersModal} >

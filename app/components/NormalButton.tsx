@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { ReactNode } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 type ButtonVariant =
   | 'primary'
