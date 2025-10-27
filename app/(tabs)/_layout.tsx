@@ -7,7 +7,7 @@ import { View } from 'react-native';
 const TabIcon = ({Icon}:any)  =>{
     return (
         <View className='flex-1 justify-center items-center '>
-            <Icon classname='w-{65} h-full' />
+            <Icon width={65} height="100%" />
         </View>
             
     )
