@@ -2,9 +2,9 @@ import { images } from "@/constants/images";
 import Slider from '@react-native-community/slider';
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { FlatList, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MechanicView from '../components/MechanicView';
+import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
@@ -40,8 +40,7 @@ export default function Index() {
   };
 
   //#region constants
-  const [isFiltersActive, setisFiltersActive] = useState(false);
-  const [mechanics, setMechanics] = useState([]);
+  const [mechanics, setMechanics] = useState<any[]>([]);
   useEffect(() => {
           const data = async () => {
               try {
@@ -55,6 +54,8 @@ export default function Index() {
           data();
       }, []);
   const [isFiltersModal, setisFiltersModal] = useState(false);
+
+  const [isFiltersActive, setisFiltersActive] = useState(false);
   const width= '45%';//for toggle button
 
   //#region quick Filter
@@ -359,22 +360,14 @@ export default function Index() {
         <View className="mt-[10] ml-2">
             <Text className="text-[25px]">Find Nearby</Text>
         </View>
-        <View>
-                    {
-                        mechanics.map((mechanic:any) => {
-                            return (
-                                <MechanicView 
-                                    name={mechanic.name}
-                                    type={mechanic.type}
-                                    rating={mechanic.rating}
-                                    reviews={mechanic.reviews}
-                                    image={mechanic.image}
-                                    services={mechanic.services}
-                                />
-                            )
-                    })
-                    }
-                </View>
+        
+        <FlatList
+          className="px-5"
+          data={mechanics}
+          keyExtractor={(item) => item.name}
+          renderItem={({item})=> <MechanicView {...item}/>}
+        />
+
 
         {/*Expand filters */}
         <Modal visible={isFiltersModal} >
