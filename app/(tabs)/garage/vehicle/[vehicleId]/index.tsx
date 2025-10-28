@@ -1,28 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Pressable, ScrollView } from "react-native";
+import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
-import { readVehicle, type Vehicle } from "@/_backend/api/vehicle";
+import { readVehicle } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
+import NormalButton from "@/app/components/NormalButton";
 
 export default function VehicleDetail() {
   const params = useLocalSearchParams<{ vehicleId: string}>();
   const vehicleId = params.vehicleId;
 
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [VIN, setVIN] = useState('')
+  const [plateNum, setPlateNum] = useState('')
+  const [make, setMake] = useState('')
+  const [model, setModel] = useState('')
+  const [year, setYear] = useState('')
+
+  // New set of states to store temporary values until save is pressed
+  const [newVIN, setNewVIN] = useState('');
+  const [newPlateNum, setNewPlateNum] = useState('');
+  const [newMake, setNewMake] = useState('');
+  const [newModel, setNewModel] = useState('');
+  const [newYear, setNewYear] = useState('');
+
+  const [vehicle, setVehicle] = useState(false);
   const [loading, setLoading] = useState(true);
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [servicesExpanded, setServicesExpanded] = useState(false);
   const [editDetails, setEditDetails] = useState(false);
 
+  // Submission state & empty value check
+  const [submittedEdit, setSubmittedEdit] = useState(false);
+
+  const isNewVINInvalid = submittedEdit && !(newVIN?.trim());
+  const isNewPlateNumInvalid = submittedEdit && !(newPlateNum?.trim());
+  const isNewMakeInvalid = submittedEdit && !(newMake?.trim());
+  const isNewModelInvalid = submittedEdit && !(newModel?.trim());
+  const isNewYearInvalid = submittedEdit && !(newYear?.trim());
+
   useEffect(() => {(async () => {
       try {
         setLoading(true);
         if (!vehicleId) throw new Error("Missing vehicleId");
+        // Use readVehicle API & store those values into states
         const { userId } = await getCurrentUser();
         const data = await readVehicle(userId, String(vehicleId));
-        setVehicle(data);
+
+        setVIN(data.VIN ?? "");
+        setPlateNum(data.plateNum ?? "");
+        setMake(data.make ?? "");
+        setModel(data.model ?? "");
+        setYear(String(data.year ?? ""));
+
+        setVehicle(true);
       } catch (e: any) {
         console.log("Failed to load vehicle.")
       } finally {
@@ -30,6 +61,31 @@ export default function VehicleDetail() {
       }
     })();
   }, [vehicleId]);
+
+  const handleSaveDetails = async() => {
+    setSubmittedEdit(true);
+
+    const nv  = (newVIN ?? "").trim();
+    const np  = (newPlateNum ?? "").trim();
+    const nmk = (newMake ?? "").trim();
+    const nmd = (newModel ?? "").trim();
+    const ny  = (newYear ?? "").trim();
+
+    if (!nv || !np || !nmk || !nmd || !ny) {
+      // Don't set setSubmittedEdit(false) because we want the error messages to show
+      return;
+    }
+
+    // If values are vaild, store them back in the original states
+    setVIN(nv);
+    setPlateNum(np);
+    setMake(nmk);
+    setModel(nmd);
+    setYear(ny);
+
+    // TODO: ADD PUT API CALL FOR VEHICLE
+    setEditDetails(false);
+  }
 
   let content: React.ReactNode;
 
@@ -55,8 +111,8 @@ export default function VehicleDetail() {
             <icons.noImage height={50} width={70} />
           </View>
           <View>
-            <Text className="buttonTextBlue">{vehicle.model}</Text>
-            <Text className="smallThinTextBlue">{vehicle.make} {vehicle.year}</Text>
+            <Text className="buttonTextBlue">{model}</Text>
+            <Text className="smallThinTextBlue">{make} {year}</Text>
           </View>
         </View>
 
@@ -70,35 +126,198 @@ export default function VehicleDetail() {
               {/* Title */}
               <Text className="smallTitle">Details</Text>
               {/* Buttons (right side) */}
-              <View>
+              {editDetails ? (
+              // When editDetails === true
+              <View className="flex-1 flex-row justify-end gap-3 items-center">
+                <NormalButton 
+                  text="Cancel" 
+                  variant="cancel" 
+                  paddingHorizontal={20} 
+                  height={34} 
+                  onClick={() => {
+                    setEditDetails(false);
+                    setSubmittedEdit(false);
+                  }}>
+                </NormalButton>
+                {/* TODO: Set onClick logic */}
+                <NormalButton text="Save" variant="primary" height={34} 
+                  onClick={handleSaveDetails}></NormalButton>
+              </View>
+              ) : (
+              // When editDetails === false
+              <View className="flex-1 flex-row justify-end gap-3 items-center">
+                {/* PENCIL/EDIT BUTTON */}
+                <Pressable onPress={() => {
+                  setEditDetails(true);
+                  setDetailsExpanded(true);
+                  setSubmittedEdit(false);
+
+                  {/* Fill temporary states with the existing form values */}
+                  setNewVIN(VIN ?? "");
+                  setNewMake(make ?? "");
+                  setNewModel(model ?? "");
+                  setNewPlateNum(plateNum ?? "");
+                  setNewYear(year ?? "");
+                }}>
+                  <icons.pencil height={22} width={22}/>
+                </Pressable>
+
+                {/* TOGGLE COLLAPSE BUTTON */}
                 <Pressable onPress={() => setDetailsExpanded(v => !v)}>
                   {detailsExpanded ? <icons.arrowUp height={28} width={28} /> : <icons.arrowDown height={28} width={28} />}
                 </Pressable>
-              </View>
+              </View>       
+              )}
             </View>
 
+            {/* EXPANDED DETAILS SECTION */}
             {detailsExpanded && (
               <View className="mt-4 gap-3.5">
-                <View className="gap-1.5">
-                  <Text className="smallTextBold">VIN</Text>
-                  <Text className="smallThinTextBlue">{vehicle.VIN}</Text>
-                </View>
-                <View className="gap-1.5">
-                  <Text className="smallTextBold">Plate number</Text>
-                  <Text className="smallThinTextBlue">{vehicle.plateNum}</Text>
-                </View>
-                <View className="gap-1.5">
-                  <Text className="smallTextBold">Make</Text>
-                  <Text className="smallThinTextBlue">{vehicle.make}</Text>
-                </View>
-                <View className="gap-1.5">
-                  <Text className="smallTextBold">Model</Text>
-                  <Text className="smallThinTextBlue">{vehicle.model}</Text>
-                </View>
-                <View className="gap-1.5">
-                  <Text className="smallTextBold">Year</Text>
-                  <Text className="smallThinTextBlue">{vehicle.year}</Text>
-                </View>
+
+                {/* VIN */}
+                { !editDetails ? (
+                  // VIN DISPLAY
+                  <View className="gap-1.5">
+                    <Text className="smallTextBold">VIN</Text>
+                    <Text className="smallThinTextBlue">{VIN}</Text>
+                  </View>
+                ) : 
+                (
+                  // VIN INPUT
+                  <View className="gap-2">
+                    <View className="flex-1 flex-row">
+                      <Text className="smallTextBold">VIN</Text>
+                      <Text className="dangerText"> *</Text>
+                    </View>
+                    <TextInput
+                      value={newVIN}
+                      placeholder="Type here"
+                      onChangeText={setNewVIN}
+                      className={`border rounded-full px-4 py-2 smallTextGray ${isNewVINInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
+                    />
+        
+                    {/* Error message for empty input */}
+                    {isNewVINInvalid ? (
+                      <Text className="dangerText mx-2">VIN is required</Text>
+                    ): null}
+                  </View>
+                )}
+
+                {/* PLATE NUMBER */}
+                { !editDetails ? (
+                  // PLATE NUMBER DISPLAY
+                  <View className="gap-1.5">
+                    <Text className="smallTextBold">Plate number</Text>
+                    <Text className="smallThinTextBlue">{plateNum}</Text>
+                  </View>
+                ) : 
+                (
+                  // PLATE NUMBER INPUT
+                  <View className="gap-2">
+                    <View className="flex-1 flex-row">
+                      <Text className="smallTextBold">Plate number</Text>
+                      <Text className="dangerText"> *</Text>
+                    </View>
+                    <TextInput
+                      value={newPlateNum}
+                      placeholder="Type here"
+                      onChangeText={setNewPlateNum}
+                      className={`border rounded-full px-4 py-2 smallTextGray ${isNewPlateNumInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
+                    />
+        
+                    {/* Error message for empty input */}
+                    {isNewPlateNumInvalid ? (
+                      <Text className="dangerText mx-2">Plate number is required</Text>
+                    ): null}
+                  </View>
+                )}               
+
+                {/* MAKE */}
+                { !editDetails ? (
+                  // MAKE DISPLAY
+                  <View className="gap-1.5">
+                    <Text className="smallTextBold">Make</Text>
+                    <Text className="smallThinTextBlue">{make}</Text>
+                  </View>
+                ) : 
+                (
+                  // MAKE INPUT
+                  <View className="gap-2">
+                    <View className="flex-1 flex-row">
+                      <Text className="smallTextBold">Make</Text>
+                      <Text className="dangerText"> *</Text>
+                    </View>
+                    <TextInput
+                      value={newMake}
+                      placeholder="Type here"
+                      onChangeText={setNewMake}
+                      className={`border rounded-full px-4 py-2 smallTextGray ${isNewMakeInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
+                    />
+        
+                    {/* Error message for empty input */}
+                    {isNewMakeInvalid ? (
+                      <Text className="dangerText mx-2">Make is required</Text>
+                    ): null}
+                  </View>
+                )}
+
+                {/* MODEL */}
+                { !editDetails ? (
+                  // MODEL DISPLAY
+                  <View className="gap-1.5">
+                    <Text className="smallTextBold">Model</Text>
+                    <Text className="smallThinTextBlue">{model}</Text>
+                  </View>
+                ) : 
+                (
+                  // MODEL INPUT
+                  <View className="gap-2">
+                    <View className="flex-1 flex-row">
+                      <Text className="smallTextBold">Model</Text>
+                      <Text className="dangerText"> *</Text>
+                    </View>
+                    <TextInput
+                      value={newModel}
+                      placeholder="Type here"
+                      onChangeText={setNewModel}
+                      className={`border rounded-full px-4 py-2 smallTextGray ${isNewModelInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
+                    />
+        
+                    {/* Error message for empty input */}
+                    {isNewModelInvalid ? (
+                      <Text className="dangerText mx-2">Model is required</Text>
+                    ): null}
+                  </View>
+                )}
+
+                {/* YEAR */}
+                { !editDetails ? (
+                  // YEAR DISPLAY
+                  <View className="gap-1.5">
+                    <Text className="smallTextBold">Year</Text>
+                    <Text className="smallThinTextBlue">{year}</Text>
+                  </View>
+                ) : 
+                (
+                  // YEAR INPUT
+                  <View className="gap-2">
+                    <View className="flex-1 flex-row">
+                      <Text className="smallTextBold">Year</Text>
+                      <Text className="dangerText"> *</Text>
+                    </View>
+                    <TextInput
+                      value={newYear}
+                      placeholder="Type here"
+                      onChangeText={setNewYear}
+                      className={`border rounded-full px-4 py-2 smallTextGray ${isNewYearInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
+                    />
+        
+                    {/* Error message for empty input */}
+                    {isNewYearInvalid ? (
+                      <Text className="dangerText mx-2">Year is required</Text>
+                    ): null}
+                  </View>
+                )}
               </View>
             )}
           </View>
