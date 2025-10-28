@@ -357,15 +357,19 @@ export default function Index() {
           </ScrollView>
         </View>
         
-        <View className="mt-[10] ml-2">
-            <Text className="text-[25px]">Find Nearby</Text>
-        </View>
         
+        <Text className="text-[25px] mt-5 ml-5 mb-5">Find Nearby</Text>
+       
+        
+      
         <FlatList
-          className="px-5"
+          
           data={mechanics}
           keyExtractor={(item) => item.name}
+          numColumns={2}
           renderItem={({item})=> <MechanicView {...item}/>}
+          contentContainerClassName="items-center"
+          columnWrapperClassName="justify-between"
         />
 
 
