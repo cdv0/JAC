@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Pressable, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
 import { readVehicle, type Vehicle } from "@/_backend/api/vehicle";
-import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
+import { getCurrentUser } from "aws-amplify/auth";
+import { useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function VehicleDetail() {
   const params = useLocalSearchParams<{ vehicleId: string}>();
