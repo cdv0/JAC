@@ -14,7 +14,8 @@ export default function Settings() {
           {/* First container */}
           <View className="bg-white rounded-xl">
             {/* Account */}
-            <Pressable className="flex-row justify-between px-5 pt-5 pb-3">
+            <Pressable className="flex-row justify-between px-5 pt-5 pb-3"
+              onPress={() => router.push('/profile/settings/account')}>
               <Text className="font-semibold text-textBlack">Account</Text>
 
               {/* <svg
@@ -37,7 +38,7 @@ export default function Settings() {
             {/* Contact us */}
             <Pressable
               className="flex-row justify-between px-5 py-3"
-              onPress={() => router.push('/profile/contact')}
+              onPress={() => router.push('/profile/settings/contact')}
             >
               <Text className="font-semibold text-textBlack">Contact us</Text>
 
