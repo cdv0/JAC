@@ -3,7 +3,6 @@ import { icons } from '@/constants/icons'
 import { confirmUserAttribute, fetchAuthSession, fetchUserAttributes, getCurrentUser, updateUserAttribute } from 'aws-amplify/auth'
 import { useEffect, useRef, useState } from 'react'
 import { Alert, Button, Modal, Pressable, Text, TextInput, View } from 'react-native'
-import { ChevronRightIcon } from 'react-native-heroicons/outline'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Account() {
@@ -132,7 +131,21 @@ export default function Account() {
               <Text className="font-semibold text-textBlack">Name</Text>
               <View className="flex-row">
               <Text className="font-semibold text-textBlack">{firstName} {lastName}</Text>
-              <ChevronRightIcon size={28} color="#000" />
+              <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 2 28 28"
+              stroke-width="2.5"
+              stroke="currentColor"
+              className="w-6 h-6 font-extrabold text-textBlack"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              />
+              </svg>
+              {/* <ChevronRightIcon size={28} color="#000" /> */}
               </View>
             </Pressable>
 
@@ -144,7 +157,21 @@ export default function Account() {
               <Text className="font-semibold text-textBlack">Email</Text>
               <View className="flex-row">
                 <Text className="flex-row font-semibold text-textBlack">{email}</Text>
-              <ChevronRightIcon size={28} color="#000" />
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 2 28 28"
+                stroke-width="2.5"
+                stroke="currentColor"
+                className="w-6 h-6 font-extrabold text-textBlack"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+                </svg>
+                {/* <ChevronRightIcon size={28} color="#000" /> */}
               </View>
             </Pressable>
             <Pressable
@@ -153,7 +180,21 @@ export default function Account() {
               <Text className="font-semibold text-textBlack">Password</Text>
               <View className="flex-row">
                 <Text className="font-semibold text-textBlack">*********</Text>
-                <ChevronRightIcon size={28} color="#000" />
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 2 28 28"
+                stroke-width="2.5"
+                stroke="currentColor"
+                className="w-6 h-6 font-extrabold text-textBlack"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+                </svg>
+                {/* <ChevronRightIcon size={28} color="#000" /> */}
               </View>
             </Pressable>
           </View>
