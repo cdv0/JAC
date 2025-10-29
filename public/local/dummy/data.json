@@ -6,7 +6,13 @@
         "rating": "5",
         "reviews": 2839,
         "image": "/local/images/mechanic-image.svg",
-        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services"]
+        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services"],
+        "additional_details": {
+            "website": "www.bestMechanic.com",
+            "phone" : "123-423-3010",
+            "address":"4241 Apple St, Long Beach, CA",
+            "hours": ["8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "Closed", "Closed"]
+        }
     },
     {
         "name": "Mechanic B",
@@ -14,7 +20,13 @@
         "rating": "3.5",
         "reviews": 100,
         "image": "",
-        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services", "Electronics", "General Services"]
+        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services", "Electronics", "General Services", "Smog Check", "A/C Repair", "Fluid Check", "Engine Lights", "Engine Repair", "Tire-Check", "Wind Shield", "Tire Rims"],
+        "additional_details": {
+            
+            "phone" : "153-493-5510",
+            "address":"9148 Orange AV, Long Beach, CA",
+            "hours": ["8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "Closed", "Closed"]
+        }
     }
 
 ]
