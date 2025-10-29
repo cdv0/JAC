@@ -9,25 +9,30 @@ type MechanicViewProps = {
     rating: string,
     reviews: string,
     image: string,
-    services: string[]
+    services: string[],
+    certified:boolean,
 }
 
 export default function MechanicView(
     {
-        name, type, rating, reviews, image
+        name, type, rating, reviews, image, certified
     }: MechanicViewProps){
                             
 
         return(
             
             <Link href={`../mechanic/${name}`} asChild>
-                <TouchableOpacity className='w-[48%] h-full'>
+                <TouchableOpacity style={{width:'48%', marginBottom:'5%'}}>
                     <View className = "rounded-xl border border-stroke py-[10%]">
-                        {image==''?(<images.defaultImage width={'100%'} height={'65%'} />):
-                        <SvgUri width={'100%'} height={'65%'}  uri={image}/>
+                        {image==''?(<images.defaultImage width={'100%'} height={150} />):
+                        <SvgUri width={'100%'} height={150}  uri={image}/>
                         }
                         <View className ="my-[5%] ml-[15%]">
-                            <Text className = {`text-xl buttonTextBlack`}>{name}</Text>
+                            <View className="flex-row">
+                                <Text className = {`text-xl buttonTextBlack mr-[5%]`}>{name}</Text>
+                                {certified && <images.badge height={25}/>}
+                            </View>
+                            
                             <Text className = {`text-l buttonTextGray`}>Type: {type}</Text>
                            
                             <View className="flex-row ">

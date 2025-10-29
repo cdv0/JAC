@@ -1,15 +1,13 @@
-import { images } from "@/constants/images";
 import Slider from '@react-native-community/slider';
-import { router } from "expo-router";
+import { router } from 'expo-router';
 import React, { useEffect, useState } from "react";
-import { FlatList, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { FlatList, ImageBackground, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
 import { useSearch } from "../components/SearchFilter";
-
 
 export default function Index() {
 
@@ -24,6 +22,8 @@ export default function Index() {
   const removeCategory = (Category:string) =>{
     setCategories(categories.filter(item => item!=Category));
   };
+
+
   //#endregion
 
   //use this to enter categories to filter
@@ -54,6 +54,8 @@ export default function Index() {
           }
           data();
       }, []);
+  const [mQuery, setMQuery] = useState('');
+  const [lQuery, setLQuery] = useState('');
   const [isFiltersModal, setisFiltersModal] = useState(false);
 
   const [isFiltersActive, setisFiltersActive] = useState(false);
@@ -339,13 +341,18 @@ export default function Index() {
       <View
       className="flex-1 bg-white "
       >
-        <View className="justify-center w-full h-[17%]">
-          <images.searchBackground width="100%" height="100%" style={{ position: 'absolute', zIndex: 0 }} />
-          <View className="ml-[50%]">
-            <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
-          </View>
+        <View className="justify-center w-full h-[18%]">
+        
+          <ImageBackground source={require("@/public/assets/images/test.png")} imageStyle={{width:'auto', height: 140 , marginTop:-60}} resizeMode='cover'>
+            <View className='items-end mr-[5%]'>
+               <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
+            </View>
+           
+          </ImageBackground>
+          
         </View > 
-        <SearchBar placeholder1="Search" placeholder2="Location"/>
+        <SearchBar placeholder1="Search" value1={mQuery} 
+                    placeholder2="Location" value2={lQuery} />
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
@@ -360,18 +367,22 @@ export default function Index() {
         
         
         <Text className="text-[25px] mt-5 ml-5 mb-5">Find Nearby</Text>
+        
+        <View style={{flex:1}}>
+            <FlatList
+                      
+                data={mechanics}
+                keyExtractor={(item) => item.name}
+                numColumns={2}
+                renderItem={({item})=> <MechanicView {...item}/>}
+                columnWrapperStyle={{justifyContent:'space-between'}}
+                contentContainerStyle={{flexGrow:1, alignItems:'center'}}
+                showsVerticalScrollIndicator={false}
+              />
+        </View>
+          
        
         
-      
-        <FlatList
-          
-          data={mechanics}
-          keyExtractor={(item) => item.name}
-          numColumns={2}
-          renderItem={({item})=> <MechanicView {...item}/>}
-          contentContainerClassName="items-center"
-          columnWrapperClassName="justify-between"
-        />
 
 
         {/*Expand filters */}
