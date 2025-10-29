@@ -1,14 +1,12 @@
-import { images } from "@/constants/images";
 import Slider from '@react-native-community/slider';
-import { router } from "expo-router";
+import { router } from 'expo-router';
 import React, { useEffect, useState } from "react";
-import { FlatList, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { FlatList, ImageBackground, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
-
 
 export default function Index() {
 
@@ -342,11 +340,15 @@ export default function Index() {
       <View
       className="flex-1 bg-white "
       >
-        <View className="justify-center w-full h-[17%]">
-          <images.searchBackground width="100%" height="100%" style={{ position: 'absolute', zIndex: 0 }} />
-          <View className="ml-[50%]">
-            <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
-          </View>
+        <View className="justify-center w-full h-[18%]">
+        
+          <ImageBackground source={require("@/public/assets/images/test.png")} imageStyle={{width:'auto', height: 140 , marginTop:-60}} resizeMode='cover'>
+            <View className='items-end mr-[5%]'>
+               <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
+            </View>
+           
+          </ImageBackground>
+          
         </View > 
         <SearchBar placeholder1="Search" value1={mQuery} 
                     placeholder2="Location" value2={lQuery} />
@@ -364,7 +366,6 @@ export default function Index() {
         
         
         <Text className="text-[25px] mt-5 ml-5 mb-5">Find Nearby</Text>
-       
         
         <View style={{flex:1}}>
             <FlatList
@@ -375,6 +376,7 @@ export default function Index() {
                 renderItem={({item})=> <MechanicView {...item}/>}
                 columnWrapperStyle={{justifyContent:'space-between'}}
                 contentContainerStyle={{flexGrow:1, alignItems:'center'}}
+                showsVerticalScrollIndicator={false}
               />
         </View>
           
