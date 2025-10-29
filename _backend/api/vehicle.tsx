@@ -26,12 +26,12 @@ export async function createVehicle(payload: {
     body: JSON.stringify(payload),
   });
 
+  const text = await response.text();
   if (!response.ok) {
-    const err = await response.text();
-    throw new Error(err || `HTTP ${response.status}`);
+    throw new Error(text || `HTTP ${response.status}`);
   }
 
-  return response.json() as Promise<{ message: string; vehicleId: string }>;
+  return (text ? JSON.parse(text) : {}) as { message: string; vehicleId: string };
 }
 
 
@@ -51,6 +51,31 @@ export async function readVehicle(userId: string, vehicleId: string) {
     }
 
     return (text ? JSON.parse(text): {}) as Vehicle;
+}
+
+
+// PUT /vehicle/updateVehicleDetails
+export async function updateVehicleDetails(payload: {
+  userId: string;
+  vehicleId: string;
+  VIN: string;
+  plateNum: string;
+  make: string;
+  model: string;
+  year: string;
+}) {
+  const response = await fetch(`${BASE_URL}/vehicle/updateVehicleDetails`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
+
+  return (text ? JSON.parse(text) : {}) as { message: string; vehicleId: string };
 }
 
 

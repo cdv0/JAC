@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
-import { readVehicle } from "@/_backend/api/vehicle";
+import { readVehicle, updateVehicleDetails } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
 import NormalButton from "@/app/components/NormalButton";
@@ -76,6 +76,19 @@ export default function VehicleDetail() {
       return;
     }
 
+    try {
+      const { userId } = await getCurrentUser();
+
+      await updateVehicleDetails({
+        userId: userId,
+        vehicleId: vehicleId,
+        VIN: nv,
+        plateNum: np,
+        make: nmk,
+        model: nmd,
+        year: ny
+      });
+
     // If values are vaild, store them back in the original states
     setVIN(nv);
     setPlateNum(np);
@@ -83,9 +96,12 @@ export default function VehicleDetail() {
     setModel(nmd);
     setYear(ny);
 
-    // TODO: ADD PUT API CALL FOR VEHICLE
     setEditDetails(false);
-  }
+    setSubmittedEdit(false);
+    } catch (e: any) {
+    console.log("Failed to update vehicle:", e?.message || e);
+    }
+  };
 
   let content: React.ReactNode;
 
@@ -139,7 +155,6 @@ export default function VehicleDetail() {
                     setSubmittedEdit(false);
                   }}>
                 </NormalButton>
-                {/* TODO: Set onClick logic */}
                 <NormalButton text="Save" variant="primary" height={34} 
                   onClick={handleSaveDetails}></NormalButton>
               </View>
