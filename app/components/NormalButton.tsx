@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { ReactNode } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 type ButtonVariant =
   | 'primary'
@@ -73,7 +73,7 @@ export default function NormalButton({
       <View
         className={`${variantStyles[variant].container} items-center justify-center rounded-xl flex flex-row ${grow ? "self-stretch w-full" : "self-center"}`}
         style={{
-          width,
+          width :"auto",
           paddingHorizontal,
           paddingVertical,
           height

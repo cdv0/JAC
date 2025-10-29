@@ -1,12 +1,16 @@
 import { images } from "@/constants/images";
 import Slider from '@react-native-community/slider';
 import { router } from "expo-router";
-import React, { useState } from "react";
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
+import { useSearch } from "../components/SearchFilter";
+
+
 export default function Index() {
 
   //TODO: Apply filtering
@@ -37,8 +41,22 @@ export default function Index() {
   };
 
   //#region constants
-  const [isFiltersActive, setisFiltersActive] = useState(false);
+  const [mechanics, setMechanics] = useState<any[]>([]);
+  useEffect(() => {
+          const data = async () => {
+              try {
+                  const file = await fetch("/local/dummy/data.json");
+                  const mechanicsData = await file.json();
+                  setMechanics(mechanicsData.mechanics);
+              } catch (error) {
+                  console.error("Error loading mechanics data:", error);
+              }
+          }
+          data();
+      }, []);
   const [isFiltersModal, setisFiltersModal] = useState(false);
+
+  const [isFiltersActive, setisFiltersActive] = useState(false);
   const width= '45%';//for toggle button
 
   //#region quick Filter
@@ -340,9 +358,21 @@ export default function Index() {
           </ScrollView>
         </View>
         
-        <View className="mt-[10] ml-2">
-            <Text className="text-[25px]">Find Nearby</Text>
-        </View>
+        
+        <Text className="text-[25px] mt-5 ml-5 mb-5">Find Nearby</Text>
+       
+        
+      
+        <FlatList
+          
+          data={mechanics}
+          keyExtractor={(item) => item.name}
+          numColumns={2}
+          renderItem={({item})=> <MechanicView {...item}/>}
+          contentContainerClassName="items-center"
+          columnWrapperClassName="justify-between"
+        />
+
 
         {/*Expand filters */}
         <Modal visible={isFiltersModal} >
