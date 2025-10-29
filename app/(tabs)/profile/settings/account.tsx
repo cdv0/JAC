@@ -1,7 +1,7 @@
-import { readUserProfile } from '@/_backend/api/profile'
+import { readUserProfile, updateProfileInfo } from '@/_backend/api/profile'
 import { icons } from '@/constants/icons'
-import { confirmUserAttribute, fetchUserAttributes, getCurrentUser, updateUserAttribute } from 'aws-amplify/auth'
-import { useEffect, useState } from 'react'
+import { confirmUserAttribute, fetchAuthSession, fetchUserAttributes, getCurrentUser, updateUserAttribute } from 'aws-amplify/auth'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Button, Modal, Pressable, Text, TextInput, View } from 'react-native'
 import { ChevronRightIcon } from 'react-native-heroicons/outline'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -10,12 +10,18 @@ export default function Account() {
 
     const [firstName, setFirstName] = useState<string>('')
     const [lastName, setLastName] = useState<string>('')
+    const [createdAt, setCreatedAt] = useState<string>('')
     const [email, setEmail] = useState<string>('')
-    
+
+    const [newEmail, setNewEmail] = useState<string>('')
+    const [verificationCode, setVerificationCode] = useState('');
+    const [isVerifying, setIsVerifying] = useState(false);
     const [updateEmailVisibile, setUpdateEmailVisible] = useState(false)
+
+    const oldEmailRef = useRef<string>(email);
   
     useEffect(() => {
-      ;(async () => {
+      (async () => {
         try {
           const { userId } = await getCurrentUser()
           const attrs = await fetchUserAttributes() 
@@ -29,6 +35,7 @@ export default function Account() {
           setFirstName(userData.firstName ?? '')
           setLastName(userData.lastName ?? '')
           setEmail(attrs.email ?? '')
+          setCreatedAt(attrs.createdAt ?? '')
         } catch (e: any) {
           console.log('Account: Error loading user data:', e)
           console.log('Account: Error message:', e.message)
@@ -36,63 +43,84 @@ export default function Account() {
       })()
     }, [firstName, lastName])
 
-      const [newEmail, setNewEmail] = useState('');
-      const [verificationCode, setVerificationCode] = useState('');
-      const [isVerifying, setIsVerifying] = useState(false);
-
       const handleUpdateEmail = async () => {
-        try {
-          const output = await updateUserAttribute({
-            userAttribute: {
-              attributeKey: 'email',
-              value: newEmail,
-            },
-          });
-          console.log(output)
-          handleUpdateUserAttributeNextSteps(output);
-        } catch (error: any) {
-          console.log('Error updating email:', error);
-          Alert.alert('Error', error.message);
-        }
-      };
+    if (!newEmail || newEmail === email) {
+      Alert.alert("No change", "Enter a different email.");
+      return;
+    }
+    try {
+      const attrs = await fetchUserAttributes();
+      oldEmailRef.current = attrs.email || email;
 
-      const handleUpdateUserAttributeNextSteps = (output: any) => {
-        const { nextStep } = output;
-        switch (nextStep.updateAttributeStep) {
-          case 'CONFIRM_ATTRIBUTE_WITH_CODE':
-            setIsVerifying(true);
-            Alert.alert(
-              'Verification Required',
-              'A code has been sent to your new email address to confirm the change.',
-            );
-            break;
-          case 'DONE':
-            Alert.alert('Success', 'Your email address has been updated!');
-            // Optionally navigate away or reset state
-            setIsVerifying(false);
-            setNewEmail('');
-            break;
-        }
-      };
-    
-      // Handle the verification code submission
-      const handleVerifyEmail = async () => {
-        try {
-          await confirmUserAttribute({
-            userAttributeKey: 'email',
-            confirmationCode: verificationCode,
-          });
-          Alert.alert('Success', 'Your email address has been successfully updated!');
-          // Reset state and potentially navigate the user back
-          setIsVerifying(false);
-          setNewEmail('');
-          setVerificationCode('');
-          setUpdateEmailVisible(!updateEmailVisibile)
-        } catch (error: any) {
-          console.log('Error confirming email:', error);
-          Alert.alert('Error', error.message);
-        }
-      };
+      const output = await updateUserAttribute({
+        userAttribute: { attributeKey: "email", value: newEmail },
+      });
+
+      const step = output?.nextStep?.updateAttributeStep;
+      if (step === "CONFIRM_ATTRIBUTE_WITH_CODE") {
+        setIsVerifying(true);
+        Alert.alert(
+          "Verify your email",
+          "We sent a code to your new email address. Enter it to confirm."
+        );
+      } else if (step === "DONE") {
+        await afterCognitoConfirm();
+      }
+    } catch (error: any) {
+      console.log("Error updating email:", error);
+      Alert.alert("Error", error?.message || "Could not start email change.");
+    }
+  };
+
+  //After user enters code, confirm with Cognito, then move the row in Dynamo
+  const handleVerifyEmail = async () => {
+    try {
+      if (!verificationCode.trim()) {
+        Alert.alert("Missing code", "Enter the 6-digit verification code.");
+        return;
+      }
+      await confirmUserAttribute({
+        userAttributeKey: "email",
+        confirmationCode: verificationCode.trim(),
+      });
+
+      await afterCognitoConfirm();
+    } catch (error: any) {
+      console.log("Error confirming email:", error);
+      Alert.alert("Error", error?.message || "Could not confirm email.");
+    }
+  };
+
+  const afterCognitoConfirm = async () => {
+    try {
+      // Refresh tokens
+      await fetchAuthSession({ forceRefresh: true });
+
+      const { userId } = await getCurrentUser();
+
+      // Use captured oldEmailRef.current for the Dynamo move
+      const oldEmail = oldEmailRef.current || email;
+      await updateProfileInfo(userId, oldEmail, newEmail);
+
+      const profile = await readUserProfile(userId, newEmail);
+
+      setEmail(newEmail);
+      setFirstName(profile.firstName ?? "");
+      setLastName(profile.lastName ?? "");
+      setCreatedAt(profile.createdAt ?? "");
+
+      // reset modal state
+      setIsVerifying(false);
+      setVerificationCode("");
+      setNewEmail("");
+      setUpdateEmailVisible(false);
+
+      Alert.alert("Success", "Email updated in Cognito and Dynamo.");
+    } catch (e: any) {
+      console.log("Post-confirm / Dynamo move failed:", e?.message || e);
+      Alert.alert("Error", e?.message || "Could not finish updating your email.");
+    }
+  };
 
   return (
     <SafeAreaView className="flex-col" edges={['top', 'bottom']}>
@@ -154,7 +182,11 @@ export default function Account() {
                     autoCapitalize="none"
                     className={`border rounded-full px-4 py-2 smallTextGray`}
                   />
-                  <Button title="Update Email" onPress={handleUpdateEmail} />
+                  <Button 
+                    title="Update Email" 
+                    onPress={() => {
+                    handleUpdateEmail();
+                  }} />
                 </View>
               ) : (
                 <View>
@@ -177,4 +209,3 @@ export default function Account() {
     </SafeAreaView>
     )
   }
-
