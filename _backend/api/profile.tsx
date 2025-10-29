@@ -1,4 +1,3 @@
-import { fetchAuthSession } from "aws-amplify/auth";
 export const BASE_URL = "https://ynwemrq0m2.execute-api.us-west-1.amazonaws.com/dev";
 
 export type UserProfile = {
@@ -25,25 +24,25 @@ export async function readUserProfile(userId: string, email: string): Promise<Us
     return (text ? JSON.parse(text): {}) as UserProfile;
 };
 
-export async function updateUserInfo(newEmail: string) {
-
-    const { tokens } = await fetchAuthSession();
-    const idToken = tokens?.idToken?.toString();
-    if (!idToken) throw new Error("No ID token; user not signed in");
-  
-    
-    const res = await fetch(`${BASE_URL}/profile/change-email`, {
+export async function updateProfileInfo(userId: string, oldEmail: string, newEmail: string) {
+    const res = await fetch(`${BASE_URL}/profile/updateProfileInfo`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`,
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ newEmail }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, oldEmail, newEmail }),
     });
   
     const text = await res.text();
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
-
     return JSON.parse(text);
   }
+
+export async function updateName(userId: string, email: string, firstName: string, lastName: string) {
+  const res = await fetch(`${BASE_URL}/profile/updateProfileName`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, email, firstName, lastName }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  return JSON.parse(text); 
+}
