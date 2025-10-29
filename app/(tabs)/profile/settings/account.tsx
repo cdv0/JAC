@@ -7,15 +7,18 @@ import { ChevronRightIcon } from 'react-native-heroicons/outline'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Account() {
-
     const [firstName, setFirstName] = useState<string>('')
     const [lastName, setLastName] = useState<string>('')
     const [email, setEmail] = useState<string>('')
+
+    const [newEmail, setNewEmail] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
+    const [isVerifying, setIsVerifying] = useState(false);
     
     const [updateEmailVisibile, setUpdateEmailVisible] = useState(false)
   
     useEffect(() => {
-      ;(async () => {
+      (async () => {
         try {
           const { userId } = await getCurrentUser()
           const attrs = await fetchUserAttributes() 
@@ -34,65 +37,61 @@ export default function Account() {
           console.log('Account: Error message:', e.message)
         }
       })()
-    }, [firstName, lastName])
+    }, [firstName, lastName]);
 
-      const [newEmail, setNewEmail] = useState('');
-      const [verificationCode, setVerificationCode] = useState('');
-      const [isVerifying, setIsVerifying] = useState(false);
+    const handleUpdateEmail = async () => {
+      try {
+        const output = await updateUserAttribute({
+          userAttribute: {
+            attributeKey: 'email',
+            value: newEmail,
+          },
+        });
+        console.log(output)
+        handleUpdateUserAttributeNextSteps(output);
+      } catch (error: any) {
+        console.log('Error updating email:', error);
+        Alert.alert('Error', error.message);
+      }
+    };
 
-      const handleUpdateEmail = async () => {
-        try {
-          const output = await updateUserAttribute({
-            userAttribute: {
-              attributeKey: 'email',
-              value: newEmail,
-            },
-          });
-          console.log(output)
-          handleUpdateUserAttributeNextSteps(output);
-        } catch (error: any) {
-          console.log('Error updating email:', error);
-          Alert.alert('Error', error.message);
-        }
-      };
-
-      const handleUpdateUserAttributeNextSteps = (output: any) => {
-        const { nextStep } = output;
-        switch (nextStep.updateAttributeStep) {
-          case 'CONFIRM_ATTRIBUTE_WITH_CODE':
-            setIsVerifying(true);
-            Alert.alert(
-              'Verification Required',
-              'A code has been sent to your new email address to confirm the change.',
-            );
-            break;
-          case 'DONE':
-            Alert.alert('Success', 'Your email address has been updated!');
-            // Optionally navigate away or reset state
-            setIsVerifying(false);
-            setNewEmail('');
-            break;
-        }
-      };
-    
-      // Handle the verification code submission
-      const handleVerifyEmail = async () => {
-        try {
-          await confirmUserAttribute({
-            userAttributeKey: 'email',
-            confirmationCode: verificationCode,
-          });
-          Alert.alert('Success', 'Your email address has been successfully updated!');
-          // Reset state and potentially navigate the user back
+    const handleUpdateUserAttributeNextSteps = (output: any) => {
+      const { nextStep } = output;
+      switch (nextStep.updateAttributeStep) {
+        case 'CONFIRM_ATTRIBUTE_WITH_CODE':
+          setIsVerifying(true);
+          Alert.alert(
+            'Verification Required',
+            'A code has been sent to your new email address to confirm the change.',
+          );
+          break;
+        case 'DONE':
+          Alert.alert('Success', 'Your email address has been updated!');
+          // Optionally navigate away or reset state
           setIsVerifying(false);
           setNewEmail('');
-          setVerificationCode('');
-          setUpdateEmailVisible(!updateEmailVisibile)
-        } catch (error: any) {
-          console.log('Error confirming email:', error);
-          Alert.alert('Error', error.message);
-        }
-      };
+          break;
+      }
+    };
+  
+    // Handle the verification code submission
+    const handleVerifyEmail = async () => {
+      try {
+        await confirmUserAttribute({
+          userAttributeKey: 'email',
+          confirmationCode: verificationCode,
+        });
+        Alert.alert('Success', 'Your email address has been successfully updated!');
+        // Reset state and potentially navigate the user back
+        setIsVerifying(false);
+        setNewEmail('');
+        setVerificationCode('');
+        setUpdateEmailVisible(!updateEmailVisibile)
+      } catch (error: any) {
+        console.log('Error confirming email:', error);
+        Alert.alert('Error', error.message);
+      }
+    };
 
   return (
     <SafeAreaView className="flex-col" edges={['top', 'bottom']}>
@@ -102,34 +101,74 @@ export default function Account() {
           <View className="bg-white rounded-xl">
             <Pressable className="flex-row justify-between px-5 pt-5 pb-3">
               <Text className="font-semibold text-textBlack">Name</Text>
-              <View className="flex-row">
-              <Text className="font-semibold text-textBlack">{firstName} {lastName}</Text>
-              <ChevronRightIcon size={28} color="#000" />
+              <View className="flex-row gap-3">
+                <Text className="xsText">{firstName} {lastName}</Text>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 2 28 28"
+                  stroke-width="2.5"
+                  stroke="currentColor"
+                  className="w-6 h-6 font-extrabold text-textBlack"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                  />
+                </svg> 
               </View>
             </Pressable>
 
-            
+            {/* EMAIL */} 
             <Pressable
               className="flex-row justify-between px-5 py-3"
               onPress={()=>{setUpdateEmailVisible(!updateEmailVisibile)}}
             >
               <Text className="font-semibold text-textBlack">Email</Text>
-              <View className="flex-row">
-                <Text className="flex-row font-semibold text-textBlack">{email}</Text>
-              <ChevronRightIcon size={28} color="#000" />
+              <View className="flex-row gap-3">
+                <Text className="xsText">{email}</Text>
+                  <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 2 28 28"
+                  stroke-width="2.5"
+                  stroke="currentColor"
+                  className="w-6 h-6 font-extrabold text-textBlack"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                  />
+                </svg> 
               </View>
             </Pressable>
             <Pressable
               className="flex-row justify-between px-5 py-3"
             >
               <Text className="font-semibold text-textBlack">Password</Text>
-              <View className="flex-row">
-                <Text className="font-semibold text-textBlack">*********</Text>
-                <ChevronRightIcon size={28} color="#000" />
+              <View className="flex-row gap-3">
+                <Text className="xsText">*********</Text>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 2 28 28"
+                    stroke-width="2.5"
+                    stroke="currentColor"
+                    className="w-6 h-6 font-extrabold text-textBlack"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                    />
+                  </svg>
               </View>
             </Pressable>
           </View>
         </View>
+
         <Modal visible={updateEmailVisibile}>
           <SafeAreaView>
           <Pressable
@@ -177,4 +216,3 @@ export default function Account() {
     </SafeAreaView>
     )
   }
-
