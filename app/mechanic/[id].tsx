@@ -68,7 +68,7 @@ const Details = () => {
   }
   else{
     return(
-      <SafeAreaView className='flex-1' edges={['right', 'bottom','left']}>
+      <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
         {/* <View className='flex-1'> */}
         <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:'1%' }}showsHorizontalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
