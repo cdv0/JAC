@@ -2,7 +2,7 @@ import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, DimensionValue, FlatList, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, DimensionValue, FlatList, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { SvgUri } from 'react-native-svg';
@@ -71,6 +71,7 @@ const Details = () => {
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
         {/* <View className='flex-1'> */}
+        <KeyboardAvoidingView className='flex-1' behavior='position' keyboardVerticalOffset={100}>
         <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:'1%' }}showsHorizontalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
                   {mechanic.image==''?(<images.defaultImage width={100} height={100} />):
@@ -157,14 +158,14 @@ const Details = () => {
                 </View>
               }
               <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
-                <View className='items-center w-[30%] ml-[5%]'>
+                <View className='items-center w-[30%] ml-[10%]'>
                       <Text className='text-center buttonTextBlack'>
                         Want to add a review?
                       </Text>
                       <StarRatingDisplay rating={0} color='black' starSize={20}/>
                 </View>
                 <View className='flex-1 justify-center'>
-                  <NormalButton text='Log in!' onClick={()=>{}}/>
+                  <NormalButton text='Log in' onClick={()=>{}}/>
                 </View>
                 
               </View>
@@ -186,7 +187,7 @@ const Details = () => {
                     }    
                 </View>
               </View>
-
+              
               <View className='flex-row w-[95%] justify-between self-center '>
                 <View className='flex-row border border-stroke rounded-full bg-white items-center '>
                     <icons.search/>
@@ -196,6 +197,7 @@ const Details = () => {
               </View>
                     
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
       
           
