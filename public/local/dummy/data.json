@@ -7,7 +7,12 @@
         "rating": "5",
         "reviews": 2839,
         "image": "/local/images/mechanic-image.svg",
-        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services"]
+        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services"],
+        "hours": ["8:00 - 20:00, 8:00 - 20:00, 8:00 - 20:00, 8:00 - 20:00, 8:00 - 20:00, 10:00 - 18:00, Closed"],
+        "phone": "(123) 456-7890",
+        "address": "123 Main St, Anytown, USA",
+        "website": "www.mechanicA.com"
+        
     },
     {
         "id": 2,
@@ -16,7 +21,11 @@
         "rating": "3.5",
         "reviews": 100,
         "image": "",
-        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services", "Electronics", "General Services"]
+        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services", "Electronics", "General Services"],
+        "hours": ["8:00 - 20:00, 8:00 - 20:00, 8:00 - 20:00, 8:00 - 20:00, 8:00 - 20:00, 10:00 - 18:00, Closed"],
+        "phone": "(123) 456-7890",
+        "address": "123 Main St, Anytown, USA",
+        "website": "www.mechanicB.com"
     }
 
 ]
