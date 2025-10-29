@@ -7,7 +7,7 @@ import { View } from 'react-native';
 const TabIcon = ({Icon}:any)  =>{
     return (
         <View className='flex-1 justify-center items-center '>
-            <Icon width={65} height="100%" />
+            <Icon width={65} height="100%"/>
         </View>
             
     )
@@ -40,7 +40,7 @@ const _layout = () => {
         <Tabs.Screen
             name = "index"
             options={{
-                title: "Search",
+                title: "Index",
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
                             <TabIcon 

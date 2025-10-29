@@ -1,12 +1,14 @@
-import { images } from "@/constants/images";
 import Slider from '@react-native-community/slider';
-import { router } from "expo-router";
-import React, { useState } from "react";
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { router } from 'expo-router';
+import React, { useEffect, useState } from "react";
+import { FlatList, ImageBackground, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
+import { useSearch } from "../components/SearchFilter";
+
 export default function Index() {
 
   //TODO: Apply filtering
@@ -20,6 +22,8 @@ export default function Index() {
   const removeCategory = (Category:string) =>{
     setCategories(categories.filter(item => item!=Category));
   };
+
+
   //#endregion
 
   //use this to enter categories to filter
@@ -37,8 +41,24 @@ export default function Index() {
   };
 
   //#region constants
-  const [isFiltersActive, setisFiltersActive] = useState(false);
+  const [mechanics, setMechanics] = useState<any[]>([]);
+  useEffect(() => {
+          const data = async () => {
+              try {
+                  const file = await fetch("/local/dummy/data.json");
+                  const mechanicsData = await file.json();
+                  setMechanics(mechanicsData.mechanics);
+              } catch (error) {
+                  console.error("Error loading mechanics data:", error);
+              }
+          }
+          data();
+      }, []);
+  const [mQuery, setMQuery] = useState('');
+  const [lQuery, setLQuery] = useState('');
   const [isFiltersModal, setisFiltersModal] = useState(false);
+
+  const [isFiltersActive, setisFiltersActive] = useState(false);
   const width= '45%';//for toggle button
 
   //#region quick Filter
@@ -321,13 +341,18 @@ export default function Index() {
       <View
       className="flex-1 bg-white "
       >
-        <View className="justify-center w-full h-[17%]">
-          <images.searchBackground width="100%" height="100%" style={{ position: 'absolute', zIndex: 0 }} />
-          <View className="ml-[50%]">
-            <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
-          </View>
+        <View className="justify-center w-full h-[18%]">
+        
+          <ImageBackground source={require("@/public/assets/images/test.png")} imageStyle={{width:'auto', height: 140 , marginTop:-60}} resizeMode='cover'>
+            <View className='items-end mr-[5%]'>
+               <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
+            </View>
+           
+          </ImageBackground>
+          
         </View > 
-        <SearchBar placeholder1="Search" placeholder2="Location"/>
+        <SearchBar placeholder1="Search" value1={mQuery} 
+                    placeholder2="Location" value2={lQuery} />
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
@@ -340,9 +365,25 @@ export default function Index() {
           </ScrollView>
         </View>
         
-        <View className="mt-[10] ml-2">
-            <Text className="text-[25px]">Find Nearby</Text>
+        
+        <Text className="text-[25px] mt-5 ml-5 mb-5">Find Nearby</Text>
+        
+        <View style={{flex:1}}>
+            <FlatList
+                      
+                data={mechanics}
+                keyExtractor={(item) => item.name}
+                numColumns={2}
+                renderItem={({item})=> <MechanicView {...item}/>}
+                columnWrapperStyle={{justifyContent:'space-between'}}
+                contentContainerStyle={{flexGrow:1, alignItems:'center'}}
+                showsVerticalScrollIndicator={false}
+              />
         </View>
+          
+       
+        
+
 
         {/*Expand filters */}
         <Modal visible={isFiltersModal} >
