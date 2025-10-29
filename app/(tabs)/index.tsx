@@ -23,6 +23,8 @@ export default function Index() {
   const removeCategory = (Category:string) =>{
     setCategories(categories.filter(item => item!=Category));
   };
+
+
   //#endregion
 
   //use this to enter categories to filter
@@ -53,6 +55,8 @@ export default function Index() {
           }
           data();
       }, []);
+  const [mQuery, setMQuery] = useState('');
+  const [lQuery, setLQuery] = useState('');
   const [isFiltersModal, setisFiltersModal] = useState(false);
 
   const [isFiltersActive, setisFiltersActive] = useState(false);
@@ -344,7 +348,8 @@ export default function Index() {
             <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
           </View>
         </View > 
-        <SearchBar placeholder1="Search" placeholder2="Location"/>
+        <SearchBar placeholder1="Search" value1={mQuery} 
+                    placeholder2="Location" value2={lQuery} />
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
