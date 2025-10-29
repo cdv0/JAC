@@ -18,11 +18,12 @@ export default function Contact() {
     const [isVerifying, setIsVerifying] = useState(false);
     const [updateEmailVisibile, setUpdateEmailVisible] = useState(false)
     const [submitted, setSubmitted] = useState(false);
-    const isEmailInvalid = submitted && !email.trim();
+    const isEmailInvalid = submitted && !newEmail.trim();
 
     const oldEmailRef = useRef<string>(email);
 
     const handleUpdateEmail = async () => {
+      setSubmitted(true);
     if (!newEmail || newEmail === email) {
       Alert.alert("No change", "Enter a different email.");
       return;
@@ -107,22 +108,24 @@ export default function Contact() {
                 <View>
                   {!isVerifying ? (
                     <View className="gap-2.5">
-                      <Text className="xsTitle">Enter new email</Text>
+                      <Text className="font-semibold text-textBlack">Enter new email</Text>
                       <View className="gap-2">
-                        <TextInput
-                            value={newEmail}
-                            placeholder="Type here"
-                            keyboardType="email-address"
-                            onChangeText={setNewEmail}
-                            autoCapitalize="none"
-                            className={`mb-2 border rounded-full px-4 py-2 smallTextGray ${isEmailInvalid ? "border-dangerBrightRed" : "border-stroke"
-                            }`}
-                        />
-                            {isEmailInvalid ? (
-                                <Text className="dangerText mx-2">Email is required</Text>
-                            ) : null}
+                        <View>
+                          <TextInput
+                              value={newEmail}
+                              placeholder="Type here"
+                              keyboardType="email-address"
+                              onChangeText={setNewEmail}
+                              autoCapitalize="none"
+                              className={`mb-2 border rounded-full px-4 py-2 smallTextGray ${isEmailInvalid ? "border-dangerBrightRed" : "border-stroke"
+                              }`}
+                          />
+                              {isEmailInvalid ? (
+                                  <Text className="dangerText mx-2">Email is required</Text>
+                              ) : null}
+                            </View>
                         </View>
-                      <View className="mt-4">
+                      <View className="mt-3">
                         <NormalButton 
                           text="Save" 
                           variant="primary" 
@@ -133,20 +136,19 @@ export default function Contact() {
                       </View>
                     </View>
                   ) : (
-                    <View>
-                      <Text className="smallTitle mb-2">Verify new email</Text>
+                    <View className="gap-2.5">
+                      <Text className="font-semibold text-textBlack">Enter verification code</Text>
                       <TextInput
                             value={verificationCode}
-                            placeholder="Verification Code"
+                            placeholder="Type here"
                             keyboardType="numeric"
                             onChangeText={setVerificationCode}
-                            className={`mb-2 border rounded-full px-4 py-2 smallTextGray`}
+                            className={`mb-2 border rounded-full px-4 py-2 smallTextGray border-stroke`}
                         />
-                        <View className="mt-4">
+                        <View className="mt-3">
                           <NormalButton 
-                          text="Verify Code" 
+                          text="Submit" 
                           variant="primary" 
-                          paddingHorizontal={30} 
                           onClick={() => {
                           handleVerifyEmail();
                         }} />
