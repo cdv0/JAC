@@ -35,3 +35,14 @@ export async function updateProfileInfo(userId: string, oldEmail: string, newEma
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
     return JSON.parse(text);
   }
+
+export async function updateName(userId: string, email: string, firstName: string, lastName: string) {
+  const res = await fetch(`${BASE_URL}/profile/updateProfileName`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, email, firstName, lastName }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  return JSON.parse(text); 
+}
