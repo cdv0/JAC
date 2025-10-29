@@ -341,14 +341,25 @@ export default function VehicleDetail() {
           <View className="bg-white rounded-xl px-4 py-5">
             <View className="flex-row items-center justify-between">
               <Text className="smallTitle">Services</Text>
-              <Pressable
-                onPress={() => setServicesExpanded(v => !v)}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel="Toggle services"
-              >
-                {servicesExpanded ? <icons.arrowUp height={28} width={28} /> : <icons.arrowDown height={28} width={28} />}
-              </Pressable>
+              <View className="flex-1 flex-row justify-end gap-3 items-center">
+                <Pressable
+                // TODO: ADD ONPRESS LOGIC FOR CREATING A SERVICE RECORD
+                  onPress={() => {}}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Add service record"
+                >
+                  <icons.add height={24} width={24}/>
+                </Pressable>
+                <Pressable
+                  onPress={() => setServicesExpanded(v => !v)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Toggle services"
+                >
+                  {servicesExpanded ? <icons.arrowUp height={28} width={28} /> : <icons.arrowDown height={28} width={28} />}
+                </Pressable>
+              </View>
             </View>
 
             {/* TODO: Add service record logic */}

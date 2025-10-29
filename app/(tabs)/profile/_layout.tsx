@@ -1,4 +1,6 @@
-import { Stack } from 'expo-router'
+import { Stack, router } from 'expo-router';
+import { icons } from "@/constants/icons";
+import { Pressable } from "react-native";
 
 export default function ProfileLayout() {
   return (
@@ -18,8 +20,20 @@ export default function ProfileLayout() {
       <Stack.Screen
         name="logged"
         options={{
-          title: 'Logged',
-          headerShown: false,
+          title: '',
+          headerShown: true,
+          headerShadowVisible: false,
+          headerBackVisible: false,
+          headerLeft: () => null, // Put this here because simply using headerBackVisible isn't reliable
+          headerRight: () => (
+            <Pressable
+              onPress={() => router.replace('/profile/settings')}
+              hitSlop={8}
+              className="mr-4"
+            >
+              <icons.settings height={24} width={24}/>
+            </Pressable>
+          )
         }}
       />
       <Stack.Screen
