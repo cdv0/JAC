@@ -87,7 +87,7 @@ export const account = () => {
 
             {/* FILTER OPEN */}
             {filterOpen && (
-              <View className="mx-3 py-4 border-y border-stroke">
+              <View className="mx-3 pt-4 pb-6 border-y border-stroke">
                 {/* TITLE AND CLOSE BUTTON */}
                 <View className="flex-1 flex-row justify-between">
                   <Text className="xsTitle mb-3">Sort by</Text>

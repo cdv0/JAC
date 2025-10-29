@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import NormalButton from '@/app/components/NormalButton';
 
 export default function Contact() {
   const[Name, setName] = useState('')
@@ -9,6 +10,7 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
 
   const submitForm = () => {
+    setSubmitted(true);
     let formData = {
       Name: Name,
       Email: Email,
@@ -24,11 +26,10 @@ export default function Contact() {
 
   return (
   <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
-      <View className="bg-white rounded-xl px-4 py-5">
-        <Text className="smallTitle mb-2">Contact Us</Text>
+      <View className="bg-white rounded-xl px-5 pt-3 pb-5 gap-3 mt-3 mx-3">
         <View className="gap-2">
                     <View className="flex-1 flex-row">
-                      <Text className="smallTextBold">Name</Text>
+                      <Text className="font-semibold text-textBlack">Name</Text>
                       <Text className="dangerText"> *</Text>
                     </View>
                     <TextInput
@@ -46,7 +47,7 @@ export default function Contact() {
                   </View>
         <View className="gap-2">
                     <View className="flex-1 flex-row">
-                      <Text className="smallTextBold">Email</Text>
+                      <Text className="font-semibold text-textBlack">Email</Text>
                       <Text className="dangerText"> *</Text>
                     </View>
                     <TextInput
@@ -64,22 +65,31 @@ export default function Contact() {
                   </View>
         <View className="gap-2">
                     <View className="flex-1 flex-row">
-                      <Text className="smallTextBold">Message</Text>
+                      <Text className="font-semibold text-textBlack">Message</Text>
                       <Text className="dangerText"> *</Text>
                     </View>
                     <TextInput
                       value={Message}
+                      multiline = { true }
+                      numberOfLines = { 6 }
                       placeholder="Type here"
                       keyboardType="default"
                       onChangeText={setMessage}
-                      className={`border rounded-full px-4 py-2 smallTextGray ${isMessageInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
+                      className={`border rounded-xl px-4 py-2 smallTextGray ${isMessageInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
                     />
                     
                     {/* Error message for empty input */}
                     {isMessageInvalid ? (
-                      <Text className="dangerText mx-2">Email is required</Text>
+                      <Text className="dangerText mx-2">Message is required</Text>
                     ): null}
                   </View>
+          <View className="pt-5">
+            <NormalButton
+              variant="primary"
+              text="Submit"
+              onClick= {submitForm}
+            ></NormalButton>
+          </View>
         </View>
     </SafeAreaView>
     )

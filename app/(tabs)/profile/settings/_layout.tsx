@@ -51,7 +51,7 @@ export default function AccountLayout() {
     <Stack.Screen
             name="contact"
             options={{
-            headerTitle: () => <Text className="buttonTextBlack">Contact</Text>,
+            headerTitle: () => <Text className="buttonTextBlack">Contact us</Text>,
             headerBackVisible: false,
             headerLeft: () => (
                 <Pressable
