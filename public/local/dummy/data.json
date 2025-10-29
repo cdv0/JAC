@@ -1,6 +1,7 @@
 {
  "mechanics" :[
     {
+        "id": 1,
         "name": "Mechanic A",
         "type": "Franchise",
         "rating": "5",
@@ -9,6 +10,7 @@
         "services" : ["Oil Change", "Tire Rotation", "Tuning-Services"]
     },
     {
+        "id": 2,
         "name": "Mechanic B",
         "type": "Independent",
         "rating": "3.5",
