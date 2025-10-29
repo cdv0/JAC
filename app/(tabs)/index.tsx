@@ -366,16 +366,20 @@ export default function Index() {
         <Text className="text-[25px] mt-5 ml-5 mb-5">Find Nearby</Text>
        
         
-      
-        <FlatList
+        <View style={{flex:1}}>
+            <FlatList
+                      
+                data={mechanics}
+                keyExtractor={(item) => item.name}
+                numColumns={2}
+                renderItem={({item})=> <MechanicView {...item}/>}
+                columnWrapperStyle={{justifyContent:'space-between'}}
+                contentContainerStyle={{flexGrow:1, alignItems:'center'}}
+              />
+        </View>
           
-          data={mechanics}
-          keyExtractor={(item) => item.name}
-          numColumns={2}
-          renderItem={({item})=> <MechanicView {...item}/>}
-          contentContainerClassName="items-center"
-          columnWrapperClassName="justify-between"
-        />
+       
+        
 
 
         {/*Expand filters */}
