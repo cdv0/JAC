@@ -9,12 +9,13 @@ type MechanicViewProps = {
     rating: string,
     reviews: string,
     image: string,
-    services: string[]
+    services: string[],
+    certified:boolean,
 }
 
 export default function MechanicView(
     {
-        name, type, rating, reviews, image
+        name, type, rating, reviews, image, certified
     }: MechanicViewProps){
                             
 
@@ -27,7 +28,11 @@ export default function MechanicView(
                         <SvgUri width={'100%'} height={150}  uri={image}/>
                         }
                         <View className ="my-[5%] ml-[15%]">
-                            <Text className = {`text-xl buttonTextBlack`}>{name}</Text>
+                            <View className="flex-row">
+                                <Text className = {`text-xl buttonTextBlack mr-[5%]`}>{name}</Text>
+                                {certified && <images.badge height={25}/>}
+                            </View>
+                            
                             <Text className = {`text-l buttonTextGray`}>Type: {type}</Text>
                            
                             <View className="flex-row ">

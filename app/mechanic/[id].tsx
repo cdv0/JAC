@@ -16,12 +16,13 @@ interface keyPair{
 interface MechanicViewProps {
     name: string,
     type: string,
+    certified:boolean,
     rating: string,
     ratingsDist:string[],
     reviews: string,
     image: string,
     services: string[],
-    additional_details: keyPair
+    additional_details: keyPair,
 }
 
 const Details = () => {
@@ -83,6 +84,7 @@ const Details = () => {
                       </View>
                       <Text>Reviews: {mechanic.reviews}</Text>
                   </View>
+                {mechanic.certified && <images.badge width={25} height={25} style={{marginTop:20, marginLeft:15}}/>}
               </View>
 
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
