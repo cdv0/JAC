@@ -103,11 +103,11 @@ export default function Contact() {
   };
     return (
     <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
-        <View className="bg-white rounded-xl px-4 py-5">
+        <View className="flex-1 bg-white rounded-xl px-4 py-5">
                 <View>
                   {!isVerifying ? (
-                    <View>
-                      <Text className="smallTitle mb-2">Enter new email</Text>
+                    <View className="gap-2.5">
+                      <Text className="xsTitle">Enter new email</Text>
                       <View className="gap-2">
                         <TextInput
                             value={newEmail}
@@ -122,13 +122,15 @@ export default function Contact() {
                                 <Text className="dangerText mx-2">Email is required</Text>
                             ) : null}
                         </View>
-                      <NormalButton 
-                        text="Save" 
-                        variant="primary" 
-                        paddingHorizontal={30} 
-                        onClick={() => {
-                        handleUpdateEmail();
-                      }} />
+                      <View className="mt-4">
+                        <NormalButton 
+                          text="Save" 
+                          variant="primary" 
+                          paddingHorizontal={30} 
+                          onClick={() => {
+                          handleUpdateEmail();
+                        }} />
+                      </View>
                     </View>
                   ) : (
                     <View>
@@ -140,13 +142,15 @@ export default function Contact() {
                             onChangeText={setVerificationCode}
                             className={`mb-2 border rounded-full px-4 py-2 smallTextGray`}
                         />
-                        <NormalButton 
-                        text="Verify Code" 
-                        variant="primary" 
-                        paddingHorizontal={30} 
-                        onClick={() => {
-                        handleVerifyEmail();
-                      }} />
+                        <View className="mt-4">
+                          <NormalButton 
+                          text="Verify Code" 
+                          variant="primary" 
+                          paddingHorizontal={30} 
+                          onClick={() => {
+                          handleVerifyEmail();
+                        }} />
+                      </View>
                     </View>
                   )}
                 </View>

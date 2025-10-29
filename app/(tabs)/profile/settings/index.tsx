@@ -29,8 +29,7 @@ export default function Settings() {
                 stroke-linejoin="round"
                 d="m8.25 4.5 7.5 7.5-7.5 7.5"
               />
-              </svg>
-              {/* <ChevronRightIcon size={28} color="#000" /> */}
+              </svg> 
             </Pressable>
 
             {/* Contact us */}
@@ -52,8 +51,7 @@ export default function Settings() {
                 stroke-linejoin="round"
                 d="m8.25 4.5 7.5 7.5-7.5 7.5"
               />
-              </svg>
-              {/* <ChevronRightIcon size={28} color="#000" /> */}
+              </svg> 
             </Pressable>
           </View>
 
@@ -87,8 +85,7 @@ export default function Settings() {
                 stroke-linejoin="round"
                 d="m8.25 4.5 7.5 7.5-7.5 7.5"
               />
-            </svg>
-            {/* <ChevronRightIcon size={28} color="#FF4D4D" /> */}
+            </svg> 
           </Pressable>
         </View>
       </View>

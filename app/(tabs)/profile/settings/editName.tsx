@@ -50,8 +50,8 @@ export default function EditName() {
 
   return (
     <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
-      <View className="bg-white rounded-xl px-4 py-5">
-        <Text className="smallTitle mb-2">Enter new name</Text>
+      <View className="flex-1 bg-white rounded-xl px-4 py-5 gap-2.5">
+        <Text className="xsTitle">Enter new name</Text>
         <View className="gap-2">
           <TextInput
             value={name}
@@ -67,13 +67,15 @@ export default function EditName() {
             <Text className="dangerText mx-2">Name is required</Text>
           ) : null}
         </View>
-
-        <NormalButton
-          variant="primary"
-          text={loading ? "Saving..." : "Save"}
-          paddingHorizontal={30}
-          onClick={onSave}
-        />
+        
+        <View className="mt-4">
+          <NormalButton
+            variant="primary"
+            text={loading ? "Saving..." : "Save"}
+            paddingHorizontal={30}
+            onClick={onSave}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
