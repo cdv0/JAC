@@ -29,6 +29,36 @@
             "address":"9148 Orange AV, Long Beach, CA",
             "hours": ["8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "Closed", "Closed"]
         }
+    },
+    {
+        "name": "Mechanic C",
+        "type": "Independent",
+        "rating": "3.5",
+        "ratingsDist":["40", "20","30","20","40"],
+        "reviews": 100,
+        "image": "",
+        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services", "Electronics", "General Services", "Smog Check", "A/C Repair", "Fluid Check", "Engine Lights", "Engine Repair", "Tire-Check", "Wind Shield", "Tire Rims"],
+        "additional_details": {
+            
+            "phone" : "153-493-5510",
+            "address":"9148 Orange AV, Long Beach, CA",
+            "hours": ["8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "Closed", "Closed"]
+        }
+    },
+    {
+        "name": "Mechanic D",
+        "type": "Independent",
+        "rating": "3.5",
+        "ratingsDist":["40", "20","30","20","40"],
+        "reviews": 100,
+        "image": "",
+        "services" : ["Oil Change", "Tire Rotation", "Tuning-Services", "Electronics", "General Services", "Smog Check", "A/C Repair", "Fluid Check", "Engine Lights", "Engine Repair", "Tire-Check", "Wind Shield", "Tire Rims"],
+        "additional_details": {
+            
+            "phone" : "153-493-5510",
+            "address":"9148 Orange AV, Long Beach, CA",
+            "hours": ["8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "8AM-5PM", "Closed", "Closed"]
+        }
     }
 
 ]
