@@ -1,6 +1,7 @@
 import { signOut } from 'aws-amplify/auth'
 import { useRouter } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
+import { ChevronRightIcon } from 'react-native-heroicons/outline'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Settings() {
@@ -13,10 +14,12 @@ export default function Settings() {
           {/* First container */}
           <View className="bg-white rounded-xl">
             {/* Account */}
-            <Pressable className="flex-row justify-between px-5 pt-5 pb-3"
-              onPress={() => router.push('/profile/settings/account')}>
+            <Pressable
+              className="flex-row justify-between px-5 pt-5 pb-3"
+              onPress={() => router.push('/profile/settings/account')}
+            >
               <Text className="font-semibold text-textBlack">Account</Text>
-              <svg
+              {/* <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 2 28 28"
@@ -29,7 +32,8 @@ export default function Settings() {
                 stroke-linejoin="round"
                 d="m8.25 4.5 7.5 7.5-7.5 7.5"
               />
-              </svg> 
+              </svg> */}
+              <ChevronRightIcon size={28} color="#000" />
             </Pressable>
 
             {/* Contact us */}
@@ -38,7 +42,7 @@ export default function Settings() {
               onPress={() => router.push('/profile/settings/contact')}
             >
               <Text className="font-semibold text-textBlack">Contact us</Text>
-              <svg
+              {/* <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 2 28 28"
@@ -51,7 +55,8 @@ export default function Settings() {
                 stroke-linejoin="round"
                 d="m8.25 4.5 7.5 7.5-7.5 7.5"
               />
-              </svg> 
+              </svg> */}
+              <ChevronRightIcon size={28} color="#000" />
             </Pressable>
           </View>
 
@@ -72,7 +77,7 @@ export default function Settings() {
               Sign out
             </Text>
 
-            <svg
+            {/* <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 2 28 28"
@@ -85,7 +90,8 @@ export default function Settings() {
                 stroke-linejoin="round"
                 d="m8.25 4.5 7.5 7.5-7.5 7.5"
               />
-            </svg> 
+            </svg> */}
+            <ChevronRightIcon size={28} color="#FF4D4D" />
           </Pressable>
         </View>
       </View>
