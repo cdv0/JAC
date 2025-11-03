@@ -78,7 +78,7 @@ const Details = () => {
                               <SvgUri  width={100} height={100} uri={mechanic.image}/>
                               }
                   <View className='ml-[5%] justify-center'>
-                      <Text className='text-[25px] buttonTextBlack'>{mechanic.name}</Text>
+                      <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
                       <View className='flex-row'>
                         <Text>Ratings: </Text>
                         <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={parseFloat(mechanic.rating)}/>
@@ -89,7 +89,7 @@ const Details = () => {
               </View>
 
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
-                  <Text className='text-[25px] buttonTextBlack mb-[5%] '> Services</Text>
+                  <Text className='text-2xl buttonTextBlack mb-[5%] '> Services</Text>
                   <FlatList
                     className='mx-[5%] mb-[5%]'
                     data={more?mechanic.services:mechanic.services.slice(0,8)}
@@ -106,7 +106,7 @@ const Details = () => {
 
               {(Object.keys(mechanic.additional_details).length>0)&& 
                 <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
-                  <Text className='text-[25px] buttonTextBlack mb-[5%] ml-[2%]'>Additional Details</Text>
+                  <Text className='text-2xl buttonTextBlack mb-[5%] ml-[2%]'>Additional Details</Text>
                   <View className='mx-[5%]'>
                     {'website' in mechanic.additional_details && 
                         (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Website: <Text className='buttonTextBlue'>{mechanic.additional_details['website']}</Text>
