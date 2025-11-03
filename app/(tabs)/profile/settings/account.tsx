@@ -74,11 +74,9 @@ export default function Account() {
               }}
             >
               <Text className="font-semibold text-textBlack">Email</Text>
-              <View className="flex-row">
-                <Text className="flex-row font-semibold text-textBlack">
-                  {email}
-                </Text>
-                {/* <svg
+              <View className="flex-row gap-3">
+                <Text className="xsText">{email}</Text>
+                <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 2 28 28"
@@ -97,9 +95,9 @@ export default function Account() {
             </Pressable>
             <Pressable className="flex-row justify-between px-5 py-3">
               <Text className="font-semibold text-textBlack">Password</Text>
-              <View className="flex-row">
-                <Text className="font-semibold text-textBlack">*********</Text>
-                {/* <svg
+              <View className="flex-row gap-3">
+                <Text className="xsText">*********</Text>
+                <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 2 28 28"
