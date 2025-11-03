@@ -46,7 +46,9 @@ export default function ProfileLayout() {
       <Stack.Screen
         name="forgetPassword"
         options={{
-          headerTitle: () => <Text className="buttonTextBlack">Settings</Text>,
+          headerTitle: () => (
+            <Text className="buttonTextBlack">Forgot password</Text>
+          ),
           headerBackVisible: false,
           headerLeft: () => (
             <Pressable

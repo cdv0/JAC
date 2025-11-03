@@ -76,7 +76,7 @@ export default function Account() {
               <Text className="font-semibold text-textBlack">Email</Text>
               <View className="flex-row gap-3">
                 <Text className="xsText">{email}</Text>
-                <svg
+                {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 2 28 28"
@@ -89,7 +89,8 @@ export default function Account() {
                     stroke-linejoin="round"
                     d="m8.25 4.5 7.5 7.5-7.5 7.5"
                   />
-                </svg> */}
+                </svg> */}{' '}
+                */
                 <ChevronRightIcon size={28} color="#000" />
               </View>
             </Pressable>
@@ -97,7 +98,7 @@ export default function Account() {
               <Text className="font-semibold text-textBlack">Password</Text>
               <View className="flex-row gap-3">
                 <Text className="xsText">*********</Text>
-                <svg
+                {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 2 28 28"
