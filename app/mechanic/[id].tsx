@@ -25,6 +25,20 @@ interface MechanicViewProps {
     additional_details: keyPair,
 }
 
+
+interface MechanicDetailsProps {
+    name: string,
+    type: string,
+    certified:boolean,
+    rating: string,
+    reviews: string,
+    image: string,
+    services: string[],
+    hours: string[],
+    website: string,
+    phone: string,
+    address: string,
+}
 const Details = () => {
   const {id} = useLocalSearchParams();
  
