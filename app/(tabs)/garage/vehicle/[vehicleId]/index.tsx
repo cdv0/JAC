@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import { readVehicle, updateVehicleDetails } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
@@ -343,8 +343,7 @@ export default function VehicleDetail() {
               <Text className="smallTitle">Services</Text>
               <View className="flex-1 flex-row justify-end gap-3 items-center">
                 <Pressable
-                // TODO: ADD ONPRESS LOGIC FOR CREATING A SERVICE RECORD
-                  onPress={() => {}}
+                  onPress={() => router.push(`/garage/vehicle/${params.vehicleId}/addServiceRecord`)}
                   hitSlop={8}
                   accessibilityRole="button"
                   accessibilityLabel="Add service record"
