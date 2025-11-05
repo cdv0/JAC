@@ -17,13 +17,16 @@ body {
 
     .smallTitle { @apply text-xl font-semibold text-textBlack; }
 
-    .xsTitle { @apply text-ls font-semibold text-textBlack }
+    .xsTitle { @apply text-lg font-semibold text-textBlack }
 
   /* Text, button text, & font-weights*/
 
   .placeholder {
     @apply text-xl text-textLightGray;
   }
+    .xsText { @apply text-sm text-textBlack }
+
+    .xsTextGray { @apply text-sm text-subheaderGray }
 
     .smallText { @apply text-base text-textBlack }
 
@@ -33,13 +36,15 @@ body {
 
     .smallTextBlue { @apply text-base text-primaryBlue }
 
+    .smallThinTextBlue { @apply text-base text-primaryBlue font-light}
+
     .buttonTextWhite { @apply text-base font-semibold text-white }
 
     .buttonTextBlue { @apply text-base font-semibold text-primaryBlue }
 
     .buttonTextBlack { @apply text-base font-semibold text-textBlack }
 
-    .dangerText { @apply text-base font-semibold text-dangerDarkRed }
+    .dangerText { @apply text-xs font-semibold text-dangerBrightRed }
 
 
     /* Garage only */

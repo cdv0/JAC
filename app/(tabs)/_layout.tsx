@@ -1,59 +1,56 @@
 import { icons } from '@/constants/icons';
-import { images } from '@/constants/images';
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View, Text } from 'react-native';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
+import { Hub } from 'aws-amplify/utils';
+import { useEffect, useState } from 'react';
 
-const styles = StyleSheet.create({
-    container : {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-    },
-    background: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: -1, 
-        
-    },
-    content: {
-        flex :0.9,
-        
-    }
-});
-
-const TabIcon = ({focused, Icon}:any)  =>{
-    if(focused){
-        return(
-            <View style = {styles.container}>
-                <images.highlight width= {100} height = "100%" style={styles.background} color='#3A5779'>
-                    
-                </images.highlight>
-                <Icon width= {100} height= "100%"  style = {styles.content} color = "#e8e5e5ff" />
-            </View>
-        )
-    }
-    else{
-        return(
-            <View style = {styles.container}>
-                <Icon width= {100}   height= "100%" style = {styles.content} color = "#3A5779" />
-            </View>
-        )
-    }
+const TabIcon = ({Icon}:any)  =>{
+    return (
+        <View className='flex-1 justify-center items-center '>
+            <Icon width={65} height="100%"/>
+        </View>
+    )
 }
 
 const _layout = () => {
+  const [firstName, setFirstName] = useState<string>('');
+
+  async function fetchNames() {
+    try {
+      await getCurrentUser();
+      const attrs = await fetchUserAttributes();
+      const given = (attrs.name || '').trim();
+      setFirstName(given);
+    } catch {
+      setFirstName("");
+    }
+  }
+
+  useEffect(() => {
+    fetchNames();
+    const unsubscribe = Hub.listen("auth", ({ payload }) => {
+      const event = payload?.event;
+      switch(event) {
+        case "signedIn":
+            fetchNames();
+            break;
+        case "signedOut":
+            setFirstName("");
+            break;
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const firstInitial = (firstName?.[0] ?? '').toUpperCase()
+
   return (
     <Tabs 
         screenOptions={{
             tabBarShowLabel: false,
             tabBarStyle:{
-                backgroundColor: '#DBDBDB',
-                
+                backgroundColor:'#D9D9D9'
             }
         }}
     >
@@ -63,22 +60,18 @@ const _layout = () => {
                 title: "Map",
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
-                            <TabIcon 
-                                focused = {focused} 
-                                Icon = {icons.map}    
-                            />
+                    <TabIcon Icon={focused? icons.mapH:icons.map} />
                 )
             }}
         />
         <Tabs.Screen
             name = "index"
             options={{
-                title: "Search",
+                title: "Index",
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
                             <TabIcon 
-                                focused = {focused} 
-                                Icon = {icons.search}   
+                                Icon = {focused? icons.seachH:icons.search}   
                             />
                 )
             }}
@@ -89,9 +82,8 @@ const _layout = () => {
                 title: "Garage",
                 headerShown:false,
                 tabBarIcon: ({focused}) => (
-                            <TabIcon 
-                                focused = {focused} 
-                                Icon = {icons.garage}    
+                            <TabIcon  
+                                Icon = {focused? icons.garageH:icons.garage}    
                             />
                 )
             }}
@@ -101,12 +93,26 @@ const _layout = () => {
             options={{
                 title: "Profile",
                 headerShown:false,
-                tabBarIcon: ({focused}) => (
-                            <TabIcon 
-                                focused = {focused} 
-                                Icon = {icons.profile}    
-                            />
-                )
+                tabBarIcon: ({focused}) =>
+                  firstInitial
+                    ? focused
+                      ? (
+                        <View className="items-center justify-center">
+                          <View className="h-7 w-16 rounded-full bg-primaryBlue items-center justify-center">
+                            <View className="h-6 w-6 rounded-full items-center justify-center bg-accountOrange">
+                              <Text className="text-white font-bold">{firstInitial}</Text>
+                            </View>
+                          </View>
+                        </View>
+                      )
+                      : (
+                        <View className="h-6 w-6 rounded-full items-center justify-center bg-accountOrange">
+                          <Text className="text-white font-bold">{firstInitial}</Text>
+                        </View>
+                      )
+                    : (
+                      <TabIcon Icon={focused? icons.profileH:icons.profile} />
+                    )
             }}
         />
         <Tabs.Screen

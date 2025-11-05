@@ -1,0 +1,39 @@
+{
+    "reviews": [
+        {
+            "mechanicId": 1,
+            "reviews": [
+                {
+                    "id": 1,
+                    "reviewer": "John Doe",
+                    "rating": 5,
+                    "comment": "Excellent service and friendly staff!"
+                },
+                {
+                    "id": 2,
+                    "reviewer": "Alice Johnson",
+                    "rating": 4,
+                    "comment": "Great experience, will come back again."
+                }
+            ]
+        },
+        {
+            "mechanicId": 2,
+            "reviews": [
+                {
+                    "id": 1,
+                    "reviewer": "Jane Smith",
+                    "rating": 3,
+                    "comment": "Average service, nothing special."
+                },
+                {
+                    "id": 2,
+                    "reviewer": "Bob Brown",
+                    "rating": 2,
+                    "comment": "Not satisfied with the repair quality."
+                }
+            ]
+        }
+
+    ]
+}

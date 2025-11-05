@@ -4,12 +4,13 @@
     "slug": "JAC",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./public/assets/assets/logo.svg",
+    "icon": "./public/assets/images/logo.svg",
     "scheme": "jac",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.JAC"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +20,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.JAC"
     },
     "web": {
       "bundler": "metro",
