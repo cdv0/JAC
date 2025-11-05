@@ -52,7 +52,7 @@ export default function ProfileLayout() {
           headerBackVisible: false,
           headerLeft: () => (
             <Pressable
-              onPress={() => router.push('/(tabs)/profile/logged')}
+              onPress={() => router.push('/(tabs)/profile')}
               className="flex-row items-center px-2"
               hitSlop={2}
             >

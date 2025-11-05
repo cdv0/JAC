@@ -94,7 +94,15 @@ export default function Account() {
                 <ChevronRightIcon size={28} color="#000" />
               </View>
             </Pressable>
-            <Pressable className="flex-row justify-between px-5 py-3">
+            <Pressable
+              className="flex-row justify-between px-5 py-3"
+              onPress={() =>
+                router.push({
+                  pathname: '/profile/settings/editPassword',
+                  params: { username: email },
+                })
+              }
+            >
               <Text className="font-semibold text-textBlack">Password</Text>
               <View className="flex-row gap-3">
                 <Text className="xsText">*********</Text>
