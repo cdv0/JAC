@@ -99,7 +99,7 @@ export default function Account() {
               onPress={() =>
                 router.push({
                   pathname: '/profile/settings/editPassword',
-                  params: { username: email },
+                  params: { email: email },
                 })
               }
             >

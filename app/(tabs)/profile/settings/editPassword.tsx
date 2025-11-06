@@ -1,5 +1,9 @@
 import NormalButton from '@/app/components/NormalButton'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import {
+  CognitoIdentityProvider,
+  InitiateAuthCommand,
+} from '@aws-sdk/client-cognito-identity-provider'
+import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Text, TextInput, View } from 'react-native'
@@ -20,11 +24,30 @@ const editPassword = () => {
     defaultValues: { oldPassword: '', newPassword: '', verifyCode: '' },
   })
   const [index, setIndex] = useState(1)
-  const router = useRouter()
-  const { username } = useLocalSearchParams()
+  const { email } = useLocalSearchParams()
+  const region = 'us-west-1'
+  const providerClient = new CognitoIdentityProvider({ region })
 
-  const validateOldPassword = async () => {
+  const validateOldPassword = async (data: NewPasswordForm) => {
     try {
+      const username = Array.isArray(email) ? email[0] : (email ?? '')
+      const array = Array.isArray(email)
+      console.log('username: ', username)
+      console.log('Email: ', email)
+      console.log(array)
+
+      const command = new InitiateAuthCommand({
+        AuthFlow: 'USER_PASSWORD_AUTH',
+        ClientId: '7vh2kml0k33akevf29gmnqod73',
+        AuthParameters: {
+          USERNAME: username,
+          PASSWORD: data.oldPassword,
+        },
+      })
+
+      const response = await providerClient.send(command)
+
+      if (response.AuthenticationResult?.AccessToken) setIndex(2)
     } catch (error) {
       console.log('Validate Error: ', error)
     }
@@ -53,7 +76,10 @@ const editPassword = () => {
           />
 
           <View className="items-center">
-            <NormalButton onClick={validateOldPassword} text="Save" />
+            <NormalButton
+              onClick={handleSubmit((data) => validateOldPassword(data))}
+              text="Save"
+            />
           </View>
         </View>
       )}
