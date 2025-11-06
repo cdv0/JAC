@@ -6,6 +6,7 @@ import { getCurrentUser } from "aws-amplify/auth";
 import { useLocalSearchParams, router } from "expo-router";
 import { icons } from "@/constants/icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { createServiceRecord } from "@/_backend/api/serviceRecord";
 
 export const ServiceRecord = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -63,13 +64,10 @@ export const ServiceRecord = () => {
 
     // Make API call to create service record
     try {
-      const { userId } = await getCurrentUser();
-
       const payload = {
-        userId: userId,
         vehicleId: vehicleId,
         title,
-        date,
+        serviceDate: date.toISOString(),
         mileage,
         note
       }
@@ -82,7 +80,7 @@ export const ServiceRecord = () => {
       setMileage('');
       setNote('');
 
-      router.replace(`/garage/vehicle/${data.vehicleId}`);
+      router.replace(`/garage/vehicle/${params.vehicleId}`);
     } catch (err: any) {
       console.log('Add service record: Error adding servie record:', err);
       console.log('Add service record: Error message:', err?.message);

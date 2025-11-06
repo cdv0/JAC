@@ -394,7 +394,7 @@ const profile = () => {
 
       switch (event) {
         case 'signedIn':
-          router.push('/profile/logged')
+          // router.push('/profile/logged')
           break
         case 'signInWithRedirect':
           router.push('/profile/logged')
