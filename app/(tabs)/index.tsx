@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from "react";
 import { FlatList, ImageBackground, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MechanicView from "../components/MechanicView";
+import MechanicView from '../components/MechanicView';
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
@@ -44,9 +44,9 @@ export default function Index() {
   useEffect(() => {
           const data = async () => {
               try {
-                  const file = await fetch("/local/dummy/data.json");
+                  const file = await fetch("/local/dummy/data2.json");
                   const mechanicsData = await file.json();
-                  setMechanics(mechanicsData.mechanics);
+                  setMechanics(JSON.parse(mechanicsData.body).data);
               } catch (error) {
                   console.error("Error loading mechanics data:", error);
               }
@@ -367,12 +367,12 @@ export default function Index() {
         
         
         <Text className="text-2xl mt-5 ml-5 mb-5">Find Nearby</Text>
-        
+        {/*TODO Update to use id for mechanics */}
         <View style={{flex:1}}>
             <FlatList
                       
                 data={mechanics}
-                keyExtractor={(item) => item.name}
+                keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
                 renderItem={({item})=> <MechanicView {...item}/>}
                 columnWrapperStyle={{justifyContent:'space-between'}}
