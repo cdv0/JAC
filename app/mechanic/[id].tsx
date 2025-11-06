@@ -36,7 +36,7 @@ const Details = () => {
                 try {
                     const file = await fetch("/local/dummy/data.json");
                     const mechanicsData = await file.json();
-                    
+                    //TODO update to use id mechanic attribute
                     const found = mechanicsData.mechanics.find((x:MechanicViewProps) =>x.name ===id)
                     setMechanic(found|| null)
                     
@@ -70,7 +70,6 @@ const Details = () => {
   else{
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
-        {/* <View className='flex-1'> */}
         <KeyboardAvoidingView className='flex-1' behavior='position' keyboardVerticalOffset={100}>
         <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:'1%' }}showsHorizontalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
