@@ -1,15 +1,24 @@
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { ReactNode } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
-type ButtonVariant = "primary" | "outline" | "cancel" | "danger" | "lightBlue" | "black";
+type ButtonVariant =
+  | 'primary'
+  | 'outline'
+  | 'cancel'
+  | 'danger'
+  | 'lightBlue'
+  | 'black'
 
 type NormalButtonProps = {
-  onClick: () => void;
-  text: string;
-  width?: number | string;
-  paddingHorizontal?: number;
-  paddingVertical?: number;
-  variant?: ButtonVariant;
+  onClick: () => void
+  text: string
+  width?: number | string
+  paddingHorizontal?: number
+  paddingVertical?: number
+  variant?: ButtonVariant
+  icon?: ReactNode
+  grow?: boolean
+  height?: number
 };
 
 export default function NormalButton({
@@ -18,9 +27,11 @@ export default function NormalButton({
   width,
   paddingHorizontal = 30,
   paddingVertical = 7,
-  variant = "primary",
+  variant = 'primary',
+  icon,
+  grow = false,
+  height = 38
 }: NormalButtonProps) {
-
   /*
   Button Types:
   - Primary: Blue BG + White text
@@ -32,42 +43,43 @@ export default function NormalButton({
   */
   const variantStyles = {
     primary: {
-      container: "bg-primaryBlue border border-textBlack",
-      text: "buttonTextWhite",
+      container: 'bg-primaryBlue border border-textBlack',
+      text: 'buttonTextWhite',
     },
     outline: {
-      container: "bg-white border border-primaryBlue",
-      text: "buttonTextBlue",
+      container: 'bg-white border border-primaryBlue',
+      text: 'buttonTextBlue',
     },
     danger: {
-      container: "bg-dangerBrightRed border border-dangerDarkRed",
-      text: "buttonTextWhite",
+      container: 'bg-dangerBrightRed border border-dangerDarkRed',
+      text: 'buttonTextWhite',
     },
     cancel: {
-      container: "bg-secondary border border-grayBorder",
-      text: "buttonTextBlue",
+      container: 'bg-secondary border border-grayBorder',
+      text: 'buttonTextBlue',
     },
     lightBlue: {
-      container: "bg-lightBlueButton border border-lightBlueText",
-      text: "buttonTextWhite",
+      container: 'bg-lightBlueButton border border-lightBlueText',
+      text: 'buttonTextWhite',
     },
     black: {
-      container: "bg-textBlack",
-      text: "buttonWhiteText"
-    }
-  };
+      container: 'bg-textBlack',
+      text: 'buttonWhiteText',
+    },
+  }
 
   return (
-    <TouchableOpacity onPress={onClick} activeOpacity={0.8}>
+    <TouchableOpacity onPress={onClick} activeOpacity={0.8} style={grow ? { alignSelf: "stretch", flexGrow: 1 } : undefined }>
       <View
-        className={`${variantStyles[variant].container} items-center justify-center rounded-xl self-center`}
+        className={`${variantStyles[variant].container} items-center justify-center rounded-xl flex flex-row ${grow ? "self-stretch w-full" : "self-center"}`}
         style={{
-          width,
-          paddingHorizontal,
-          paddingVertical,
-          height: 38,
+          width: "auto",
+          paddingHorizontal : paddingHorizontal,
+          paddingVertical: paddingVertical,
+          height: height
         }}
       >
+        {icon && <View className="mr-2">{icon}</View>}
         <Text className={`buttonTextWhite ${variantStyles[variant].text}`}>
           {text}
         </Text>
