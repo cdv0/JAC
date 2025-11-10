@@ -2,6 +2,7 @@ import { images } from '@/constants/images';
 import { Link } from 'expo-router';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 type MechanicViewProps = {
+    mechanicID: string,
     name: string,
     //rating: string,
     Review: string,
@@ -12,12 +13,12 @@ type MechanicViewProps = {
 
 export default function MechanicView(
     {
-        name, Review, Image:image
+        name, Review, Image:image, mechanicID
     }: MechanicViewProps){
                       
         return(
             
-            <Link href={`../mechanic/${name}`} asChild>
+            <Link href={`../mechanic/${mechanicID}`} asChild>
                 <TouchableOpacity style={{ marginBottom:'5%'}}>
                     <View className = "w-full h-[85%] rounded-xl border border-stroke py-[10%]">
                         {image==''?(<images.defaultImage width={'100%'} height={150} />):
