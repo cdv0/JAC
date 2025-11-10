@@ -394,7 +394,7 @@ const profile = () => {
           await getCurrentUser()
           router.push('/profile/logged')
         } catch (error) {
-          console.log('Check User Error: ', error)
+          //   console.log('Check User Error: ', error)
         }
       }
       checkUser()
