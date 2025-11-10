@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { DimensionValue, Text, TouchableOpacity, View } from 'react-native';
 
 type ButtonVariant =
   | 'primary'
@@ -12,7 +12,7 @@ type ButtonVariant =
 type NormalButtonProps = {
   onClick: () => void
   text: string
-  width?: number | string
+  width?: DimensionValue
   paddingHorizontal?: number
   paddingVertical?: number
   variant?: ButtonVariant
@@ -71,7 +71,7 @@ export default function NormalButton({
       <View
         className={`${variantStyles[variant].container} items-center justify-center rounded-xl flex flex-row ${grow ? "self-stretch w-full" : "self-center"}`}
         style={{
-          width :"auto",
+          width: width,
           paddingHorizontal,
           paddingVertical,
           height: 38,
