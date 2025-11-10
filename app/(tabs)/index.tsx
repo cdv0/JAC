@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from "react";
 import { FlatList, ImageBackground, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MechanicView from '../components/MechanicView';
+import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
@@ -45,16 +45,15 @@ export default function Index() {
   useEffect(() => {
           const data = async () => {
               try {
-                  const file = await fetch("/local/dummy/data2.json");
+                  const file = await fetch("/local/dummy/data.json");
                   const mechanicsData = await file.json();
-                  setMechanics(JSON.parse(mechanicsData.body).data);
+                  setMechanics(mechanicsData.mechanics);
               } catch (error) {
                   console.error("Error loading mechanics data:", error);
               }
           }
           data();
       }, []);
-      
   const [mQuery, setMQuery] = useState('');
   const [lQuery, setLQuery] = useState('');
   const [isFiltersModal, setisFiltersModal] = useState(false);
@@ -353,7 +352,8 @@ export default function Index() {
           
         </View > 
         <SearchBar placeholder1="Search" value1={mQuery} 
-                    placeholder2="Location" value2={lQuery} />
+                    placeholder2="Location" value2={lQuery}
+                    data = mechancis />
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
@@ -367,13 +367,13 @@ export default function Index() {
         </View>
         
         
-        <Text className="text-2xl mt-5 ml-5 mb-5">Find Nearby</Text>
-        {/*TODO Update to use id for mechanics */}
+        <Text className="text-[25px] mt-5 ml-5 mb-5">Find Nearby</Text>
+        
         <View style={{flex:1}}>
             <FlatList
                       
                 data={mechanics}
-                keyExtractor={(item) => item.mechanicID}
+                keyExtractor={(item) => item.name}
                 numColumns={2}
                 renderItem={({item})=> <MechanicView {...item}/>}
                 columnWrapperStyle={{justifyContent:'space-between'}}
@@ -387,10 +387,10 @@ export default function Index() {
 
 
         {/*Expand filters */}
-        <Modal visible={isFiltersModal} className='flex-1'>
-          <View className={`flex-1 ${Platform.OS=='ios'?'mt-[10%]':''}`}>
+        <Modal visible={isFiltersModal} >
+          <View className="flex-1">
               <View className="flex-row justify-between ml-[2%] mr-[2%] mt-[5%] mb-[5%]">
-                  <Text className="justify-start text-2xl buttonTextBlack">
+                  <Text className="justify-start  text-[25px] buttonTextBlack">
                     Filters
                   </Text>
 
@@ -410,7 +410,7 @@ export default function Index() {
                       }}>
           
                       <View className="w-[35] items-center justify-center ">
-                        <Text className="text-2xl buttonTextBlack">
+                        <Text className="text-[25px] buttonTextBlack">
                           X
                         </Text>
                       </View>
@@ -547,10 +547,10 @@ export default function Index() {
         </Modal>
 
         {/*Expand Services*/}
-        <Modal visible={isServicesModal} className='flex-1'>
-          <View className={`flex-1 ${Platform.OS=='ios'?'mt-[10%]':''}`}>
+        <Modal visible={isServicesModal}>
+          <View className="flex-1">
               <View className="flex-row justify-between ml-[2%] mr-[2%] mt-[5%] mb-[5%]">
-                <Text className="justify-start text-2xl buttonTextBlack">
+                <Text className="justify-start text-[25px] buttonTextBlack">
                   Services
                 </Text>
 
@@ -564,7 +564,7 @@ export default function Index() {
                     }}>
         
                     <View className="w-[35] items-center justify-center ">
-                      <Text className="text-2xl buttonTextBlack">
+                      <Text className="text-[25px] buttonTextBlack">
                         X
                       </Text>
                     </View>
