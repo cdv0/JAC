@@ -14,6 +14,7 @@ export default function VehicleLayout() {
       <Stack.Screen
         name="index"
         options={{
+          headerTitle: "",
           headerShadowVisible: false,
           headerTintColor: "#1f3559",
           headerBackVisible: false,
