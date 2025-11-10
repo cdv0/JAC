@@ -115,6 +115,8 @@ const profile = () => {
 
   let content: JSX.Element = <View />
 
+  console.log('profile page')
+
   switch (profileStatus) {
     case 'SignUp':
       content = (
