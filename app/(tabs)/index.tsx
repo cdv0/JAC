@@ -22,6 +22,9 @@ export default function Index() {
     setCategories(categories.filter(item => item!=Category));
   };
 
+  const applyFilter = () =>{
+
+  }
 
   //#endregion
 
@@ -351,7 +354,7 @@ export default function Index() {
           </ImageBackground>
           
         </View > 
-        <SearchBar placeholder1="Search" value1={mQuery} 
+        <SearchBar placeholder1="Search" value1={mQuery} onChangeText1={(newV)=>{setMQuery(newV)}}
                     placeholder2="Location" value2={lQuery} />
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
@@ -386,9 +389,9 @@ export default function Index() {
         <View style={{flex:1}}>
             <FlatList
                       
-                data={categories.length==0?mechanics:
+                data={categories.length==0?mechanics.filter(element=> element.name.toLowerCase().includes(mQuery.toLowerCase())):
                       mechanics.filter(element=>{
-                      return categories.every(cat=> element.Services.includes(cat));
+                      return categories.every(cat=> element.Services.includes(cat)) && element.name.toLowerCase().includes(mQuery.toLowerCase());
                 })}
                 keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
