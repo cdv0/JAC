@@ -7,8 +7,6 @@ import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
-import { useSearch } from "../components/SearchFilter";
-
 export default function Index() {
 
   //TODO: Apply filtering
@@ -45,7 +43,7 @@ export default function Index() {
   useEffect(() => {
           const data = async () => {
               try {
-                  const file = await fetch("/local/dummy/data.json");
+                  const file = await fetch(process.env.PROCESS_ENV_GETMECHANICS_URL as string);
                   const mechanicsData = await file.json();
                   setMechanics(mechanicsData.mechanics);
               } catch (error) {
@@ -353,7 +351,8 @@ export default function Index() {
         </View > 
         <SearchBar placeholder1="Search" value1={mQuery} 
                     placeholder2="Location" value2={lQuery}
-                    data = mechancis />
+                    onChangeText1={ (value1:string) => {setMQuery(value1)} }
+                    />
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
