@@ -70,6 +70,27 @@ export default function AccountLayout() {
         }}
       />
       <Stack.Screen
+        name="contactConfirm"
+        options={{
+          headerTitle: () => (
+            <Text className="buttonTextBlack">Contact us</Text>
+          ),
+          headerBackVisible: false,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => router.push('/(tabs)/profile/settings')}
+              className="flex-row items-center px-2"
+              hitSlop={2}
+            >
+              <icons.chevBack width={24} height={24} fill="#1B263B" />
+              <Text className="ml-1 text-primaryBlue text-[15px] font-medium">
+                Back
+              </Text>
+            </Pressable>
+          ),
+        }}
+      />
+      <Stack.Screen
         name="editEmail"
         options={{
           headerTitle: () => <Text className="buttonTextBlack">Email</Text>,
