@@ -1,7 +1,7 @@
 import Slider from '@react-native-community/slider';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from "react";
-import { FlatList, ImageBackground, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { FlatList, ImageBackground, Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MechanicView from '../components/MechanicView';
 import NormalButton from "../components/NormalButton";
