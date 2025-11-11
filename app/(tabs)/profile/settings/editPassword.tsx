@@ -86,22 +86,32 @@ const editPassword = () => {
       {index === 2 && (
         <View className="flex gap-4">
           <Text className="text-xl font-bold">Enter new password</Text>
-          {/* <Controller
+          <Controller
             control={control}
-            name="email"
+            name="newPassword"
             rules={{
-              required: 'Email is required',
+              required: 'Password is required',
+              pattern: {
+                value:
+                  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                message:
+                  'Please enter password with at least 8 characters with 1 uppercase, 1 number, 1 special case',
+              },
+              minLength: {
+                value: 8,
+                message: 'Password must be at least 8 characters',
+              },
             }}
             render={({ field: { onChange, value } }) => (
               <TextInput
                 onChangeText={onChange}
                 value={value}
-                id="email"
+                id="newPassword"
                 placeholder="Type here"
                 className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
               />
             )}
-          /> */}
+          />
 
           <Text className="text-xl font-bold">Type new password again</Text>
 
