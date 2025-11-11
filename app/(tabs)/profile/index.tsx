@@ -162,6 +162,7 @@ const profile = () => {
               render={({ field: { onChange, value } }) => (
                 <TextInput
                   onChangeText={onChange}
+                  id="email"
                   value={value}
                   placeholder="Type here"
                   className={`px-4 py-3 bg-white border rounded-full smallTextGray h-fit ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
@@ -185,13 +186,17 @@ const profile = () => {
                   value:
                     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                   message:
-                    'Please enter password at least 8 characters with 1 uppercase, 1 number, 1 special case',
+                    'Please enter password with at least 8 characters with 1 uppercase, 1 number, 1 special case',
                 },
-                minLength: 8,
+                minLength: {
+                  value: 8,
+                  message: 'Password must be at least 8 characters',
+                },
               }}
               render={({ field: { onChange, value } }) => (
                 <TextInput
                   onChangeText={onChange}
+                  id="password"
                   value={value}
                   placeholder="Type here"
                   secureTextEntry
@@ -277,6 +282,7 @@ const profile = () => {
                     onChange(text)
                     if (errors.email) clearErrors('email')
                   }}
+                  id="email"
                   value={value}
                   placeholder="Type here"
                   className={`px-4 py-3 bg-white border rounded-full smallTextGray h-fit ${errors.email ? 'border-dangerBrightRed' : 'border-stroke'}`}
@@ -296,7 +302,10 @@ const profile = () => {
               name="password"
               rules={{
                 required: 'Password is required',
-                minLength: 8,
+                minLength: {
+                  value: 8,
+                  message: 'Password must be at least 8 characters long',
+                },
               }}
               render={({ field: { onChange, value } }) => (
                 <TextInput
@@ -304,6 +313,7 @@ const profile = () => {
                     onChange(text)
                     if (errors.password) clearErrors('password')
                   }}
+                  id="password"
                   value={value}
                   placeholder="Type here"
                   secureTextEntry
@@ -317,7 +327,10 @@ const profile = () => {
           </View>
 
           {/* SIGN IN: Forgot password */}
-          <Text className="flex mx-2 font-bold text-right text-lightBlueText">
+          <Text
+            className="flex justify-end mx-2 font-bold text-right text-lightBlueText"
+            onPress={() => router.push('/profile/forgetPassword')}
+          >
             Forgot password?
           </Text>
 
@@ -383,7 +396,7 @@ const profile = () => {
           await getCurrentUser()
           router.push('/profile/logged')
         } catch (error) {
-          console.log('Check User Error: ', error)
+          //   console.log('Check User Error: ', error)
         }
       }
       checkUser()
