@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput } from "react-native";
+import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import { readVehicle, updateVehicleDetails } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
 import NormalButton from "@/app/components/NormalButton";
+import { type ServiceRecord, listServiceRecords } from "@/_backend/api/serviceRecord";
 
 export default function VehicleDetail() {
   const params = useLocalSearchParams<{ vehicleId: string}>();
   const vehicleId = params.vehicleId;
 
+  // Service record
+  const [records, setRecords] = useState<ServiceRecord[]>([]);  // List of vehicles
+
+  // Vehicle
   const [VIN, setVIN] = useState('')
   const [plateNum, setPlateNum] = useState('')
   const [make, setMake] = useState('')
@@ -39,6 +44,7 @@ export default function VehicleDetail() {
   const isNewModelInvalid = submittedEdit && !(newModel?.trim());
   const isNewYearInvalid = submittedEdit && !(newYear?.trim());
 
+  // LOAD VEHICLE DETAILS
   useEffect(() => {(async () => {
       try {
         setLoading(true);
@@ -61,6 +67,26 @@ export default function VehicleDetail() {
       }
     })();
   }, [vehicleId]);
+
+    // LOAD SERVICE RECORD METADATA
+  useEffect(() => {(async () => {
+      try {
+        setLoading(true);
+        if (!vehicleId) throw new Error("Missing vehicleId");
+        // Use listServiceRecords API & store those values into states
+        const data = await listServiceRecords(vehicleId);
+        const sorted = (data.items || []).slice().sort((a, b) =>
+        (a.serviceDate).localeCompare(b.serviceDate)
+      );
+      setRecords(sorted);
+      } catch (e: any) {
+        console.log("Vehicle: Service record list error:", e?.message);
+        setRecords([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []); 
 
   const handleSaveDetails = async() => {
     setSubmittedEdit(true);
@@ -343,8 +369,7 @@ export default function VehicleDetail() {
               <Text className="smallTitle">Services</Text>
               <View className="flex-1 flex-row justify-end gap-3 items-center">
                 <Pressable
-                // TODO: ADD ONPRESS LOGIC FOR CREATING A SERVICE RECORD
-                  onPress={() => {}}
+                  onPress={() => router.push(`/garage/vehicle/${params.vehicleId}/addServiceRecord`)}
                   hitSlop={8}
                   accessibilityRole="button"
                   accessibilityLabel="Add service record"
@@ -362,11 +387,42 @@ export default function VehicleDetail() {
               </View>
             </View>
 
-            {/* TODO: Add service record logic */}
+            {/* Render list of service records */}
             {servicesExpanded && (
-              <View className="mt-4 gap-3">
-                <Text className="smallTextGray">No services yet.</Text>
-                {/* Render a list of service records here */}
+              <View className=" gap-3">
+                {/* Main content: Service record list */}
+                <FlatList
+                  data={records}
+                  keyExtractor={(r: any) => (r.empty ? r.key : r.serviceRecordId)}
+                  numColumns={1}
+                  ListEmptyComponent={
+                    <View className="mt-10 items-center">
+                      <Text className="smallTextGray">{loading ? "Loading..." : "No services yet."}</Text>
+                    </View>
+                  }
+                  renderItem={({ item }: { item: any }) => {
+                    return (
+                      <Pressable 
+                        onPress={() => router.push(`/garage/vehicle/${params.vehicleId}/${item.serviceRecordId}`)} 
+                        style={{ flex: 1 }}
+                        className="py-3 border-b border-stroke"
+                        >
+                        {/* Row */}
+                        <View className="flex-1 flex-row items-center">
+                          <Text className="buttonTextBlue">{item.title}</Text>
+                          {/* Right side text column */}
+                          <View className="flex-1 flex-col items-end justify-center">
+                            <Text className="smallTextBlue">{item.serviceDate}</Text>
+                            {item.mileage != "" ? (
+                              <Text className="smallTextBlue">{item.mileage} mi</Text>
+                            ) : <Text className="smallTextBlue">- mi</Text>
+                            }
+                          </View>
+                        </View>
+                      </Pressable>
+                    );
+                  }}
+                />
               </View>
             )}
           </View>

@@ -115,6 +115,8 @@ const profile = () => {
 
   let content: JSX.Element = <View />
 
+  console.log('profile page')
+
   switch (profileStatus) {
     case 'SignUp':
       content = (
@@ -407,7 +409,7 @@ const profile = () => {
 
       switch (event) {
         case 'signedIn':
-          router.push('/profile/logged')
+          // router.push('/profile/logged')
           break
         case 'signInWithRedirect':
           router.push('/profile/logged')
