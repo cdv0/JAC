@@ -10,9 +10,8 @@ import ToggleButton from "../components/ToggleButton";
 
 export default function Index() {
 
-  //TODO: Apply filtering
+  //TODO: Refactor filters
   const [categories, setCategories] = useState<string[]>([]);
-
   //#region helper functions
   const insertCategory= (newCategory:string) => {
     setCategories(arr =>[...arr, newCategory]);
@@ -22,8 +21,17 @@ export default function Index() {
     setCategories(categories.filter(item => item!=Category));
   };
 
+  const searchCondition = (n:string, l:string) => {
+    return n.toLowerCase().includes(mQuery.toLowerCase()) && l.toLowerCase().includes(lQuery.toLowerCase());
+  }
+  
   const applyFilter = () =>{
-
+    if(categories.length ==0){
+      return mechanics.filter(element=> searchCondition(element.name, element.address));
+    }
+    return  mechanics.filter(element=>{
+                      return categories.every(cat=> element.Services.includes(cat)) && searchCondition(element.name, element.address);
+                });
   }
 
   //#endregion
@@ -50,6 +58,8 @@ export default function Index() {
                   const file = await fetch("/local/dummy/data2.json");
                   const mechanicsData = await file.json();
                   setMechanics(JSON.parse(mechanicsData.body).data);
+                 
+                  
               } catch (error) {
                   console.error("Error loading mechanics data:", error);
               }
@@ -93,26 +103,26 @@ export default function Index() {
         return(
           <>
               <Text className={` ${AC_Heat[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(0, !AC_Heat[0], setAC_Heat)}}
+                    onPress={()=>{updateStates(0, !AC_Heat[0], setAC_Heat); handleCategories(!AC_Heat[0], "AC Recharge")}}
               >
-                AC recharge
+                AC Recharge
               </Text>
               <Text className={` ${AC_Heat[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(1, !AC_Heat[1], setAC_Heat)}}
+                    onPress={()=>{updateStates(1, !AC_Heat[1], setAC_Heat); handleCategories(!AC_Heat[1], "Compressor Replacement")}}
               >
-                Compressor replacement
+                Compressor Replacement
               </Text>
               <Text className={` ${AC_Heat[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !AC_Heat[2], setAC_Heat)}}>
-                Radiator service
+                    onPress={()=>{updateStates(2, !AC_Heat[2], setAC_Heat); handleCategories(!AC_Heat[2], "Radiator Service")}}>
+                Radiator Service
               </Text>
               <Text className={` ${AC_Heat[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !AC_Heat[3], setAC_Heat)}}>
-                Heater Core repair
+                    onPress={()=>{updateStates(3, !AC_Heat[3], setAC_Heat); handleCategories(!AC_Heat[3], "Heater Core Repair")}}>
+                Heater Core Repair
               </Text>
               <Text className={` ${AC_Heat[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(4, !AC_Heat[4], setAC_Heat)}}>
-                Thermostat/water pump
+                    onPress={()=>{updateStates(4, !AC_Heat[4], setAC_Heat); handleCategories(!AC_Heat[4], "Thermostat/Water Pump")}}>
+                Thermostat/Water Pump
               </Text>   
           </>
         );   
@@ -120,23 +130,23 @@ export default function Index() {
         return(
           <>
             <Text className={` ${Bat_Elec[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(0, !Bat_Elec[0], setBat_Elec)}}>
+                    onPress={()=>{updateStates(0, !Bat_Elec[0], setBat_Elec); handleCategories(!Bat_Elec[0], "Battery Replacement");}}>
               Battery Replacement
             </Text>
             <Text className={` ${Bat_Elec[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(1, !Bat_Elec[1], setBat_Elec)}}>
+                    onPress={()=>{updateStates(1, !Bat_Elec[1], setBat_Elec); handleCategories(!Bat_Elec[1], "Alternator/Starter Repair")}}>
               Alternator/Starter Repair
             </Text>
             <Text className={` ${Bat_Elec[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !Bat_Elec[2], setBat_Elec)}}>
+                    onPress={()=>{updateStates(2, !Bat_Elec[2], setBat_Elec); handleCategories(!Bat_Elec[2], "Wiring & Fuses")}}>
               Wiring & Fuses
             </Text>
             <Text className={` ${Bat_Elec[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !Bat_Elec[3], setBat_Elec)}}>
+                    onPress={()=>{updateStates(3, !Bat_Elec[3], setBat_Elec); handleCategories(!Bat_Elec[3], "Radio")}}>
                Radio
             </Text>
             <Text className={` ${Bat_Elec[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(4, !Bat_Elec[4], setBat_Elec)}}>
+                    onPress={()=>{updateStates(4, !Bat_Elec[4], setBat_Elec); handleCategories(!Bat_Elec[4], "Lighting")}}>
               Lighting
             </Text>
           </>
@@ -145,23 +155,23 @@ export default function Index() {
         return(
           <>
             <Text className={` ${Eng_Serv[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(0, !Eng_Serv[0], setEng_Serv)}}>
-              Engine Diagnosts/Check Engine lights
+                    onPress={()=>{updateStates(0, !Eng_Serv[0], setEng_Serv); handleCategories(!Eng_Serv[0], "Engine Diagnostics/Check Engine lights")}}>
+              Engine Diagnostics/Check Engine lights
             </Text>
             <Text className={` ${Eng_Serv[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(1, !Eng_Serv[1], setEng_Serv)}}>
+                    onPress={()=>{updateStates(1, !Eng_Serv[1], setEng_Serv); handleCategories(!Eng_Serv[1], "Engine Repair")}}>
               Engine Repair
             </Text>
             <Text className={` ${Eng_Serv[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !Eng_Serv[2], setEng_Serv)}}>
+                    onPress={()=>{updateStates(2, !Eng_Serv[2], setEng_Serv); handleCategories(!Eng_Serv[2], "Ignition System")}}>
               Ignition System
             </Text>
             <Text className={` ${Eng_Serv[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !Eng_Serv[3], setEng_Serv)}}>
+                    onPress={()=>{updateStates(3, !Eng_Serv[3], setEng_Serv); handleCategories(!Eng_Serv[3], "Fuel System")}}>
               Fuel System
             </Text>
             <Text className={` ${Eng_Serv[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(4, !Eng_Serv[4], setEng_Serv)}}>
+                    onPress={()=>{updateStates(4, !Eng_Serv[4], setEng_Serv); handleCategories(!Eng_Serv[4], "Engine Performance Check")}}>
               Engine Performance Check
             </Text>
           </>
@@ -353,7 +363,7 @@ export default function Index() {
           
         </View > 
         <SearchBar placeholder1="Search" value1={mQuery} onChangeText1={(newV)=>{setMQuery(newV)}}
-                    placeholder2="Location" value2={lQuery} />
+                    placeholder2="Location" value2={lQuery} onChangeText2={(newL)=>{setLQuery(newL)}}/>
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
@@ -383,14 +393,10 @@ export default function Index() {
         
         
         <Text className="text-2xl mt-5 ml-5 mb-5">Find Nearby</Text>
-        {/*TODO Update to use id for mechanics */}
         <View style={{flex:1}}>
             <FlatList
                       
-                data={categories.length==0?mechanics.filter(element=> element.name.toLowerCase().includes(mQuery.toLowerCase())):
-                      mechanics.filter(element=>{
-                      return categories.every(cat=> element.Services.includes(cat)) && element.name.toLowerCase().includes(mQuery.toLowerCase());
-                })}
+                data={applyFilter()}
                 keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
                 renderItem={({item})=> <MechanicView {...item}/>}
@@ -400,7 +406,6 @@ export default function Index() {
               />
         </View>
           
-       
         
 
 
