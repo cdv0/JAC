@@ -3,6 +3,7 @@ import {
   CognitoIdentityProvider,
   InitiateAuthCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
+import { confirmResetPassword, resetPassword } from 'aws-amplify/auth'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -21,10 +22,15 @@ const editPassword = () => {
     formState: { errors, isSubmitting },
     setError,
   } = useForm<NewPasswordForm>({
-    defaultValues: { oldPassword: '', newPassword: '', verifyCode: '' },
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      verifyCode: '',
+    },
   })
   const [index, setIndex] = useState(1)
   const { email } = useLocalSearchParams()
+  const [showPass, setShowPass] = useState<boolean>(true)
   const region = 'us-west-1'
   const providerClient = new CognitoIdentityProvider({ region })
 
@@ -53,6 +59,38 @@ const editPassword = () => {
     }
   }
 
+  const sendCode = async (data: NewPasswordForm) => {
+    try {
+      const username = Array.isArray(email) ? email[0] : (email ?? '')
+      const response = await resetPassword({ username: username })
+
+      if (
+        response.nextStep.resetPasswordStep !==
+        'CONFIRM_RESET_PASSWORD_WITH_CODE'
+      ) {
+        return
+      }
+    } catch (error) {
+      console.log('Error: ', error)
+    }
+    setIndex(3)
+  }
+
+  const verifyCode = async (data: NewPasswordForm) => {
+    try {
+      const username = Array.isArray(email) ? email[0] : (email ?? '')
+      await confirmResetPassword({
+        username: username,
+        confirmationCode: data.verifyCode,
+        newPassword: data.newPassword,
+      })
+
+      setIndex(4)
+    } catch (error) {
+      console.log('Error: ', error)
+    }
+  }
+
   return (
     <View className="flex flex-col gap-4 mt-6 ml-10 mr-10 text-left">
       {index === 1 && (
@@ -70,6 +108,7 @@ const editPassword = () => {
                 value={value}
                 id="oldPassword"
                 placeholder="Type here"
+                secureTextEntry={showPass}
                 className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
               />
             )}
@@ -108,19 +147,53 @@ const editPassword = () => {
                 value={value}
                 id="newPassword"
                 placeholder="Type here"
+                secureTextEntry={showPass}
                 className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
               />
             )}
           />
 
-          <Text className="text-xl font-bold">Type new password again</Text>
-
           <View className="items-center">
-            <NormalButton onClick={() => setIndex(3)} text="Save" />
+            <NormalButton
+              onClick={handleSubmit((data) => {
+                sendCode(data)
+              })}
+              text="Save"
+            />
           </View>
         </View>
       )}
       {index === 3 && (
+        <View className="flex gap-4">
+          <Text className="text-xl font-bold">Enter Code From Email</Text>
+          <Controller
+            control={control}
+            name="verifyCode"
+            rules={{
+              required: 'Verify Code is required',
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                onChangeText={onChange}
+                value={value}
+                id="verifyCode"
+                placeholder="Type here"
+                className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
+              />
+            )}
+          />
+
+          <View className="items-center">
+            <NormalButton
+              onClick={handleSubmit((data) => {
+                verifyCode(data)
+              })}
+              text="Save"
+            />
+          </View>
+        </View>
+      )}
+      {index === 4 && (
         <View>
           <Text className="text-xl font-bold">New password set</Text>
         </View>
