@@ -24,7 +24,7 @@ export default function Index() {
   const searchCondition = (n:string, l:string) => {
     return n.toLowerCase().includes(mQuery.toLowerCase()) && l.toLowerCase().includes(lQuery.toLowerCase());
   }
-  
+
   const applyFilter = () =>{
     if(categories.length ==0){
       return mechanics.filter(element=> searchCondition(element.name, element.address));
@@ -180,19 +180,19 @@ export default function Index() {
         return(
           <>
             <Text className={` ${Suspen_Steer[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(0, !Suspen_Steer[0], setSuspen_Steer)}}>
-              Steering Wheel adjustment
+                    onPress={()=>{updateStates(0, !Suspen_Steer[0], setSuspen_Steer); handleCategories(!Suspen_Steer[0], "Steering Wheel adjustment")}}>
+              Steering Wheel Adjustment
             </Text>
             <Text className={` ${Suspen_Steer[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(1, !Suspen_Steer[1], setSuspen_Steer)}}>
-              Shock and Strut replacement
+                    onPress={()=>{updateStates(1, !Suspen_Steer[1], setSuspen_Steer); handleCategories(!Suspen_Steer[1], "Shock and Strut Replacement")}}>
+              Shock and Strut Replacement
             </Text>
             <Text className={` ${Suspen_Steer[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !Suspen_Steer[2], setSuspen_Steer)}}>
-              Power Streering repair
+                    onPress={()=>{updateStates(2, !Suspen_Steer[2], setSuspen_Steer); handleCategories(!Suspen_Steer[2], "Power Streering Repair")}}>
+              Power Streering Repair
             </Text>
             <Text className={` ${Suspen_Steer[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !Suspen_Steer[3], setSuspen_Steer)}}>
+                    onPress={()=>{updateStates(3, !Suspen_Steer[3], setSuspen_Steer); handleCategories(!Suspen_Steer[3], "Steering/Suspension Component Replacement")}}>
               Steering/Suspension Component Replacement
             </Text>
           </>
@@ -201,23 +201,23 @@ export default function Index() {
         return(
           <>
             <Text className={` ${Brakes[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(0, !Brakes[0], setBrakes)}}>
+                    onPress={()=>{updateStates(0, !Brakes[0], setBrakes); handleCategories(!Brakes[0], "Brake Pad Replacement")}}>
               Brake Pad Replacement
             </Text>
             <Text className={` ${Brakes[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(1, !Brakes[1], setBrakes)}}>
-              Rotor and drum replacement
+                    onPress={()=>{updateStates(1, !Brakes[1], setBrakes); handleCategories(!Brakes[1], "Rotor and Drum Replacement")}}>
+              Rotor and Drum Replacement
             </Text>
             <Text className={` ${Brakes[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !Brakes[2], setBrakes)}}>
-              Brake caliper
+                    onPress={()=>{updateStates(2, !Brakes[2], setBrakes); handleCategories(!Brakes[2], "Brake Caliper")}}>
+              Brake Caliper
             </Text>
             <Text className={` ${Brakes[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !Brakes[3], setBrakes)}}>
+                    onPress={()=>{updateStates(3, !Brakes[3], setBrakes); handleCategories(!Brakes[3], "Anti-Lock Braking Diagnostics and Repair")}}>
               Anti-Lock Braking Diagnostics and Repair
             </Text>
             <Text className={` ${Brakes[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(4, !Brakes[4], setBrakes)}}>
+                    onPress={()=>{updateStates(4, !Brakes[4], setBrakes); handleCategories(!Brakes[4], "Parking/Emergency Brake Repair")}}>
               Parking/Emergency Brake Repair
             </Text>
           </>
@@ -226,20 +226,20 @@ export default function Index() {
         return(
           <>
             <Text className={` ${Exh_Muff[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(0, !Exh_Muff[0], setExh_Muff)}}>
+                    onPress={()=>{updateStates(0, !Exh_Muff[0], setExh_Muff); handleCategories(!Exh_Muff[0], "Muffler Replacement")}}>
               Muffler Replacement
             </Text>
             <Text className={` ${Exh_Muff[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(1, !Exh_Muff[1], setExh_Muff)}}>
+                    onPress={()=>{updateStates(1, !Exh_Muff[1], setExh_Muff); handleCategories(!Exh_Muff[1], "Catalytic Converter Replacement")}}>
               Catalytic Converter Replacement
             </Text>
             <Text className={` ${Exh_Muff[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !Exh_Muff[2], setExh_Muff)}}>
+                    onPress={()=>{updateStates(2, !Exh_Muff[2], setExh_Muff); handleCategories(!Exh_Muff[2], "Exhaust Pipe Repair")}}>
               Exhaust Pipe Repair
             </Text>
             <Text className={` ${Exh_Muff[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !Exh_Muff[3], setExh_Muff)}}>
-              Exhaust Pipe Alignment
+                    onPress={()=>{updateStates(3, !Exh_Muff[3], setExh_Muff); handleCategories(!Exh_Muff[3], "Exhaust Pipe Replacement")}}>
+              Exhaust Pipe Replacement
             </Text>
           </>
         );
@@ -247,19 +247,19 @@ export default function Index() {
         return(
           <>
             <Text className={` ${Tires[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(0, !Tires[0], setTires)}}>
-              Tire rotation
+                    onPress={()=>{updateStates(0, !Tires[0], setTires); handleCategories(!Tires[0], "Tire Rotation")}}>
+              Tire Rotation
             </Text>
             <Text className={` ${Tires[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(1, !Tires[1], setTires)}}>
+                    onPress={()=>{updateStates(1, !Tires[1], setTires); handleCategories(!Tires[1], "Tire Repair")}}>
               Tire Repair
             </Text>
             <Text className={` ${Tires[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !Tires[2], setTires)}}>
+                    onPress={()=>{updateStates(2, !Tires[2], setTires); handleCategories(!Tires[2], "Tire Replacement")}}>
               Tire Replacement
             </Text>
             <Text className={` ${Tires[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !Tires[3], setTires)}}>
+                    onPress={()=>{updateStates(3, !Tires[3], setTires); handleCategories(!Tires[3], "Tire Rim Repair")}}>
               Tire Rim Repair
             </Text>
           </>
@@ -268,27 +268,27 @@ export default function Index() {
         return(
           <>
             <Text className={` ${Fluids[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(0, !Fluids[0], setFluids)}}>
+                    onPress={()=>{updateStates(0, !Fluids[0], setFluids); handleCategories(!Fluids[0], "Oil/Filter Replacement")}}>
               Oil/Filter Replacement
             </Text>
             <Text className={` ${Fluids[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(1, !Fluids[1], setFluids)}}>
+                    onPress={()=>{updateStates(1, !Fluids[1], setFluids); handleCategories(!Fluids[1], "Coolant Replacement")}}>
               Coolant Replacement
             </Text>
             <Text className={` ${Fluids[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !Fluids[2], setFluids)}}>
-             Transmission Replacement
+                    onPress={()=>{updateStates(2, !Fluids[2], setFluids); handleCategories(!Fluids[2], "Transmission Fluid Replacement")}}>
+             Transmission Fluid Replacement
             </Text>
             <Text className={` ${Fluids[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !Fluids[3], setFluids)}}>
+                    onPress={()=>{updateStates(3, !Fluids[3], setFluids); handleCategories(!Fluids[3], "Power Steering Fluid Replacement")}}>
              Power Steering Fluid Replacement
             </Text>
             <Text className={` ${Fluids[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(4, !Fluids[4], setFluids)}}>
+                    onPress={()=>{updateStates(4, !Fluids[4], setFluids); handleCategories(!Fluids[4], "Brake Fluid Replacement")}}>
               Brake Fluid Replacement
             </Text>
             <Text className={` ${Fluids[5]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(5, !Fluids[5], setFluids)}}>
+                    onPress={()=>{updateStates(5, !Fluids[5], setFluids); handleCategories(!Fluids[5], "Differential Fluid Replacement")}}>
               Differential Fluid Replacement
             </Text>
           </>
@@ -297,23 +297,23 @@ export default function Index() {
         return(
           <>
             <Text className={` ${Other[0]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                      onPress={()=>{updateStates(0, !Other[0], setOther)}}>
+                      onPress={()=>{updateStates(0, !Other[0], setOther); handleCategories(!Other[0], "Emission Check")}}>
               Emission Check
             </Text>
             <Text className={` ${Other[1]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                      onPress={()=>{updateStates(1, !Other[1], setOther)}}>
+                      onPress={()=>{updateStates(1, !Other[1], setOther); handleCategories(!Other[1], "SeatBelt Replacement")}}>
               SeatBelt Replacement
             </Text>
             <Text className={` ${Other[2]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(2, !Other[2], setOther)}}>
+                    onPress={()=>{updateStates(2, !Other[2], setOther); handleCategories(!Other[2], "Door Handle Replacement")}}>
               Door Handle Replacement
             </Text>
             <Text className={` ${Other[3]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(3, !Other[3], setOther)}}>
+                    onPress={()=>{updateStates(3, !Other[3], setOther); handleCategories(!Other[3], "Wiper Replacement")}}>
               Wiper Replacement
             </Text>
             <Text className={` ${Other[4]?'buttonTextWhite bg-primaryBlue':'buttonTextBlue'} w-full border-b-[2px] py-[5%] border-stroke text-center`}
-                    onPress={()=>{updateStates(4, !Other[4], setOther)}}>
+                    onPress={()=>{updateStates(4, !Other[4], setOther); handleCategories(!Other[4], "Seat Replacement")}}>
               Seat Replacement
             </Text>
           </>    
