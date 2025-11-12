@@ -1,3 +1,4 @@
+import { fetchAuthSession } from "aws-amplify/auth";
 export const BASE_URL = "https://ynwemrq0m2.execute-api.us-west-1.amazonaws.com/dev";
 
 export type UserProfile = {
@@ -35,6 +36,7 @@ export async function updateProfileInfo(userId: string, oldEmail: string, newEma
     if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
     return JSON.parse(text);
   }
+
 
 export async function updateName(userId: string, email: string, firstName: string, lastName: string) {
   const res = await fetch(`${BASE_URL}/profile/updateProfileName`, {
