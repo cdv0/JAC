@@ -77,7 +77,7 @@ const Details = () => {
         <KeyboardAvoidingView className='flex-1' behavior='position' keyboardVerticalOffset={100}>
         <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:'1%' }}showsHorizontalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
-                  {mechanic.image==''?(<images.defaultImage width={100} height={100} />):
+                  {!mechanic.image?(<images.defaultImage width={100} height={100} />):
                               <SvgUri  width={100} height={100} uri={mechanic.image}/>
                               }
                   <View className='ml-[5%] justify-center'>
