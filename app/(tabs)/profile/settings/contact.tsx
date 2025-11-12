@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { Text, TextInput, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import NormalButton from '@/app/components/NormalButton';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Contact() {
   const[Name, setName] = useState('')
@@ -11,12 +12,17 @@ export default function Contact() {
 
   const submitForm = () => {
     setSubmitted(true);
+
+    if (!Name.trim() || !Email.trim() || !Message.trim()) {
+    return;
+    }
     let formData = {
       Name: Name,
       Email: Email,
       Message: Message,
     }
     console.log('Contact form submitted:', formData)
+    router.push('/(tabs)/profile/settings/contactConfirm');
   }
 
   //Check for empty input upon submission
@@ -25,8 +31,8 @@ export default function Contact() {
   const isMessageInvalid = submitted && !Message.trim();
 
   return (
-  <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
-      <View className="bg-white rounded-xl px-5 pt-3 pb-5 gap-3 mt-3 mx-3">
+  <SafeAreaView className="bg-white flex-1" edges={['top', 'bottom']}>
+      <View className="rounded-xl px-5 pt-3 pb-5 gap-3 mt-3 mx-3">
         <View className="gap-2">
                     <View className="flex-1 flex-row">
                       <Text className="font-semibold text-textBlack">Name</Text>
