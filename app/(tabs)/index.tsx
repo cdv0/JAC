@@ -319,10 +319,8 @@ export default function Index() {
   //#endregion
 
   //#region expanded Filters
-  //0-> relevance, 1-> open now, 2->popular, 3-> rating
-  const [expFilterStates, setExpFilterStates] = useState(Array(4).fill(false));
-  const [expFilterApplied, setExpFilterApplied] = useState(Array(4).fill(false));
-
+  const [sortOpt, setSortOpt] = useState('0');
+  const [sortOptApplied, setSortOptApplied] = useState('0');
   const [minP, setminP] = useState('');
   const [tempMinP, setTempMinP] = useState('');
 
@@ -399,6 +397,7 @@ export default function Index() {
                 columnWrapperStyle={{justifyContent:'space-between'}}
                 contentContainerStyle={{flexGrow:1, alignItems:'center'}}
                 showsVerticalScrollIndicator={false}
+                ListEmptyComponent={<Text>No Mechanics found</Text>}
               />
         </View>
           
@@ -418,10 +417,7 @@ export default function Index() {
                     onPress={()=> 
                       {
                         //undo the changes
-                        updateStates(0, expFilterApplied[0], setExpFilterStates) 
-                        updateStates(1, expFilterApplied[1], setExpFilterStates);
-                        updateStates(2, expFilterApplied[2], setExpFilterStates)
-                        updateStates(3, expFilterApplied[3], setExpFilterStates);
+                        setSortOpt(sortOptApplied);
                         setTempMinP(minP);
                         setTempMaxP(maxP);
                         setWarning(false);
@@ -446,13 +442,13 @@ export default function Index() {
                 </Text>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
-                  <ToggleButton width={width} text="Relevance" flag={expFilterStates[0]} onPress={(newf)=>{updateStates(0, newf, setExpFilterStates)}}/>
-                  <ToggleButton width={width} text="Open Now" flag={expFilterStates[1]} onPress={(newf)=>{updateStates(1, newf, setExpFilterStates)}}/>
+                  <ToggleButton width={width} text="Relevance" flag={sortOpt == '1'} onPress={(newf)=>{newf?setSortOpt('1'):setSortOpt('0')}}/>
+                  <ToggleButton width={width} text="Open Now" flag={sortOpt == '2'} onPress={(newf)=>{newf?setSortOpt('2'):setSortOpt('0')}}/>
                 </View>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%] mt-[-2%]">
-                  <ToggleButton width={width} text="Popular" flag={expFilterStates[2]} onPress={(newf)=>{updateStates(2, newf, setExpFilterStates)}}/>
-                  <ToggleButton width={width} text="Rating" flag={expFilterStates[3]} onPress={(newf)=>{updateStates(3, newf, setExpFilterStates)}}/>
+                  <ToggleButton width={width} text="Popular" flag={sortOpt == '3'} onPress={(newf)=>{newf?setSortOpt('3'):setSortOpt('0')}}/>
+                  <ToggleButton width={width} text="Rating" flag={sortOpt == '4'} onPress={(newf)=>{newf?setSortOpt('4'):setSortOpt('0')}}/>
                
                 </View>
 
@@ -483,7 +479,6 @@ export default function Index() {
                   <View className={`border ${warning?'border-dangerBrightRed':'border-textBlack'} w-[30%] rounded-xl`}>
                     <TextInput value={tempMaxP} keyboardType='numeric'
                               onChangeText={(newP)=>{ 
-                                              //newP = newP.split('$').join('');
                                               newP = newP.replace(/[^0-9]/g,'');
                                               if (newP == '')
                                                 setTempMaxP('')
@@ -540,7 +535,7 @@ export default function Index() {
                    if(min==null || max ==null ||min<=max)
                    {
                       setWarning(false);
-                      if(expFilterStates.some(flag => flag) || tempMinP != ''|| tempMaxP != '' || tempSliderValue != maxD /2){
+                      if(sortOpt !='0' || tempMinP != ''|| tempMaxP != '' || tempSliderValue != maxD /2){
                         setisFiltersActive(true)
                       }
                       else{
@@ -549,10 +544,7 @@ export default function Index() {
 
                       //filter logic goes here
 
-                      updateStates(0, expFilterStates[0], setExpFilterApplied);
-                      updateStates(1, expFilterStates[1], setExpFilterApplied);
-                      updateStates(2, expFilterStates[2], setExpFilterApplied);
-                      updateStates(3, expFilterStates[3], setExpFilterApplied);
+                      setSortOptApplied(sortOpt);
                       setminP(tempMinP);
                       setmaxP(tempMaxP);
                       setSliderValue(tempSliderValue);
