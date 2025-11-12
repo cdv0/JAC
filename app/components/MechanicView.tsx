@@ -19,10 +19,10 @@ export default function MechanicView(
         return(
             
             <Link href={`../mechanic/${mechanicID}`} asChild>
-                <TouchableOpacity style={{ marginBottom:'5%'}}>
-                    <View className = "w-full h-[85%] rounded-xl border border-stroke py-[10%]">
-                        {!image?(<images.defaultImage width={'100%'} height={150} />):
-                        <Image source={{uri:image}} className='w-[80%] h-[150] self-center'/>
+                <TouchableOpacity style={{ width:175, height:250, marginBottom:'5%', marginHorizontal:'3%'}}>
+                    <View className = "w-full h-full rounded-xl border border-stroke py-[5%]">
+                        {!image?(<images.defaultImage width={150} height={150} style={{alignSelf:'center'}} />):
+                        <Image source={{uri:image}} className='w-[150] h-[150] self-center'/>
                         }
                         <View className ="my-[5%] ml-[15%]">
                             <View className="flex-row">

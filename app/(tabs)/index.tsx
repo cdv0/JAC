@@ -394,8 +394,7 @@ export default function Index() {
                 keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
                 renderItem={({item})=> <MechanicView {...item}/>}
-                columnWrapperStyle={{justifyContent:'space-between'}}
-                contentContainerStyle={{flexGrow:1, alignItems:'center'}}
+                contentContainerStyle={{alignItems:'center'}}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={<Text>No Mechanics found</Text>}
               />
