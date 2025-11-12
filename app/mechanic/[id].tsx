@@ -2,10 +2,9 @@ import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import { SvgUri } from 'react-native-svg';
 import NormalButton from '../components/NormalButton';
 
 
@@ -77,8 +76,8 @@ const Details = () => {
         <KeyboardAvoidingView className='flex-1' behavior='position' keyboardVerticalOffset={100}>
         <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:'1%' }}showsHorizontalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
-                  {!mechanic.image?(<images.defaultImage width={100} height={100} />):
-                              <SvgUri  width={100} height={100} uri={mechanic.image}/>
+                  {!mechanic.Image?(<images.defaultImage width={100} height={100} />):
+                              <Image source={{uri:String(mechanic.Image)}} className='w-[100] h-[100]'/>
                               }
                   <View className='ml-[5%] justify-center'>
                       <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
