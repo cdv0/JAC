@@ -46,3 +46,21 @@ export async function listServiceRecords(vehicleId: string) {
   const parsed = text ? JSON.parse(text) : { items: [] };
   return parsed as { items: ServiceRecord[] };
 }
+
+// GET /vehicle/serviceRecord/readServiceRecord
+export async function readServiceRecord(serviceRecordId: string, vehicleId: string) {
+  const url = `${BASE_URL}/vehicle/serviceRecord/readServiceRecord` +
+            `?vehicleId=${encodeURIComponent(vehicleId)}` +
+            `&serviceRecordId=${encodeURIComponent(serviceRecordId)}`;
+  const response = await fetch(url, {
+      method: "GET",
+      cache: "no-store"
+  });
+
+  const text = await response.text()
+  if (!response.ok) {
+      throw new Error(text || `HTTP ${response.status}`);
+  }
+
+  return (text ? JSON.parse(text): {}) as ServiceRecord;
+}
