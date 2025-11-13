@@ -13,7 +13,7 @@ export default function VehicleDetail() {
   const vehicleId = params.vehicleId;
 
   // Service record
-  const [records, setRecords] = useState<ServiceRecord[]>([]);  // List of vehicles
+  const [records, setRecords] = useState<ServiceRecord[]>([]);  // List of service records
 
   // Vehicle
   const [VIN, setVIN] = useState('')
@@ -43,6 +43,16 @@ export default function VehicleDetail() {
   const isNewMakeInvalid = submittedEdit && !(newMake?.trim());
   const isNewModelInvalid = submittedEdit && !(newModel?.trim());
   const isNewYearInvalid = submittedEdit && !(newYear?.trim());
+
+  function formatServiceDate(date: string) {
+    const d = new Date(date);
+
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+  }
 
   // LOAD VEHICLE DETAILS
   useEffect(() => {(async () => {
@@ -400,19 +410,20 @@ export default function VehicleDetail() {
                       <Text className="smallTextGray">{loading ? "Loading..." : "No services yet."}</Text>
                     </View>
                   }
-                  renderItem={({ item }: { item: any }) => {
+                  renderItem={({ item, index }: { item: any, index: number }) => {
+                    const isLast = index === records.length - 1
                     return (
                       <Pressable 
                         onPress={() => router.push(`/garage/vehicle/${params.vehicleId}/${item.serviceRecordId}`)} 
                         style={{ flex: 1 }}
-                        className="py-3 border-b border-stroke"
+                        className={`py-3 border-stroke ${!isLast ? "border-b" : ""}`}
                         >
                         {/* Row */}
                         <View className="flex-1 flex-row items-center">
                           <Text className="buttonTextBlue">{item.title}</Text>
                           {/* Right side text column */}
                           <View className="flex-1 flex-col items-end justify-center">
-                            <Text className="smallTextBlue">{item.serviceDate}</Text>
+                            <Text className="smallTextBlue">{formatServiceDate(item.serviceDate)}</Text>
                             {item.mileage != "" ? (
                               <Text className="smallTextBlue">{item.mileage} mi</Text>
                             ) : <Text className="smallTextBlue">- mi</Text>
