@@ -1,11 +1,12 @@
-import { Text, View, ScrollView, ActivityIndicator, TextInput, Pressable, Modal } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { Text, View, ScrollView, ActivityIndicator, TextInput, Pressable, Modal, Platform } from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect, useLayoutEffect } from "react";
 import { readServiceRecord } from "@/_backend/api/serviceRecord";
 import { useNavigation } from "expo-router";
 import { icons } from "@/constants/icons";
 import NormalButton from "@/app/components/NormalButton";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const ServiceRecord = () => {
   const navigation = useNavigation();
@@ -19,13 +20,14 @@ const ServiceRecord = () => {
 
   // Service record
   const [title, setTitle] = useState('')
-  const [serviceDate, setServiceDate] = useState('')
+  const [serviceDateDisplay, setServiceDateDisplay] = useState('')
+  const [serviceDate, setServiceDate] = useState<Date>(new Date())
   const [mileage, setMileage] = useState('')
   const [note, setNote] = useState('')
 
   // New set of states to store temporary values until save is pressed
   const [newTitle, setNewTitle] = useState('');
-  const [newServiceDate, setNewServiceDate] = useState('');
+  const [newServiceDate, setNewServiceDate] = useState<Date>(new Date());
   const [newMileage, setNewMileage] = useState('');
   const [newNote, setNewNote] = useState('');
 
@@ -34,6 +36,7 @@ const ServiceRecord = () => {
 
   const [editDetails, setEditDetails] = useState(false);
   const [areFiles, setAreFiles] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // Submission state & empty value check
   const [submittedEdit, setSubmittedEdit] = useState(false);
@@ -43,18 +46,68 @@ const ServiceRecord = () => {
   const isNewMileageInvalid = submittedEdit && !(newMileage?.trim());
   const isNewNoteInvalid = submittedEdit && !(newNote?.trim());
 
-  function formatServiceDate(date: string) {
-    const d = new Date(date);
-
-    return d.toLocaleDateString("en-US", {
+  function formatServiceDate(date: Date) {
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     }); // Ex. November 12, 2025
   }
 
+  function formatServiceDateNumber(date: Date) {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    }); // Ex. November 12, 2025
+  }
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    // Android: Close date picker after any action
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    
+    // Only update date if the user actually picked one
+    if (event?.type === 'set' && selectedDate) {
+      setNewServiceDate(selectedDate);
+    }
+  };
+
   // TODO: ADD SAVE EDIT RECORD LOGIC
-  const handleSave = async() => {
+  const handleSave = async () => {
+    setSubmittedEdit(true);
+
+    const nt = (newTitle ?? "").trim();
+    const nsdDate = newServiceDate;
+    const nsd = nsdDate.toISOString();
+    const nm = (newMileage ?? "").trim();
+    const nn = (newNote ?? "").trim();
+
+    if (!nt || !nsd || !nm || !nn) {
+      return;
+    }
+
+    try {
+      await updateServiceRecord({
+        vehicleId: vehicleId,
+        title: nt,
+        serviceDate: nsd,
+        mileage: nm,
+        note: nn,
+      });
+
+      setTitle(nt);
+      setServiceDate(nsdDate);
+      setServiceDateDisplay(formatServiceDate(nsdDate));
+      setMileage(nm);
+      setNote(nn);
+
+      setEditDetails(false);
+      setSubmittedEdit(false);
+    } catch (e: any) {
+      console.log("Failed to update service record:", e?.message || e);
+    }
   };
 
   // LOAD SERVICE RECORD DETAILS
@@ -62,11 +115,13 @@ const ServiceRecord = () => {
       try {
         setLoading(true);
         if (!vehicleId) throw new Error("Missing vehicleId");
-        // Use readServiceRecord API & store those values into states
+
         const data = await readServiceRecord(serviceRecordId, vehicleId);
+        const loadedDate = new Date(data.serviceDate);
 
         setTitle(data.title ?? "");
-        setServiceDate(formatServiceDate(data.serviceDate));
+        setServiceDateDisplay(formatServiceDate(loadedDate));
+        setServiceDate(loadedDate);
         setMileage(data.mileage ?? "");
         setNote(data.note ?? "");
 
@@ -79,44 +134,79 @@ const ServiceRecord = () => {
     })();
   }, [serviceRecordId]);
 
+  function editPressed() {
+    setEditDetails(true);
+
+    setNewTitle(title ?? "");
+    setNewServiceDate(serviceDate ?? new Date());
+    setNewMileage(mileage ?? "");
+    setNewNote(note ?? "");
+  }
+
   // Update the right side of the header so we can set the state when pencil icon is clicked
   useLayoutEffect(() => {
-  navigation.setOptions({
-    headerRight: () => (
-      <View className="flex-1 flex-row justify-end gap-3 items-center">
-        <Pressable onPress={() => setEditDetails(true)}>
-          <icons.pencil width={22} height={22}/>
-        </Pressable>
-        <Pressable
-          onPress={() => {}}
-          className="items-center mr-4"
-          hitSlop={8}
-        >
-          <icons.trash width={24} height={24}/>
-        </Pressable>
+    navigation.setOptions({
+      headerLeft: () =>
+        editDetails ? (
+          <Pressable 
+            onPress={() => setEditDetails(false)}
+            className="p-5"
+            hitSlop={8}
+          >
+            <icons.x height={24} width={24}/>
+          </Pressable>
+        ) :
+        (
+          <Pressable
+              onPress={() => router.back()}
+              className="flex-row items-center px-2"
+              hitSlop={8}
+          >
+              <icons.chevBack width={24} height={24} fill="#1B263B" />
+              <Text className="ml-1 text-primaryBlue text-[15px] font-medium">
+              Back
+              </Text>
+          </Pressable>
+        ),
+      headerRight: () => (
+        <View className="flex-1 flex-row justify-end gap-3 items-center">
+          {!editDetails ? (
+            <>
+              <Pressable onPress={() => editPressed()}>
+                <icons.pencil width={22} height={22} />
+              </Pressable>
+              <Pressable
+                onPress={() => {}}
+                className="items-center mr-4"
+                hitSlop={8}
+              >
+                <icons.trash width={24} height={24} />
+              </Pressable>
+            </>
+          ) : null}
+        </View>
+      ),
+    });
+  }, [navigation, editDetails, handleSave]);
+
+  let content: React.ReactNode;
+
+  if (loading) {
+    content = (
+      <View className="items-center mt-10">
+        <ActivityIndicator />
+        <Text className="smallTextGray mt-2">Loading service record...</Text>
       </View>
-    ),
-  });
-}, [navigation]);
-
-let content: React.ReactNode;
-
-if (loading) {
-  content = (
-    <View className="items-center mt-10">
-      <ActivityIndicator />
-      <Text className="smallTextGray mt-2">Loading service record</Text>
-    </View>
-  );
-} else if (!record) {
-  content = (
-    <View className="items-center mt-10">
-      <Text className="smallTextGray">Service record not found.</Text>
-    </View>
-  );
-} else {
-  content = (
-    <View className="flex-1">
+    );
+  } else if (!record) {
+    content = (
+      <View className="items-center mt-10">
+        <Text className="smallTextGray">Service record not found.</Text>
+      </View>
+    );
+  } else {
+    content = (
+      <View className="flex-1">
         <View className="items-center gap-4 bg-white w-full p-2 px-5">
           <View className="mt-2.5 gap-3.5 w-full">
 
@@ -154,7 +244,7 @@ if (loading) {
               // SERVICE DATE DISPLAY
               <View className="gap-1.5">
                 <Text className="smallTextBold">Service date</Text>
-                <Text className="smallThinTextBlue">{serviceDate}</Text>
+                <Text className="smallThinTextBlue">{serviceDateDisplay}</Text>
               </View>
             ) : 
             (
@@ -164,13 +254,39 @@ if (loading) {
                   <Text className="smallTextBold">Service date</Text>
                   <Text className="dangerText"> *</Text>
                 </View>
-                <TextInput
-                  value={newServiceDate}
-                  placeholder="Type here"
-                  onChangeText={setNewServiceDate}
-                  className={`border rounded-full px-4 py-2 smallTextGray ${isNewServiceDateInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
-                />
-    
+
+                {/* Date display and picker trigger */}
+                <Pressable 
+                  onPress={() => setShowDatePicker(true)}
+                  className="border rounded-full px-4 py-3 border-stroke"
+                >
+                  <Text className="smallTextGray">
+                    {formatServiceDateNumber(newServiceDate)}
+                  </Text>
+                </Pressable>
+
+                {/*DATE TIME PICKER*/}
+                {(showDatePicker || Platform.OS === 'ios') && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={newServiceDate}
+                    mode="date"
+                    display="default"
+                    onChange={onDateChange}
+                    maximumDate={new Date()}
+                  />
+                )}
+
+                {/* iOS done button */}
+                {Platform.OS === 'ios' && showDatePicker && (
+                  <Pressable 
+                    onPress={() => setShowDatePicker(false)}
+                    className="bg-primary rounded-full px-4 py-2 mt-2"
+                  >
+                    <Text className="text-center text-white smallTextBold">Done</Text>
+                  </Pressable>
+                )}
+
                 {/* Error message for empty input */}
                 {isNewServiceDateInvalid ? (
                   <Text className="dangerText mx-2">Service date is required</Text>
@@ -220,16 +336,16 @@ if (loading) {
                 <View className="flex-1 flex-row">
                   <Text className="smallTextBold">Note</Text>
                 </View>
-                  <TextInput
-                    value={note}
-                    multiline = { true }
-                    numberOfLines = { 6 }
-                    placeholder="Type here"
-                    keyboardType="default"
-                    onChangeText={setNote}
-                    className={"border rounded-xl px-4 py-2 smallTextGray border-stroke"}
-                  />
-    
+                <TextInput
+                  value={newNote}
+                  multiline={true}
+                  numberOfLines={6}
+                  placeholder="Type here"
+                  keyboardType="default"
+                  onChangeText={setNewNote}
+                  className={"border rounded-xl px-4 py-2 smallTextGray border-stroke"}
+                />
+
                 {/* Error message for empty input */}
                 {isNewNoteInvalid ? (
                   <Text className="dangerText mx-2">Enter a valid note</Text>
@@ -260,71 +376,80 @@ if (loading) {
                   <View className="flex-1 justify-center gap-0.5">
                     <Text className="xsTextGray">Upload</Text>
                     {/* TODO: ADD DIMENSION HERE e.g. 1024(w) X 128(h) */}
-                      <Text className="xsTextGray">No file selected</Text>
+                    <Text className="xsTextGray">No file selected</Text>
                   </View>
                 </Pressable>
               </View>
             )}
 
-            {/* SAVE BUTTON */}
+            {/* CANCEL and SAVE BUTTON */}
             {editDetails && (
-            <View className="mt-5">
-              <NormalButton variant="primary" text="Save" onClick={handleSave} />
-            </View>
+              <View className="flex-1 mt-5 flex-row justify-center items-center gap-5">
+                <NormalButton
+                  variant="cancel"
+                  text="Cancel"
+                  onClick={() => setEditDetails(false)}
+                />
+
+                <NormalButton
+                  variant="primary"
+                  text="Save"
+                  onClick={handleSave}
+                />
+              </View>
             )}
 
-              {/* FILE MODAL */}
-              <Modal
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-              >
-                {/* Fullscreen */}
-                <View className="flex-1 justify-end px-2">
-                  {/* Shadow background */}
-                  <Pressable 
-                    className="absolute inset-0 bg-black/40"
-                    onPress={() => setModalVisible(false)}>
-                  </Pressable>
-    
-                  {/* Bottom popup */}
-                  <View className="w-full mb-3 gap-2 mx-3 self-center">
-    
-                    {/* Select source buttons */}
-                    <View className="bg-white px-4 py-3 rounded-lg">
-                      <Text className="smallTextGray">Choose source</Text>
-                      <Pressable className="py-3 border-b border-stroke">
-                        <Text className="smallText">Choose a file</Text>
-                      </Pressable>
-                      <Pressable className="py-3">
-                        <Text className="smallText">Choose from photos</Text>
-                      </Pressable>
-                    </View>
-    
-                    {/* Cancel button */}
-                    <View className="bg-white rounded-lg">
-                      <Pressable 
-                        onPress={() => setModalVisible(false)}
-                        className="px-4 py-3"
-                      >
-                        <Text className="text-center smallTextBold">Cancel</Text>
-                      </Pressable>
-                    </View>
+            {/* FILE MODAL */}
+            <Modal
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => setModalVisible(false)}
+            >
+              {/* Fullscreen */}
+              <View className="flex-1 justify-end px-2">
+                {/* Shadow background */}
+                <Pressable
+                  className="absolute inset-0 bg-black/40"
+                  onPress={() => setModalVisible(false)}
+                ></Pressable>
+
+                {/* Bottom popup */}
+                <View className="w-full mb-3 gap-2 mx-3 self-center">
+                  {/* Select source buttons */}
+                  <View className="bg-white px-4 py-3 rounded-lg">
+                    <Text className="smallTextGray">Choose source</Text>
+                    <Pressable className="py-3 border-b border-stroke">
+                      <Text className="smallText">Choose a file</Text>
+                    </Pressable>
+                    <Pressable className="py-3">
+                      <Text className="smallText">Choose from photos</Text>
+                    </Pressable>
+                  </View>
+
+                  {/* Cancel button */}
+                  <View className="bg-white rounded-lg">
+                    <Pressable
+                      onPress={() => setModalVisible(false)}
+                      className="px-4 py-3"
+                    >
+                      <Text className="text-center smallTextBold">Cancel</Text>
+                    </Pressable>
                   </View>
                 </View>
-              </Modal>
+              </View>
+            </Modal>
           </View>
         </View>
-    </View>
+      </View>
+    );
+  }
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView>
+        <View className="flex-1">{content}</View>
+      </ScrollView>
+    </SafeAreaView>
   );
-}
-return (
-  <SafeAreaView className="flex-1 bg-white">
-    <ScrollView>
-      <View className="flex-1">{content}</View>
-    </ScrollView>
-  </SafeAreaView>
-);
-}
+};
 
 export default ServiceRecord;
