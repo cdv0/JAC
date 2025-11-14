@@ -7,7 +7,6 @@ export type ServiceRecord = {
     serviceDate: string;
     mileage: string;
     note: string;
-    createdAt: string
 }
 
 // POST /vehicle/serviceRecord/createServiceRecord
@@ -63,4 +62,20 @@ export async function readServiceRecord(serviceRecordId: string, vehicleId: stri
   }
 
   return (text ? JSON.parse(text): {}) as ServiceRecord;
+}
+
+// PUT /vehicle/serviceRecord/updateServiceRecord
+export async function updateServiceRecord (payload: ServiceRecord) {
+  const response = await fetch(`${BASE_URL}/vehicle/serviceRecord/updateServiceRecord`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
+
+  return (text ? JSON.parse(text) : {}) as { message: string; serviceRecordId: string };
 }

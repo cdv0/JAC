@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, router } from "expo-router";
+import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import { readVehicle, updateVehicleDetails } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
@@ -79,7 +79,8 @@ export default function VehicleDetail() {
   }, [vehicleId]);
 
     // LOAD SERVICE RECORD METADATA
-  useEffect(() => {(async () => {
+    useFocusEffect(
+      useCallback(() => {(async () => {
       try {
         setLoading(true);
         if (!vehicleId) throw new Error("Missing vehicleId");
@@ -95,8 +96,12 @@ export default function VehicleDetail() {
       } finally {
         setLoading(false);
       }
-    })();
-  }, []); 
+      })();
+
+      return () => {};
+
+    }, [vehicleId])
+  );
 
   const handleSaveDetails = async() => {
     setSubmittedEdit(true);

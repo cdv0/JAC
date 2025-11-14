@@ -2,7 +2,7 @@ import { Text, View, ScrollView, ActivityIndicator, TextInput, Pressable, Modal,
 import { useLocalSearchParams, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect, useLayoutEffect } from "react";
-import { readServiceRecord } from "@/_backend/api/serviceRecord";
+import { readServiceRecord, updateServiceRecord } from "@/_backend/api/serviceRecord";
 import { useNavigation } from "expo-router";
 import { icons } from "@/constants/icons";
 import NormalButton from "@/app/components/NormalButton";
@@ -90,6 +90,7 @@ const ServiceRecord = () => {
 
     try {
       await updateServiceRecord({
+        serviceRecordId: serviceRecordId,
         vehicleId: vehicleId,
         title: nt,
         serviceDate: nsd,
