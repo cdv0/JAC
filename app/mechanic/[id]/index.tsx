@@ -213,7 +213,7 @@ const Details = () => {
                   }
 
                     router.push({
-                      pathname: "/mechanic/[id]/review",
+                      pathname: "/mechanic/[id]/createReview",
                       params: { id },
                   });
                 }}
