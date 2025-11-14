@@ -2,11 +2,12 @@ import { Text, View, ScrollView, ActivityIndicator, TextInput, Pressable, Modal,
 import { useLocalSearchParams, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect, useLayoutEffect } from "react";
-import { readServiceRecord, updateServiceRecord } from "@/_backend/api/serviceRecord";
+import { readServiceRecord, updateServiceRecord, deleteServiceRecord } from "@/_backend/api/serviceRecord";
 import { useNavigation } from "expo-router";
 import { icons } from "@/constants/icons";
 import NormalButton from "@/app/components/NormalButton";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import DeleteModal from "@/app/components/DeleteModal";
 
 const ServiceRecord = () => {
   const navigation = useNavigation();
@@ -37,6 +38,7 @@ const ServiceRecord = () => {
   const [editDetails, setEditDetails] = useState(false);
   const [areFiles, setAreFiles] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Submission state & empty value check
   const [submittedEdit, setSubmittedEdit] = useState(false);
@@ -144,6 +146,18 @@ const ServiceRecord = () => {
     setNewNote(note ?? "");
   }
 
+  const deleteRecord = async () => {
+    try {
+      await deleteServiceRecord({
+        vehicleId: vehicleId,
+        serviceRecordId: serviceRecordId
+      })
+      router.back();
+    } catch (e: any) {
+        console.log("Failed to delete service record:", e?.message || e);
+    }
+  }
+
   // Update the right side of the header so we can set the state when pencil icon is clicked
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -177,7 +191,7 @@ const ServiceRecord = () => {
                 <icons.pencil width={22} height={22} />
               </Pressable>
               <Pressable
-                onPress={() => {}}
+                onPress={() => setShowDeleteModal(true)}
                 className="items-center mr-4"
                 hitSlop={8}
               >
@@ -399,6 +413,14 @@ const ServiceRecord = () => {
                 />
               </View>
             )}
+
+            {/* DELETE MODAL */}
+            <DeleteModal
+              visible={showDeleteModal}
+              setHide={setShowDeleteModal}
+              type="record"
+              onConfirm={deleteRecord}
+            />
 
             {/* FILE MODAL */}
             <Modal
