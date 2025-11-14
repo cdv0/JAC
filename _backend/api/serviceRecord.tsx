@@ -79,3 +79,19 @@ export async function updateServiceRecord (payload: ServiceRecord) {
 
   return (text ? JSON.parse(text) : {}) as { message: string; serviceRecordId: string };
 }
+
+// DELETE /vehicle/serviceRecord/deleteServiceRecord
+export async function deleteServiceRecord (payload: {serviceRecordId: string, vehicleId: string}) {
+  const response = await fetch(`${BASE_URL}/vehicle/serviceRecord/deleteServiceRecord`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
+
+  return (text ? JSON.parse(text) : {}) as { message: string; serviceRecordId: string };
+}
