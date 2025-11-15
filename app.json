@@ -4,7 +4,7 @@
     "slug": "JAC",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./public/assets/images/logo.svg",
+    "icon": "./public/assets/images/logo.png",
     "scheme": "jac",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -28,22 +28,7 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
-        }
-      ],
-      "expo-web-browser"
-    ],
+    "plugins": ["expo-router", "expo-web-browser"],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
