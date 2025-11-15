@@ -15,11 +15,12 @@ const map = () => {
   }
 
   return (
-    <View className="flex-1 m-5 bg-white">
+    <View className="flex-1 bg-white">
       {/* <Text className="text-black">map</Text> */}
 
       <View className="flex-1 overflow-hidden bg-white rounded-2xl">
         <MapView
+          ref={mapRef}
           style={{ flex: 1 }}
           provider={PROVIDER_GOOGLE}
           initialRegion={{
@@ -37,11 +38,17 @@ const map = () => {
           showsScale={Platform.OS === 'ios'}
         ></MapView>
         <View className="absolute gap-2 bottom-6 right-6">
-          <TouchableOpacity onPress={() => zoomBy(+1)}>
-            <Text>+</Text>
+          <TouchableOpacity
+            onPress={() => zoomBy(+1)}
+            className="flex justify-center p-1 bg-white border border-black"
+          >
+            <Text className="size-auto">+</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => zoomBy(-1)}>
-            <Text>-</Text>
+          <TouchableOpacity
+            onPress={() => zoomBy(-1)}
+            className="flex justify-center p-1 bg-white border border-black"
+          >
+            <Text className="size-auto">-</Text>
           </TouchableOpacity>
         </View>
       </View>
