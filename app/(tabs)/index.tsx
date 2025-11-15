@@ -8,6 +8,18 @@ import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
 
+
+interface Mechanics {
+    mechanicID: string,
+    name: string,
+    //rating: string,
+    Image: string,
+    Services: string,
+    Certified:boolean,
+    address:string,
+    
+}
+
 export default function Index() {
 
   //TODO: Refactor filters
@@ -27,11 +39,16 @@ export default function Index() {
 
   const applyFilter = () =>{
     if(categories.length ==0){
-      return mechanics.filter(element=> searchCondition(element.name, element.address));
+      let temp = mechanics.filter(element=> searchCondition(element.name, element.address));
+      return isCertified? temp.filter(x => x.Certified):temp;
     }
-    return  mechanics.filter(element=>{
-                      return categories.every(cat=> element.Services.includes(cat)) && searchCondition(element.name, element.address);
-                });
+    else{
+      let temp = mechanics.filter(element=>{
+        return categories.every(cat=> element.Services.includes(cat)) && searchCondition(element.name, element.address);
+      });
+      return isCertified? temp.filter(x => x.Certified):temp;
+    }
+   
   }
 
   //#endregion
@@ -39,9 +56,9 @@ export default function Index() {
   //use this to enter categories to filter
   const handleCategories = (flag:boolean, Category:string) => {
     if (flag)
-      insertCategory(Category);
+      insertCategory(Category.toLowerCase());
     else
-      removeCategory(Category)
+      removeCategory(Category.toLowerCase())
   };
 
   const updateStates =(i:number, value:boolean, setFunc:React.Dispatch<React.SetStateAction<any[]>>) =>{
@@ -56,10 +73,14 @@ export default function Index() {
           const data = async () => {
               try {
                   const file = await fetch("/local/dummy/data2.json");
-                  const mechanicsData = await file.json();
-                  setMechanics(JSON.parse(mechanicsData.body).data);
-                 
+                  const mechanicsData = await file.json();    
+                  const temp =  JSON.parse(mechanicsData.body).data as Mechanics[];    
+                  temp.forEach((x:Mechanics)=>{
+                     x.Services = x.Services.toLowerCase()
+                  }) 
+                  setMechanics(temp);
                   
+                 
               } catch (error) {
                   console.error("Error loading mechanics data:", error);
               }
@@ -77,7 +98,7 @@ export default function Index() {
   //#region quick Filter
   //0 -> oil change, 1 -> tire, 2-> Smog, 3->Transmission, 4->Wheel
   const [quickFilterStates, setQuickFilterStates] = useState(Array(5).fill(false));
-
+  const [isCertified, setIsCertified] = useState(false);
   //#endregion
   
 
@@ -368,6 +389,7 @@ export default function Index() {
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
             <NormalButton variant={`${isServicesActive?`primary`:`outline`}`} onClick={()=>{setIsServicesModal(!isServicesModal)}} text="Services"/>
+            <ToggleButton flag = {isCertified} onPress={(newf)=>{setIsCertified(newf)}} text="Certified"/>
             <ToggleButton flag = {quickFilterStates[0]} onPress={(newf)=>{
                                                                             updateStates(0, newf, setQuickFilterStates); 
                                                                             handleCategories(newf, "Oil Change");
