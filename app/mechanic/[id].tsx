@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
+import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 import NormalButton from '../components/NormalButton';
 
 
@@ -12,10 +13,7 @@ import NormalButton from '../components/NormalButton';
 interface MechanicViewProps {
     mechanicID: string,
     name: string,
-    // type: string,
-    // certified:boolean,
-    // rating: string,
-    // ratingsDist:string[],
+    Certified:boolean,
     Review: string,
     Image: string,
     Services: string,
@@ -26,10 +24,17 @@ interface MechanicViewProps {
     
 }
 
+type ReviewProps ={
+    MechanicId:string,
+    Rating: Float
+}
+
 const Details = () => {
   const {id} = useLocalSearchParams();
  
   const [mechanic, setMechanic] = useState<any>(null);
+  const[reviews, setReviews] = useState<any>([])
+  const [reviewAVG, setreviewAVG] = useState<Float>(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
   useEffect(() => {
@@ -37,9 +42,19 @@ const Details = () => {
                 try {
                     const file = await fetch("/local/dummy/data2.json");
                     const mechanicsData = await file.json();
-                    //TODO update to use id mechanic attribute
                     const found = JSON.parse(mechanicsData.body).data.find((x:MechanicViewProps) =>x.mechanicID ===id)
                     setMechanic(found|| null)
+                    if (!mechanic){
+                      const file2 = await fetch("/local/dummy/review.json");
+                      const reviewData = await file2.json();
+                      const reviews = JSON.parse(reviewData.body).filter((x:ReviewProps) =>x.MechanicId === id) as ReviewProps[]
+                      setReviews(reviews || [])     
+                      let sum = 0;
+                      reviews.forEach(x=>{
+                          sum+=x.Rating
+                      }) 
+                      setreviewAVG(sum/reviews.length)  
+                  }
                     
                 } catch (error) {
                     console.error("Error loading mechanics data:", error);
@@ -83,11 +98,11 @@ const Details = () => {
                       <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
                       <View className='flex-row'>
                         <Text>Ratings: </Text>
-                        <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={parseFloat(mechanic.rating)}/>
+                        <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={reviewAVG}/>
                       </View>
-                      <Text>Reviews: {mechanic.reviews}</Text>
+                      <Text>Reviews: {reviews.length}</Text>
                   </View>
-                {mechanic.certified && <images.badge width={25} height={25} style={{marginTop:20, marginLeft:15}}/>}
+                {mechanic.Certified && <images.badge width={25} height={25} style={{marginTop:20, marginLeft:15}}/>}
               </View>
 
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
