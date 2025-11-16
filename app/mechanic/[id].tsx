@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 import NormalButton from '../components/NormalButton';
+import TimeConverter from '../components/TimeConverter';
 import ViewReviews from '../components/ViewReviews';
 
 
@@ -155,31 +156,31 @@ const Details = () => {
                         <View className='mx-[5%] w-[50%]'>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Mon</Text>
-                            <Text className='buttonTextBlue'>{mechanic.Hours[0]}</Text>
+                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[0])}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Tues</Text>
-                            <Text className='buttonTextBlue'>{mechanic.Hours[1]}</Text>
+                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[1])}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Weds</Text>
-                            <Text className='buttonTextBlue'>{mechanic.Hours[2]}</Text>
+                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[2])}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Thurs</Text>
-                            <Text className='buttonTextBlue'>{mechanic.Hours[3]}</Text>
+                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[3])}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Fri</Text>
-                            <Text className='buttonTextBlue'>{mechanic.Hours[4]}</Text>
+                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[4])}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Sat</Text>
-                            <Text className='buttonTextBlue'>{mechanic.Hours[5]}</Text>
+                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[5])}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Sun</Text>
-                            <Text className='buttonTextBlue'>{mechanic.Hours[6]}</Text>
+                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[6])}</Text>
                           </View>
                           
                         </View>
@@ -203,7 +204,7 @@ const Details = () => {
               
               <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%] gap-2'>
                 <View className='items-center mt-[5%]'>
-                  <Text className='buttonTextBlack mb-[5%]'>{reviewAVG.toFixed(2)}</Text>
+                  <Text className='buttonTextBlack mb-[5%]'>{reviewAVG?reviewAVG.toFixed(2):0}</Text>
                   <StarRatingDisplay rating={reviewAVG} color='black' starSize={15}/>
                   <Text className='buttonTextBlack mt-[5%]'>{reviews.length} reviews</Text>
                 </View>
@@ -211,8 +212,8 @@ const Details = () => {
 
                     {
                       Object.keys(sortedTemp).reverse().map(x=>{
-                        const percent = sortedTemp[x]/reviews.length * 100
-                        return (<View className=' w-full mb-[2%] flex-row justify-center items-center gap-1'>
+                        const percent = reviews.length >0?sortedTemp[x]/reviews.length * 100:0
+                        return (<View key={x} className=' w-full mb-[2%] flex-row justify-center items-center gap-1'>
                           <Text className='buttonTextBlack mt-[-2%]'>
                             {x}
                           </Text>
@@ -234,12 +235,14 @@ const Details = () => {
                 </View>
                 <NormalButton text='Filter' onClick={()=> {}}/>
               </View>
-              <View className='w-[95%] h-[300] bg-white rounded-xl self-center py-[5%] '>
+              <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
                 <FlatList
                 data={reviews}
                 renderItem={({item})=><ViewReviews {... item}/>}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{gap:10}}
+                ListEmptyComponent={<Text className='self-center buttonTextBlack'>No Reviews Available</Text>}
+                scrollEnabled={false}
                 />
               </View>
               
