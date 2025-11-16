@@ -4,7 +4,6 @@
     "slug": "JAC",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./public/assets/images/logo.svg",
     "scheme": "jac",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,6 +18,12 @@
         "backgroundImage": "",
         "monochromeImage": ""
       },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.JAC"
@@ -30,18 +35,7 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
-        }
-      ],
+      
       "expo-web-browser"
     ],
     "experiments": {
