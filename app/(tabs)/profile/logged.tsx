@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { icons } from '@/constants/icons';
+import { getReviewsByUser } from '@/_backend/api/review'
 
 export const account = () => {
   const router = useRouter()
@@ -15,6 +16,8 @@ export const account = () => {
   const [createdAt, setCreatedAt] = useState<string>('')
 
   const [filterOpen, setFilterOpen] = useState(false);
+
+  const [reviews, setReviews] = useState<any[]>([])
 
   useEffect(() => {
     (async () => {
@@ -32,6 +35,11 @@ export const account = () => {
         setFirstName(userData.firstName ?? '')
         setLastName(userData.lastName ?? '')
         setCreatedAt(userData.createdAt ?? '')
+
+        const reviewData = await getReviewsByUser(userId)
+        console.log("Reviews:", reviewData)
+        setReviews(reviewData ?? [])
+
       } catch (e: any) {
         console.log('Account: Error loading user data:', e)
         console.log('Account: Error message:', e.message)
@@ -114,8 +122,30 @@ export const account = () => {
 
             {/* REVIEWS */}
             {/* TODO: ADD LIST REVIEW LOGIC */}
-            <View>
-              <Text className="smallTextGray text-center">No reviews yet.</Text>
+            {/* REVIEW LIST */}
+            <View className="gap-4 pb-10">
+              {reviews.length === 0 ? (
+                <Text className="smallTextGray text-center">No reviews yet.</Text>
+              ) : (
+                reviews.map((rev) => (
+                  <View 
+                    key={rev.reviewId}
+                    className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm"
+                  >
+                    <Text className="text-lg font-semibold">{rev.mechanicName}</Text>
+
+                    {/* Rating */}
+                    <Text className="text-base font-bold mt-1">
+                      {rev.rating}/5
+                    </Text>
+
+                    {/* Description */}
+                    <Text className="text-sm text-gray-600 mt-2">
+                      {rev.review}
+                    </Text>
+                  </View>
+                ))
+              )}
             </View>
           </View>
         </View>

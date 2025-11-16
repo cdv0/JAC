@@ -1,4 +1,4 @@
-export const BASE_URL = "https://ynwemrq0m2.execute-api.us-west-1.amazonaws.com/dev";
+export const BASE_URL = "https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev";
 
 
 export async function createReview(
@@ -26,3 +26,16 @@ export async function createReview(
   
     return response.json();
   }
+
+  export async function getReviewsByUser(userId: string) {
+    const url = `${BASE_URL}/reviews/getReviewsByUser?userId=${userId}`;
+  
+    const response = await fetch(url, { method: "GET" });
+  
+    if (!response.ok) {
+      throw new Error("Failed to fetch reviews by user");
+    }
+  
+    return await response.json();
+  }
+  
