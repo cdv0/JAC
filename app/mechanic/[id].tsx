@@ -213,7 +213,7 @@ const Details = () => {
                       Object.keys(sortedTemp).reverse().map(x=>{
                         const percent = sortedTemp[x]/reviews.length * 100
                         return (<View className=' w-full mb-[2%] flex-row justify-center items-center gap-1'>
-                          <Text className='buttonTextBlack mt-[-5]'>
+                          <Text className='buttonTextBlack mt-[-2%]'>
                             {x}
                           </Text>
                           <View className='bg-stroke rounded-full w-full mb-[2%] flex-row'>
