@@ -13,8 +13,12 @@ export type File = {
 export const MAX_IMAGE_SIZE = 256 * 1024; // 256 KB
 export const ALLOWED_MIME_TYPES_VEHICLE = ["image/jpeg", "image/jpg"];
 
+// VEHICLE IMAGE CONDITIONS
+export const MAX_RECORD_SIZE = 1000 * 1024; // 1 MB
+export const ALLOWED_MIME_TYPES_RECORD = ["application/json"];
+
 // POST /vehicle/uploadVehicleImage
-export default async function uploadVehicleImage(payload: File) {
+export default async function uploadVehicleImage(payload: File, type: "vehicle" | "record") {
   const base64 = Base64.encode(payload.uri);
 
   const response = await fetch(BASE_URL+"/vehicle/uploadVehicleImage", {

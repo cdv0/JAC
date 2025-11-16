@@ -5,13 +5,18 @@ const s3 = new S3Client({region: "us-west-1"});
 export const handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
-    const { fileName, fileContent, contentType } = body;
+    const { fileName, fileContent, contentType, type } = body;
 
     // Decode base64 to binary
     const fileBuffer = Buffer.from(fileContent, "base64");
 
+    const bucketName =
+    type === "record"
+      ? process.env.RECORDS_BUCKET_NAME
+      : process.env.VEHICLES_BUCKET_NAME;
+
     const params = {
-      Bucket: process.env.BUCKET_NAME,
+      Bucket: bucketName,
       Key: fileName,
       Body: fileBuffer,
       ContentType: contentType,

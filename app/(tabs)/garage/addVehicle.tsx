@@ -89,7 +89,7 @@ export const addVehicle = () => {
       // Upload vehicle image to bucket
       if (file) {
         try {
-          vehicleImageKey = await uploadVehicleImage(file);
+          vehicleImageKey = await uploadVehicleImage(file, "vehicle");
           console.log("Add vehicle: Image upload successful:", vehicleImageKey);
         } catch (e: any) {
           console.log("Add vehicle: Error upload vehicle image:", e);

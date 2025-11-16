@@ -25,6 +25,7 @@ const ServiceRecord = () => {
   const [serviceDate, setServiceDate] = useState<Date>(new Date())
   const [mileage, setMileage] = useState('')
   const [note, setNote] = useState('')
+  const [areFiles, setAreFiles] = useState(false);
 
   // New set of states to store temporary values until save is pressed
   const [newTitle, setNewTitle] = useState('');
@@ -36,7 +37,6 @@ const ServiceRecord = () => {
   const [loading, setLoading] = useState(true);
 
   const [editDetails, setEditDetails] = useState(false);
-  const [areFiles, setAreFiles] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 

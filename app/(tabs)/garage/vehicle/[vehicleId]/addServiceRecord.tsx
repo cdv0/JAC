@@ -7,6 +7,8 @@ import { useLocalSearchParams, router } from "expo-router";
 import { icons } from "@/constants/icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { createServiceRecord } from "@/_backend/api/serviceRecord";
+import { type File } from "@/_backend/api/fileUpload";
+import * as DocumentPicker from "expo-document-picker";
 
 export const ServiceRecord = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -22,6 +24,7 @@ export const ServiceRecord = () => {
 
   const [mileage, setMileage] = useState('')
   const [note, setNote] = useState('')
+  const [files, setFiles] = useState<File[]>([]);
 
   // Check for empty input upon submission
   const isTitleInvalid = submitted && !title.trim();
@@ -232,9 +235,9 @@ export const ServiceRecord = () => {
                   <Pressable className="py-3 border-b border-stroke">
                     <Text className="smallText">Choose a file</Text>
                   </Pressable>
-                  <Pressable className="py-3">
+                  {/* <Pressable className="py-3">
                     <Text className="smallText">Choose from photos</Text>
-                  </Pressable>
+                  </Pressable> */}
                 </View>
 
                 {/* Cancel button */}
