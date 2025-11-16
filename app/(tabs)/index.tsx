@@ -1,4 +1,5 @@
 import Slider from '@react-native-community/slider';
+import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from "react";
 import { FlatList, ImageBackground, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
@@ -8,11 +9,9 @@ import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
 
-
 interface Mechanics {
     mechanicID: string,
     name: string,
-    //rating: string,
     Image: string,
     Services: string,
     Certified:boolean,
@@ -363,7 +362,14 @@ export default function Index() {
   const [sliderValue, setSliderValue] = useState(maxD / 2); 
   const [tempSliderValue, setTempSliderValue] = useState(sliderValue);
   const [warning, setWarning] = useState(false);
-  
+  const [LocationEnabled, setLocationEnabled] = useState<boolean>(false);
+    useEffect(() => {
+    (async () => {
+      const services = await Location.hasServicesEnabledAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      setLocationEnabled(services && status === 'granted');
+    })();
+  }, []);
   //#endregion
   
   //#endregion
@@ -423,6 +429,7 @@ export default function Index() {
                 numColumns={2}
                 renderItem={({item})=> <MechanicView {...item}/>}
                 contentContainerStyle={{alignItems:'center'}}
+                columnWrapperStyle={{justifyContent: "space-between",  marginBottom:'5%', gap:"3%"}}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={<Text>No Mechanics found</Text>}
               />
@@ -535,6 +542,7 @@ export default function Index() {
                           step={1}
                           value={tempSliderValue}
                           onValueChange={(newVal)=>{setTempSliderValue(newVal)}}
+                          disabled={!LocationEnabled}
                       />
 
                     <View className="flex-row justify-between">
