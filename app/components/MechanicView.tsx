@@ -48,7 +48,7 @@ export default function MechanicView(
         return(
             
             <Link href={`../mechanic/${mechanicID}`} asChild>
-                <TouchableOpacity style={{ width:175, height:250, marginBottom:'5%', marginHorizontal:10}}>
+                <TouchableOpacity style={{ width:175, height:250}}>
                     <View className = "w-full h-full rounded-xl border border-stroke py-[5%]">
                         {!image?(<images.defaultImage width={150} height={120} style={{alignSelf:'center'}} />):
                         <Image source={{uri:image}} className='w-[150] h-[120] self-center'/>
