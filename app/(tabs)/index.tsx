@@ -392,7 +392,7 @@ export default function Index() {
         <SearchBar placeholder1="Search" value1={mQuery} onChangeText1={(newV)=>{setMQuery(newV)}}
                     placeholder2="Location" value2={lQuery} onChangeText2={(newL)=>{setLQuery(newL)}}/>
         <View >
-          <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
+          <ScrollView  horizontal={true} contentContainerStyle={{gap:10, marginLeft:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
             <NormalButton variant={`${isServicesActive?`primary`:`outline`}`} onClick={()=>{setIsServicesModal(!isServicesModal)}} text="Services"/>
             <ToggleButton flag = {isCertified} onPress={(newf)=>{setIsCertified(newf)}} text="Certified"/>
@@ -522,7 +522,7 @@ export default function Index() {
 
                 </View>
 
-                {warning&&<Text className="text-[10px] ml-[5%] buttonTextBlack text-dangerBrightRed mb-[-5%]">*Minimum cannot be over Maxmimum</Text>}
+                {warning&&<Text className="text-l ml-[5%] buttonTextBlack text-dangerBrightRed mb-[-5%]">*Minimum cannot be over Maxmimum</Text>}
                 
                 <Text className="text-[20px] buttonTextBlack ml-[5%] mt-[2%] ">
                   Distance
@@ -553,6 +553,13 @@ export default function Index() {
                         {maxD}+ mi
                       </Text> 
                     </View>
+                    {
+                      !LocationEnabled
+                       && <Text className='text-l buttonTextBlack text-subheaderGray mt-[10]'>
+                        *Enable location to use slider
+                          </Text>
+                    }
+                    
                 </View>
                                  
             </View>
