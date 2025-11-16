@@ -40,6 +40,7 @@ const Details = () => {
   const [reviewAVG, setreviewAVG] = useState<Float>(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
+  const [query, setQuery] = useState('');
   useEffect(() => {
             const data = async () => {
                 try {
@@ -231,13 +232,13 @@ const Details = () => {
               <View className='flex-row w-[95%] justify-between self-center '>
                 <View className='flex-row border border-stroke rounded-full bg-white items-center '>
                     <icons.search/>
-                    <TextInput className='w-[50%]'/>
+                    <TextInput className='w-[50%]'value={query} onChangeText={(newf) =>{setQuery(newf)}}/>
                 </View>
                 <NormalButton text='Filter' onClick={()=> {}}/>
               </View>
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
                 <FlatList
-                data={reviews}
+                data={query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews}
                 renderItem={({item})=><ViewReviews {... item}/>}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{gap:10}}
