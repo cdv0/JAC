@@ -7,6 +7,7 @@ export type ServiceRecord = {
     serviceDate: string;
     mileage: string;
     note: string;
+    files?: string[]
 }
 
 // POST /vehicle/serviceRecord/createServiceRecord
@@ -16,6 +17,7 @@ export async function createServiceRecord(payload: {
   serviceDate: string;
   mileage: string;
   note: string;
+  files: string[];  // store list of file keys
 }) {
   const response = await fetch(BASE_URL+"/vehicle/serviceRecord/createServiceRecord", {
     method: "POST",

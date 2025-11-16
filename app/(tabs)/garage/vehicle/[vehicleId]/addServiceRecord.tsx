@@ -99,13 +99,17 @@ export const ServiceRecord = () => {
 
     // Make API call to create service record
     try {
+      const fileKeys: string[] = []
+
       // UPLOAD FILES TO S3 IF ANY
       if (files.length > 0) {
         try {
           for (const file of files) {
             const recordFileKey = await uploadVehicleImage(file, "record");
             console.log("Add service record: Service records upload successful:", recordFileKey);
+            fileKeys.push(recordFileKey);
           }
+          console.log("All file keys", fileKeys);
         } catch (e: any) {
           console.log("Add service record: Error uploading service records:", e);
           console.log("Add service record: Error message:", e?.message);
@@ -118,7 +122,8 @@ export const ServiceRecord = () => {
         title,
         serviceDate: date.toISOString(),
         mileage,
-        note
+        note,
+        files: fileKeys
       }
 
       const data = await createServiceRecord(payload)

@@ -1,4 +1,4 @@
-import { Text, View, ScrollView, ActivityIndicator, TextInput, Pressable, Modal, Platform } from "react-native";
+import { Text, View, ScrollView, ActivityIndicator, TextInput, Pressable, Modal, Platform, FlatList } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect, useLayoutEffect } from "react";
@@ -8,6 +8,7 @@ import { icons } from "@/constants/icons";
 import NormalButton from "@/app/components/NormalButton";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DeleteModal from "@/app/components/DeleteModal";
+import { type File } from "@/_backend/api/fileUpload";
 
 const ServiceRecord = () => {
   const navigation = useNavigation();
@@ -25,7 +26,8 @@ const ServiceRecord = () => {
   const [serviceDate, setServiceDate] = useState<Date>(new Date())
   const [mileage, setMileage] = useState('')
   const [note, setNote] = useState('')
-  const [areFiles, setAreFiles] = useState(false);
+  const [fileDisplay, setFileDisplay] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
 
   // New set of states to store temporary values until save is pressed
   const [newTitle, setNewTitle] = useState('');
@@ -127,6 +129,7 @@ const ServiceRecord = () => {
         setServiceDate(loadedDate);
         setMileage(data.mileage ?? "");
         setNote(data.note ?? "");
+        setFileDisplay(data.files ?? [])
 
         setRecord(true);
       } catch (e: any) {
@@ -373,9 +376,22 @@ const ServiceRecord = () => {
               // FILE DISPLAY
               <View className="gap-1.5">
                 <Text className="smallTextBold">Files</Text>
-                {!areFiles && (
+                {fileDisplay.length === 0 ? (
                   <Text className="smallTextGray italic">No files yet.</Text>
-                )}
+                ) : (
+                  <View style={{ maxHeight: 200 }}>
+                    <FlatList
+                      data={fileDisplay}
+                      keyExtractor={(item) => item}
+                      renderItem={({ item }) => (
+                        <View className="w-full flex-1 flex-row justify-between items-center mb-2.5">
+                          <Text className="smallThinTextBlue italic">{item}</Text>
+                        </View>
+                      )}
+                    />
+                  </View>
+                 )
+                }
               </View>
             ) : 
             (

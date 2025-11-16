@@ -15,7 +15,7 @@ export const ALLOWED_MIME_TYPES_VEHICLE = ["image/jpeg", "image/jpg"];
 
 // VEHICLE IMAGE CONDITIONS
 export const MAX_RECORD_SIZE = 1000 * 1024; // 1 MB
-export const ALLOWED_MIME_TYPES_RECORD = ["application/pdf"];
+export const ALLOWED_MIME_TYPES_RECORD = ["application/pdf", "pdf"];
 
 // POST /vehicle/uploadVehicleImage
 export default async function uploadVehicleImage(payload: File, type: "vehicle" | "record") {
