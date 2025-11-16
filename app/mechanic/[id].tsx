@@ -2,11 +2,12 @@ import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 import NormalButton from '../components/NormalButton';
+import ViewReviews from '../components/ViewReviews';
 
 
 
@@ -26,14 +27,15 @@ interface MechanicViewProps {
 
 type ReviewProps ={
     MechanicId:string,
-    Rating: Float
+    Rating: number,
 }
 
 const Details = () => {
   const {id} = useLocalSearchParams();
  
   const [mechanic, setMechanic] = useState<any>(null);
-  const[reviews, setReviews] = useState<any>([])
+  const[reviews, setReviews] = useState<any[]>([])
+  const [ratingCount, setRatingCount] = useState<any[]>([])
   const [reviewAVG, setreviewAVG] = useState<Float>(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
@@ -52,7 +54,7 @@ const Details = () => {
                       let sum = 0;
                       reviews.forEach(x=>{
                           sum+=x.Rating
-                      }) 
+                      })
                       setreviewAVG(sum/reviews.length)  
                   }
                     
@@ -86,6 +88,18 @@ const Details = () => {
   else{
     const servicesData = mechanic.Services.split(',').map( (item:string) => item.trim());
     const condition = (mechanic.Hours.length > 0) || (mechanic.address != '') || (mechanic.Website != '') || (mechanic.Phone !='');
+    const temp = reviews.reduce((acc, curr)=>{
+                        const val = String(Math.round(curr['Rating']))
+                        acc[val] = (acc[val] || 0) + 1
+                        return acc
+                      }, {'1': 0,'2': 0,'3': 0,'4': 0,'5': 0,} as Record<string, number>);
+    const sortedTemp = Object.keys(temp)
+    .sort((a, b) => Number(b) - Number(a)) // Sort keys numerically
+    .reduce((acc, key) => {
+        acc[key] = temp[key];
+        return acc;
+    }, {} as Record<string, number>)
+
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
         <KeyboardAvoidingView className='flex-1' behavior='position' keyboardVerticalOffset={100}>
@@ -174,7 +188,7 @@ const Details = () => {
                   
                 </View>
               }
-              {/* <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
+               <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
                 <View className='items-center w-[30%] ml-[10%]'>
                       <Text className='text-center buttonTextBlack'>
                         Want to add a review?
@@ -187,23 +201,31 @@ const Details = () => {
                 
               </View>
               
-              <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
+              <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%] gap-2'>
                 <View className='items-center mt-[5%]'>
-                  <Text className='buttonTextBlack mb-[5%]'>{mechanic.rating}</Text>
-                  <StarRatingDisplay rating={parseFloat(mechanic.rating)} color='black' starSize={15}/>
-                  <Text className='buttonTextBlack mt-[5%]'>{mechanic.reviews} reviews</Text>
+                  <Text className='buttonTextBlack mb-[5%]'>{reviewAVG.toFixed(2)}</Text>
+                  <StarRatingDisplay rating={reviewAVG} color='black' starSize={15}/>
+                  <Text className='buttonTextBlack mt-[5%]'>{reviews.length} reviews</Text>
                 </View>
                 <View className='items-center flex-1 mr-[2%]'> 
-                    {mechanic.ratingsDist.map((percent:string, index:number) => (
+
+                    {
+                      Object.keys(sortedTemp).reverse().map(x=>{
+                        const percent = sortedTemp[x]/reviews.length * 100
+                        return (<View className=' w-full mb-[2%] flex-row justify-center items-center gap-1'>
+                          <Text className='buttonTextBlack mt-[-5]'>
+                            {x}
+                          </Text>
+                          <View className='bg-stroke rounded-full w-full mb-[2%] flex-row'>
+                              <Text className='bg-primaryBlue rounded-full' style={{width:`${percent}%` as DimensionValue}}> </Text>
+                           </View>
+                        </View>)
+                      })
+                    }
                                 
-                        <View key={index} className='bg-stroke rounded-full w-full mb-[2%]'>
-                            <Text className='bg-primaryBlue rounded-full' style={{width:`${percent}%` as DimensionValue}}/>
-                         </View>
-                     
-                    ))
-                    }    
                 </View>
-              </View> */}
+               
+              </View> 
               
               <View className='flex-row w-[95%] justify-between self-center '>
                 <View className='flex-row border border-stroke rounded-full bg-white items-center '>
@@ -212,6 +234,15 @@ const Details = () => {
                 </View>
                 <NormalButton text='Filter' onClick={()=> {}}/>
               </View>
+              <View className='w-[95%] h-[300] bg-white rounded-xl self-center py-[5%] '>
+                <FlatList
+                data={reviews}
+                renderItem={({item})=><ViewReviews {... item}/>}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{gap:10}}
+                />
+              </View>
+              
                     
         </ScrollView>
         </KeyboardAvoidingView>
