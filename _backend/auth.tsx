@@ -64,7 +64,7 @@ export const verifyAccountHandler = async (code: string, username: string) => {
       confirmationCode: code,
     })
 
-    console.log('Verify Response: ', response)
+    // console.log('Verify Response: ', response)
 
     return 'success'
   } catch (error) {

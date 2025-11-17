@@ -25,8 +25,13 @@ const authConfig: ResourcesConfig['Auth'] = {
         redirectSignIn: [
           'http://localhost:8081/profile/logged',
           'jac://profile/logged',
+          'exp://10.39.76.156:8081/--/profile/logged',
         ],
-        redirectSignOut: ['jac://profile', 'http://localhost:8081/profile'],
+        redirectSignOut: [
+          'jac://profile',
+          'http://localhost:8081/profile',
+          'exp://10.39.76.156:8081/--/profile',
+        ],
         responseType: 'code',
       },
     },
@@ -37,8 +42,11 @@ Amplify.configure({ Auth: authConfig })
 export default function RootLayout() {
   return (
     <Stack>
-      <Stack.Screen name = "(tabs)" options = {{headerShown: false}}/>
-      <Stack.Screen name = "mechanic/[id]" options={{headerTitle:'Back', headerShadowVisible:false}}/>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="mechanic/[id]"
+        options={{ headerTitle: 'Back', headerShadowVisible: false }}
+      />
     </Stack>
-  );
+  )
 }

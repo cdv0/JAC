@@ -17,6 +17,7 @@ module.exports = {
         stroke: '#D9D9D9',
         dangerDarkRed: '#8E080A',
         dangerBrightRed: '#C42529',
+        accountOrange: '#E89321', 
       },
     },
   },

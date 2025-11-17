@@ -1,6 +1,7 @@
 {
  "mechanics" :[
     {
+        "id": 1,
         "name": "Mechanic A",
         "type": "Franchise",
         "certified": true ,
@@ -17,6 +18,7 @@
         }
     },
     {
+        "id": 2,
         "name": "Mechanic B",
         "type": "Independent",
         "certified": true ,

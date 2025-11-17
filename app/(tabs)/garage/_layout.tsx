@@ -3,8 +3,8 @@ import { icons } from "@/constants/icons";
 import { getCurrentUser } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 import { Stack, router } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Text, View, Pressable, ActivityIndicator } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function GarageLayout() {

@@ -1,11 +1,11 @@
-import NormalButton from "@/app/components/NormalButton";
-import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Modal, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { createVehicle } from "@/_backend/api/vehicle";
+import NormalButton from "@/app/components/NormalButton";
+import { icons } from "@/constants/icons";
 import { getCurrentUser } from "aws-amplify/auth";
 import { router } from "expo-router";
-import { icons } from "@/constants/icons";
+import { useState } from "react";
+import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const addVehicle = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -187,7 +187,7 @@ export const addVehicle = () => {
               <View className="flex-1 justify-center gap-0.5">
                 <Text className="xsTextGray">Upload</Text>
                 {/* TODO: ADD DIMENSION HERE e.g. 1024(w) X 128(h) */}
-                <Text className="xsTextGray"></Text>
+                  <Text className="xsTextGray">No file selected</Text>
               </View>
             </Pressable>
           </View>

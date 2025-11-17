@@ -18,6 +18,7 @@ type NormalButtonProps = {
   variant?: ButtonVariant
   icon?: ReactNode
   grow?: boolean
+  height?: number
 };
 
 export default function NormalButton({
@@ -28,7 +29,8 @@ export default function NormalButton({
   paddingVertical = 7,
   variant = 'primary',
   icon,
-  grow = false
+  grow = false,
+  height = 38
 }: NormalButtonProps) {
   /*
   Button Types:

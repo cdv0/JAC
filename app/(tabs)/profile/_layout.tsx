@@ -2,14 +2,14 @@ import { icons } from '@/constants/icons'
 import { Stack, router } from 'expo-router'
 import { Pressable, Text } from 'react-native'
 
-export default function AccountLayout() {
+export default function ProfileLayout() {
   return (
     <Stack
       screenOptions={{
         headerTitleAlign: 'center',
       }}
     >
-      {/* Account page */}
+      {/* Profile page */}
       <Stack.Screen
         name="index"
         options={{
@@ -20,18 +20,39 @@ export default function AccountLayout() {
       <Stack.Screen
         name="logged"
         options={{
-          title: 'Logged',
-          headerShown: false,
+          title: '',
+          headerShown: true,
+          headerShadowVisible: false,
+          headerBackVisible: false,
+          headerLeft: () => null, // Put this here because simply using headerBackVisible isn't reliable
+          headerRight: () => (
+            <Pressable
+              onPress={() => router.replace('/profile/settings')}
+              hitSlop={8}
+              className="mr-4"
+            >
+              <icons.settings height={24} width={24} />
+            </Pressable>
+          ),
         }}
       />
       <Stack.Screen
         name="settings"
         options={{
-          headerTitle: () => <Text className="buttonTextBlack">Settings</Text>,
+          title: 'Settings',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="forgetPassword"
+        options={{
+          headerTitle: () => (
+            <Text className="buttonTextBlack">Forgot password</Text>
+          ),
           headerBackVisible: false,
           headerLeft: () => (
             <Pressable
-              onPress={() => router.push('/(tabs)/profile/logged')}
+              onPress={() => router.push('/(tabs)/profile')}
               className="flex-row items-center px-2"
               hitSlop={2}
             >

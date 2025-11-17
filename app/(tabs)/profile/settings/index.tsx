@@ -14,22 +14,24 @@ export default function Settings() {
           {/* First container */}
           <View className="bg-white rounded-xl">
             {/* Account */}
-            <Pressable className="flex-row justify-between px-5 pt-5 pb-3">
+            <Pressable
+              className="flex-row justify-between px-5 pt-5 pb-3"
+              onPress={() => router.push('/profile/settings/account')}
+            >
               <Text className="font-semibold text-textBlack">Account</Text>
-
               {/* <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 2 28 28"
-                stroke-width="2.5"
-                stroke="currentColor"
-                className="w-6 h-6 font-extrabold text-textBlack"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                />
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 2 28 28"
+              stroke-width="2.5"
+              stroke="currentColor"
+              className="w-6 h-6 font-extrabold text-textBlack"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              />
               </svg> */}
               <ChevronRightIcon size={28} color="#000" />
             </Pressable>
@@ -37,23 +39,22 @@ export default function Settings() {
             {/* Contact us */}
             <Pressable
               className="flex-row justify-between px-5 py-3"
-              onPress={() => router.push('/profile/contact')}
+              onPress={() => router.push('/profile/settings/contact')}
             >
               <Text className="font-semibold text-textBlack">Contact us</Text>
-
               {/* <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 2 28 28"
-                stroke-width="2.5"
-                stroke="currentColor"
-                className="w-6 h-6 font-extrabold text-textBlack"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                />
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 2 28 28"
+              stroke-width="2.5"
+              stroke="currentColor"
+              className="w-6 h-6 font-extrabold text-textBlack"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              />
               </svg> */}
               <ChevronRightIcon size={28} color="#000" />
             </Pressable>

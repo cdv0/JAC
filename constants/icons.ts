@@ -16,6 +16,11 @@ import profileH from "@/public/assets/icons/profileH-icon.svg"
 import search from "@/public/assets/icons/search-icon.svg"
 import seachH from "@/public/assets/icons/searchH-icon.svg"
 import upload from "@/public/assets/icons/upload.svg"
+import settings from "@/public/assets/icons/settings.svg"
+import trash from "@/public/assets/icons/trash.svg"
+import add from "@/public/assets/icons/add.svg"
+import filter from "@/public/assets/icons/filter.svg"
+import x from "@/public/assets/icons/x.svg"
 export const icons = {
     garage,
     garageH,
@@ -35,4 +40,9 @@ export const icons = {
     upload,
     location,
     start
+    settings,
+    trash,
+    add,
+    filter,
+    x
 };
