@@ -8,7 +8,7 @@ type ReviewProps ={
 }
 const ViewReviews = ({Rating, Review, userId}:ReviewProps) => {
   return (
-    <View className='flex-1 border-b-2 border-stroke'>
+    <View className=' border-b-2 border-stroke px-5 py-3'>
       <View className='flex-row ml-5'>
         <View className='w-[50] h-[50] border border-black rounded-full justify-center items-center'>
           <Text className='buttonTextBlack'>
