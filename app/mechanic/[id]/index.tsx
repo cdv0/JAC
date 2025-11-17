@@ -8,9 +8,10 @@ import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingVie
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
-import NormalButton from '../components/NormalButton';
-import TimeConverter from '../components/TimeConverter';
-import ViewReviews from '../components/ViewReviews';
+import NormalButton from '@/app/components/NormalButton';
+import TimeConverter from '@/app/components/TimeConverter';
+import ViewReviews from '@/app/components/ViewReviews';
+import { router } from 'expo-router'
 
 
 
