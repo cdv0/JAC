@@ -7,6 +7,7 @@ import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
+import { set } from 'react-hook-form';
 export default function Index() {
 
   //TODO: Apply filtering
@@ -43,11 +44,11 @@ export default function Index() {
   useEffect(() => {
           const data = async () => {
               try {
-                  const file = await fetch(process.env.PROCESS_ENV_GETMECHANICS_URL as string);
-                  const mechanicsData = await file.json();
+                  const mechanics = await fetch(process.env.PROCESS_ENV_GETMECHANICS_URL as string);
+                  const mechanicsData = await mechanics.json();
                   setMechanics(mechanicsData.mechanics);
               } catch (error) {
-                  console.error("Error loading mechanics data:", error);
+                  console.error("Error loading data:", error);
               }
           }
           data();
