@@ -2,7 +2,7 @@ import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
+import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
@@ -106,10 +106,10 @@ const Details = () => {
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
         <KeyboardAvoidingView className='flex-1' behavior='padding' keyboardVerticalOffset={100}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:10 }} showsHorizontalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 10, gap:10 }} showsHorizontalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
-                  {!mechanic.Image?(<images.defaultImage width={100} height={100} />):
-                              <Image source={{uri:String(mechanic.Image)}} className='w-[100] h-[100]'/>
+                  {!mechanic.Image?(<images.defaultImage width={120} height={120} />):
+                              <Image source={{uri:String(mechanic.Image)}} className='w-[120] h-[120]'/>
                               }
                   <View className='ml-[5%] justify-center'>
                       <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
@@ -120,10 +120,7 @@ const Details = () => {
                       <Text>Reviews: {reviews.length}</Text>
                   </View>
                   <View style={{marginTop:20, marginLeft:15, gap:10}}>
-                    {mechanic.Certified && <images.badge width={25} height={25}/>}
-                    <Pressable onPress={()=>Linking.openURL("https://google.com/maps")}>
-                        <icons.start width={30} height={30}/>
-                    </Pressable>                
+                    {mechanic.Certified && <images.badge width={25} height={25}/>}            
                   </View>
                 
               </View>
@@ -155,8 +152,15 @@ const Details = () => {
                         (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Phone: <Text className='buttonTextBlue'>{mechanic.Phone}</Text>
                           </Text>)}
                     {mechanic.address != ''&& 
-                        (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Address: <Text className='buttonTextBlue'>{mechanic.address}</Text>
-                          </Text>)}
+                        (<View className='flex-row gap-5'>
+                          <View className='w-[80%]'>
+                            <Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Address: <Text className='buttonTextBlue'>{mechanic.address} </Text>
+                          </Text>
+                          </View>
+                          <Pressable onPress={()=>Linking.openURL("https://google.com/maps")}>
+                            <icons.start width={20} height={20}/>
+                          </Pressable>
+                        </View>)}
                     {mechanic.Hours.length > 0 && 
                       (      
                       <>
@@ -211,21 +215,21 @@ const Details = () => {
               </View>
               
               <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%] gap-2'>
-                <View className='items-center mt-[5%]'>
-                  <Text className='buttonTextBlack mb-[5%]'>{reviewAVG?reviewAVG.toFixed(1):0}</Text>
+                <View className='items-center justify-center gap-[5]'>
+                  <Text className='buttonTextBlack'>{reviewAVG?reviewAVG.toFixed(1):0}</Text>
                   <StarRatingDisplay rating={reviewAVG} color='black' starSize={15}/>
-                  <Text className='buttonTextBlack mt-[5%]'>{reviews.length} reviews</Text>
+                  <Text className='buttonTextBlack'>{reviews.length} reviews</Text>
                 </View>
-                <View className='items-center flex-1 mr-[2%]'> 
+                <View className='items-center justify-center flex-1 mr-[2%]'> 
 
                     {
                       Object.keys(sortedTemp).reverse().map(x=>{
                         const percent = reviews.length >0?sortedTemp[x]/reviews.length * 100:0
                         return (<View key={x} className=' w-full mb-[2%] flex-row justify-center items-center gap-1'>
-                          <Text className='buttonTextBlack mt-[-2%]'>
+                          <Text className='buttonTextBlack'>
                             {x}
                           </Text>
-                          <View className='bg-stroke rounded-full w-full mb-[2%] flex-row'>
+                          <View className='bg-stroke rounded-full w-full  flex-row'>
                               <Text className='bg-primaryBlue rounded-full' style={{width:`${percent}%` as DimensionValue}}> </Text>
                            </View>
                         </View>)
