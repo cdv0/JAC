@@ -54,7 +54,7 @@ export default function mechanicLayout() {
           headerBackVisible: false,
           headerLeft: () => (
             <Pressable
-              onPress={() => router.push('/(tabs)')}
+              onPress={() => router.push('/(tabs)/profile')}
               className="flex-row items-center px-2"
               hitSlop={2}
             >
@@ -73,7 +73,7 @@ export default function mechanicLayout() {
           headerBackVisible: false,
           headerLeft: () => (
             <Pressable
-              onPress={() => router.push('/(tabs)')}
+              onPress={() => router.push('/(tabs)/profile')}
               className="flex-row items-center px-2"
               hitSlop={2}
             >

@@ -5,7 +5,7 @@ export type Review = {
   userId: string;
   mechanicId: string;
   rating: number;
-  description: string;
+  review: string;
   createdAt: string;
   mechanicName?: string;
   mechanicAddress?: string;
@@ -103,7 +103,7 @@ export async function getSingleReview(
     userId: r.UserId,
     mechanicId: r.MechanicId,
     rating: Number(r.Rating),
-    description: r.Description,
+    review: r.Review,
     createdAt: r.CreatedAt,
   };
 }

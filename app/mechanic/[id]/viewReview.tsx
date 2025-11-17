@@ -19,7 +19,6 @@ const ViewReview = () => {
     reviewId: string | string[];
   }>();
 
-  // Normalize params to strings in case they come in as string[]
   const mechanicId =
     typeof params.id === "string" ? params.id : params.id?.[0];
   const reviewId =
@@ -153,7 +152,7 @@ const ViewReview = () => {
 
           {/* Review text */}
           <Text className="smallTextGray leading-5">
-            {review.description}
+            {review.review}
           </Text>
         </View>
       </ScrollView>
