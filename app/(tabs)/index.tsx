@@ -2,13 +2,12 @@ import Slider from '@react-native-community/slider';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from "react";
-import { FlatList, ImageBackground, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, FlatList, ImageBackground, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MechanicView from '../components/MechanicView';
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
-import { useSearch } from "../components/SearchFilter";
 
 interface Mechanics {
     mechanicID: string,
@@ -68,6 +67,7 @@ export default function Index() {
 
   //#region constants
   const [mechanics, setMechanics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
           const data = async () => {
               try {
@@ -78,6 +78,7 @@ export default function Index() {
                      x.Services = x.Services.toLowerCase()
                   }) 
                   setMechanics(temp);
+                  setLoading(false);
                   
                  
               } catch (error) {
@@ -431,7 +432,11 @@ export default function Index() {
                 contentContainerStyle={{alignItems:'center'}}
                 columnWrapperStyle={{justifyContent: "space-between",  marginBottom:'5%', gap:"3%"}}
                 showsVerticalScrollIndicator={false}
-                ListEmptyComponent={<Text>No Mechanics found</Text>}
+                ListEmptyComponent={loading?
+                                <View className='mt-[25%] items-center self-center ' >
+                                  <ActivityIndicator size="large" />
+                                </View>:
+                                <Text className='buttonTextBlack'>No Mechanics found</Text>}
               />
         </View>
           
@@ -496,7 +501,6 @@ export default function Index() {
                   <View className={`border ${warning?'border-dangerBrightRed':'border-textBlack'} w-[30%] rounded-xl`}>
                     <TextInput value={tempMinP} keyboardType='numeric'                  
                               onChangeText={(newP)=>{              
-                                                //newP = newP.split('$').join('');
                                                 newP = newP.replace(/[^0-9]/g,'');
                                                 if(newP == '')
                                                   setTempMinP('');
