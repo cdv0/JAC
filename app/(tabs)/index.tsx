@@ -45,11 +45,11 @@ export default function Index() {
   useEffect(() => {
           const data = async () => {
               try {
-                  const file = await fetch("/local/dummy/data.json");
-                  const mechanicsData = await file.json();
+                  const mechanics = await fetch(process.env.PROCESS_ENV_GETMECHANICS_URL as string);
+                  const mechanicsData = await mechanics.json();
                   setMechanics(mechanicsData.mechanics);
               } catch (error) {
-                  console.error("Error loading mechanics data:", error);
+                  console.error("Error loading data:", error);
               }
           }
           data();
@@ -352,16 +352,33 @@ export default function Index() {
           
         </View > 
         <SearchBar placeholder1="Search" value1={mQuery} 
-                    placeholder2="Location" value2={lQuery} />
+                    placeholder2="Location" value2={lQuery}
+                    onChangeText1={ (value1:string) => {setMQuery(value1)} }
+                    />
         <View >
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
             <NormalButton variant={`${isServicesActive?`primary`:`outline`}`} onClick={()=>{setIsServicesModal(!isServicesModal)}} text="Services"/>
-            <ToggleButton flag = {quickFilterStates[0]} onPress={(newf)=>{updateStates(0, newf, setQuickFilterStates)}} text="Oil Change" />
-            <ToggleButton flag = {quickFilterStates[1]} onPress={(newf)=>{updateStates(1, newf, setQuickFilterStates)}} text="Tire Rotation"/>
-            <ToggleButton flag = {quickFilterStates[2]} onPress={(newf)=>{updateStates(2, newf, setQuickFilterStates)}} text="Smog Check"/>
-            <ToggleButton flag ={quickFilterStates[3]} onPress={(newf)=>{updateStates(3, newf, setQuickFilterStates)}} text="Transmission Repair"/>
-            <ToggleButton flag = {quickFilterStates[4]} onPress={(newf)=>{updateStates(4, newf, setQuickFilterStates)}} text="Wheel Alignment"/>
+            <ToggleButton flag = {quickFilterStates[0]} onPress={(newf)=>{
+                                                                            updateStates(0, newf, setQuickFilterStates); 
+                                                                            handleCategories(newf, "Oil Change");
+                                                                            }} text="Oil Change" />
+            <ToggleButton flag = {quickFilterStates[1]} onPress={(newf)=>{
+                                                                            updateStates(1, newf, setQuickFilterStates);
+                                                                            handleCategories(newf, "Tire Rotation");
+                                                                            }} text="Tire Rotation"/>
+            <ToggleButton flag = {quickFilterStates[2]} onPress={(newf)=>{
+                                                                            updateStates(2, newf, setQuickFilterStates);
+                                                                            handleCategories(newf, "Smog Check");
+                                                                            }} text="Smog Check"/>
+            <ToggleButton flag ={quickFilterStates[3]} onPress={(newf)=>{
+                                                                            updateStates(3, newf, setQuickFilterStates);
+                                                                            handleCategories(newf, "Transmission Repair");
+                                                                            }} text="Transmission Repair"/>
+            <ToggleButton flag = {quickFilterStates[4]} onPress={(newf)=>{
+                                                                            updateStates(4, newf, setQuickFilterStates)
+                                                                            handleCategories(newf, "Wheel Alignment");
+                                                                            }} text="Wheel Alignment"/>
           </ScrollView>
         </View>
         
@@ -371,8 +388,11 @@ export default function Index() {
         <View style={{flex:1}}>
             <FlatList
                       
-                data={mechanics}
-                keyExtractor={(item) => item.name}
+                data={categories.length==0?mechanics:
+                      mechanics.filter(element=>{
+                      return categories.every(cat=> element.Services.includes(cat));
+                })}
+                keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
                 renderItem={({item})=> <MechanicView {...item}/>}
                 columnWrapperStyle={{justifyContent:'space-between'}}
