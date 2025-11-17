@@ -1,8 +1,8 @@
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 // Custom hook for search functionality
-export const useSearch = (data: unknown, searchKeys = ['name']) => {
+ const useSearch = (data: unknown, searchKeys = ['name']) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredData = useMemo(() => {
@@ -25,3 +25,5 @@ export const useSearch = (data: unknown, searchKeys = ['name']) => {
     filteredData,
   };
 };
+
+export default useSearch;

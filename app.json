@@ -4,7 +4,6 @@
     "slug": "JAC",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./public/assets/images/logo.png",
     "scheme": "jac",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,8 +18,15 @@
         "backgroundImage": "",
         "monochromeImage": ""
       },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "pan",
       "package": "com.anonymous.JAC"
     },
     "web": {
@@ -28,7 +34,11 @@
       "output": "static",
       "favicon": ""
     },
-    "plugins": ["expo-router", "expo-web-browser"],
+    "plugins": [
+      "expo-router",
+      
+      "expo-web-browser"
+    ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true

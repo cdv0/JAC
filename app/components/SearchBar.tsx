@@ -9,11 +9,10 @@ interface Props{
     placeholder2 :string;
     value2?: string;
     onChangeText2?: (text: string) => void;
-    data?: string[] | void;
 
 }
 
-const SearchBar = ({placeholder1, value1, onChangeText1, placeholder2, value2,  onChangeText2, data}:Props) => {
+const SearchBar = ({placeholder1, value1, onChangeText1, placeholder2, value2,  onChangeText2}:Props) => {
   return (
     <View className='border border-stroke flex-row items-center bg-white rounded-full px-2 py-1 my-4 mx-5'>
       {/*General search*/}
