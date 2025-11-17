@@ -1,12 +1,15 @@
 import NormalButton from "@/app/components/NormalButton";
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Modal, ScrollView, Platform } from "react-native";
+import { View, Text, TextInput, Pressable, Modal, ScrollView, Platform, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getCurrentUser } from "aws-amplify/auth";
 import { useLocalSearchParams, router } from "expo-router";
 import { icons } from "@/constants/icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { createServiceRecord } from "@/_backend/api/serviceRecord";
+import { type File, MAX_RECORD_SIZE, ALLOWED_MIME_TYPES_RECORD } from "@/_backend/api/fileUpload";
+import * as DocumentPicker from "expo-document-picker";
+import uploadVehicleImage from "@/_backend/api/fileUpload";
 
 export const ServiceRecord = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -22,10 +25,36 @@ export const ServiceRecord = () => {
 
   const [mileage, setMileage] = useState('')
   const [note, setNote] = useState('')
+  const [files, setFiles] = useState<File[]>([]);
 
   // Check for empty input upon submission
   const isTitleInvalid = submitted && !title.trim();
   const isDateInvalid = submitted && !date;
+  const isFileInvalid = submitted && files.some(file => 
+    file.size > MAX_RECORD_SIZE || !ALLOWED_MIME_TYPES_RECORD.includes(file.mimeType ?? "")
+  );
+
+  const handleChooseFile = async () => {
+    const res = await DocumentPicker.getDocumentAsync({
+      type: ALLOWED_MIME_TYPES_RECORD,
+      multiple: true,
+      copyToCacheDirectory: true,
+    });
+
+    if (res.canceled) return;
+
+    const doc = res.assets[0];
+
+    const pickedFile: File = {
+      uri: doc.uri,
+      name: doc.name,
+      size: doc.size ?? 0,
+      mimeType: doc.mimeType ?? null,
+    };
+
+    setFiles([...files, pickedFile]);
+    setModalVisible(false);
+  };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
     // Android: Close date picker after any action
@@ -62,14 +91,39 @@ export const ServiceRecord = () => {
       return
     }
 
+    // If a file exists, make sure it's valid
+    if (files.some(file => file.size > MAX_RECORD_SIZE || !ALLOWED_MIME_TYPES_RECORD.includes(file.mimeType ?? ""))) {
+      console.log("Add service record: Invalid file selected");
+      return;
+    }
+
     // Make API call to create service record
     try {
+      const fileKeys: string[] = []
+
+      // UPLOAD FILES TO S3 IF ANY
+      if (files.length > 0) {
+        try {
+          for (const file of files) {
+            const recordFileKey = await uploadVehicleImage(file, "record");
+            console.log("Add service record: Service records upload successful:", recordFileKey);
+            fileKeys.push(recordFileKey);
+          }
+          console.log("All file keys", fileKeys);
+        } catch (e: any) {
+          console.log("Add service record: Error uploading service records:", e);
+          console.log("Add service record: Error message:", e?.message);
+          return;
+        }
+      }
+
       const payload = {
         vehicleId: vehicleId,
         title,
         serviceDate: date.toISOString(),
         mileage,
-        note
+        note,
+        files: fileKeys
       }
 
       const data = await createServiceRecord(payload)
@@ -90,7 +144,7 @@ export const ServiceRecord = () => {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <ScrollView>
-        <View className="flex-1 mx-5 mt-3 gap-3 mb-5">
+        <View className="mx-5 mt-3 gap-3 mb-5">
 
           {/* TITLE INPUT */}
           <View className="gap-2">
@@ -120,35 +174,53 @@ export const ServiceRecord = () => {
             </View>
 
             {/* Date display and picker trigger */}
-            <Pressable 
+            <Pressable
               onPress={() => setShowDatePicker(true)}
-              className={`border rounded-full px-4 py-3 ${isDateInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
+              className={`flex-1 flex-row border rounded-full px-4 py-3 justify-between items-center
+                ${isDateInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
             >
               <Text className="smallTextGray">
                 {formatDate(date)}
               </Text>
             </Pressable>
 
-            {/*DATE TIME PICKER*/}
-            {(showDatePicker || Platform.OS === 'ios') && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={onDateChange}
-                maximumDate={new Date()}
-              />
-            )}
-
-            {/* iOS done button */}
-            {Platform.OS === 'ios' && showDatePicker && (
-              <Pressable 
-                onPress={() => setShowDatePicker(false)}
-                className="bg-primary rounded-full px-4 py-2 mt-2"
+            {Platform.OS === "ios" ? (
+              <Modal
+                transparent={true}
+                visible={showDatePicker}
+                onRequestClose={() => setShowDatePicker(false)}
               >
-                <Text className="text-center text-white smallTextBold">Done</Text>
-              </Pressable>
+                <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                  <View className="bg-white p-8">
+                    <Pressable 
+                      onPress={() => setShowDatePicker(false)}
+                      className="self-end pb-5"
+                    >
+                      <Text className="text-primaryBlue font-semibold">Done</Text>
+                    </Pressable>
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={date}
+                      mode="date"
+                      display="spinner"
+                      onChange={onDateChange}
+                      maximumDate={new Date()}
+                    />
+                  </View>
+                </View>
+              </Modal>
+            ) : (
+              // ANDROID
+              showDatePicker && (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={date}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                  maximumDate={new Date()}
+                />
+              )
             )}
 
             {/* <DatePicker
@@ -195,18 +267,40 @@ export const ServiceRecord = () => {
           {/* Upload files */}
           <View className="gap-2">
             <Text className="smallTextBold">Upload service records</Text>
-            <Text className="xsTextGray">Up to 5MB per file in HEIC, HEIF, JPEG, JPG, PNG</Text>
+            <Text className="xsTextGray">Up to 1MB per file in PDF</Text>
             <Pressable
               onPress={() => setModalVisible(!modalVisible)}
-              className="flex-1 flex-row gap-2 border border-dashed border-grayBorder rounded-lg px-2 py-3"
+              className={`flex-row gap-2 border border-dashed border-grayBorder rounded-lg px-2 py-3 
+                ${isFileInvalid ? "border-dangerBrightRed" : "border-grayBorder"}
+                `}
             >
               <icons.upload/>
               <View className="flex-1 justify-center gap-0.5">
                 <Text className="xsTextGray">Upload</Text>
-                {/* TODO: ADD DIMENSION HERE e.g. 1024(w) X 128(h) */}
-                <Text className="xsTextGray"></Text>
+                <Text className="xsTextGray">{files.length} files selected</Text>
               </View>
             </Pressable>
+
+            {/* LIST FILES */}
+            {files.length === 0 ? null : (
+              <View style={{ maxHeight: 200 }}>
+                <FlatList
+                  data={files}
+                  keyExtractor={(item, index) => `${item.uri}-${index}`}
+                  renderItem={({ item, index }) => (
+                    <View className="w-full bg-secondary rounded-xl flex-1 flex-row justify-between items-center px-4 py-3 mt-1.5 mb-1">
+                      <Text>{item.name}</Text>
+                      <Pressable
+                        onPress={() => { setFiles(prev => prev.filter((_, i) => i !== index));}}
+                        hitSlop={8}
+                      >
+                        <icons.trash width={24} height={24} />
+                      </Pressable>
+                    </View>
+                  )}
+                />
+              </View>
+            )}
           </View>
 
           {/* File/photo uploader modal */}
@@ -229,12 +323,12 @@ export const ServiceRecord = () => {
                 {/* Select source buttons */}
                 <View className="bg-white px-4 py-3 rounded-lg">
                   <Text className="smallTextGray">Choose source</Text>
-                  <Pressable className="py-3 border-b border-stroke">
-                    <Text className="smallText">Choose a file</Text>
+                  <Pressable className="py-3 border-stroke">
+                    <Text className="smallText" onPress={handleChooseFile}>Choose a file</Text>
                   </Pressable>
-                  <Pressable className="py-3">
+                  {/* <Pressable className="py-3">
                     <Text className="smallText">Choose from photos</Text>
-                  </Pressable>
+                  </Pressable> */}
                 </View>
 
                 {/* Cancel button */}

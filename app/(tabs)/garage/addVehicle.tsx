@@ -6,6 +6,9 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { type File, MAX_IMAGE_SIZE, ALLOWED_MIME_TYPES_VEHICLE } from "@/_backend/api/fileUpload";
+import * as DocumentPicker from "expo-document-picker";
+import uploadVehicleImage from "@/_backend/api/fileUpload";
 
 export const addVehicle = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -16,6 +19,7 @@ export const addVehicle = () => {
   const [make, setMake] = useState('')
   const [model, setModel] = useState('')
   const [year, setYear] = useState('')
+  const [file, setFile] = useState<File | null>(null);
 
   // Check for empty input upon submission
   const isVINInvalid = submitted && !VIN.trim();
@@ -23,6 +27,32 @@ export const addVehicle = () => {
   const isMakeInvalid = submitted && !make.trim();
   const isModelInvalid = submitted && !model.trim();
   const isYearInvalid = submitted && !year.trim();
+  
+  const isFileInvalid = submitted && file !== null && (
+    file.size > MAX_IMAGE_SIZE || !ALLOWED_MIME_TYPES_VEHICLE.includes(file.mimeType ?? "")
+  )
+
+  const handleChooseFile = async () => {
+    const res = await DocumentPicker.getDocumentAsync({
+      type: ALLOWED_MIME_TYPES_VEHICLE,
+      multiple: false,
+      copyToCacheDirectory: true,
+    });
+
+    if (res.canceled) return;
+
+    const doc = res.assets[0];
+
+    const pickedFile: File = {
+      uri: doc.uri,
+      name: doc.name,
+      size: doc.size ?? 0,
+      mimeType: doc.mimeType ?? null,
+    };
+
+    setFile(pickedFile);
+    setModalVisible(false);
+  };
 
   const handleSave = async () => {
     // Check all inputs are filled
@@ -45,9 +75,29 @@ export const addVehicle = () => {
       return
     }
 
-    // Make API call to create vehicle
+    // If a file exists, make sure it's valid
+    if ( file && (file.size > MAX_IMAGE_SIZE || !ALLOWED_MIME_TYPES_VEHICLE.includes(file.mimeType ?? ""))) {
+      console.log("Add vehicle: Invalid file selected");
+      return;
+    }
+
+    // Make API call to upload file if any, and create vehicle
     try {
       const { userId } = await getCurrentUser()
+      let vehicleImageKey: string | null = null;
+
+      // Upload vehicle image to bucket
+      if (file) {
+        try {
+          vehicleImageKey = await uploadVehicleImage(file, "vehicle");
+          console.log("Add vehicle: Image upload successful:", vehicleImageKey);
+        } catch (e: any) {
+          console.log("Add vehicle: Error upload vehicle image:", e);
+          console.log("Add vehicle: Error message:", e?.message);
+          return;
+        }
+      }
+      
       const payload = {
         userId: userId,
         VIN,
@@ -55,6 +105,7 @@ export const addVehicle = () => {
         make,
         model,
         year: Number(year),
+        vehicleImage: vehicleImageKey
       }
 
       const data = await createVehicle(payload)
@@ -65,6 +116,7 @@ export const addVehicle = () => {
       setMake('')
       setModel('')
       setYear('')
+      setFile(null)
 
       router.replace('/(tabs)/garage')
     } catch (err: any) {
@@ -178,20 +230,46 @@ export const addVehicle = () => {
           {/* Vehicle image file/photo uploader */}
           <View className="gap-2">
             <Text className="smallTextBold">Upload vehicle image</Text>
-            <Text className="xsTextGray">Up to 5MB per file in HEIC, HEIF, JPEG, JPG, PNG</Text>
+            <Text className="xsTextGray">Up to 256KB per file in JPEG, JPG</Text>
+
+            {/* FILE UPLOADER BUTTON */}
             <Pressable
-              onPress={() => setModalVisible(!modalVisible)}
-              className="flex-1 flex-row gap-2 border border-dashed border-grayBorder rounded-lg px-2 py-3"
+              disabled={!!file}
+              onPress={!file ? () => setModalVisible(!modalVisible) : undefined}
+              className={`flex-1 flex-row gap-2 border border-dashed rounded-lg px-2 items-center 
+                ${isFileInvalid ? "border-dangerBrightRed" : "border-grayBorder"} 
+                ${!file ? "py-3" : "py-5"}
+                `}
             >
               <icons.upload/>
-              <View className="flex-1 justify-center gap-0.5">
+              <View className={`flex-1 justify-center gap-0.5`}>
                 <Text className="xsTextGray">Upload</Text>
                 {/* TODO: ADD DIMENSION HERE e.g. 1024(w) X 128(h) */}
+                {!file ? (
                   <Text className="xsTextGray">No file selected</Text>
+                ) : (
+                  <Text className="xsTextGray">1 file selected</Text>
+                )}
               </View>
             </Pressable>
-          </View>
 
+            {/* UPLOADED FILE NAME */}
+            {!file ? (
+              null
+            ) : (
+              <View className="w-full bg-secondary rounded-xl flex-1 flex-row justify-between items-center px-4 py-1.5 mt-1.5">
+                <Text>{file.name}</Text>
+                <Pressable
+                  onPress={()=> {setFile(null);}}
+                  className=""
+                  hitSlop={8}
+                >
+                  <icons.trash width={24} height={24}/>
+                </Pressable>
+              </View>
+            )}
+          </View>
+          
           {/* File/photo uploader modal */}
           <Modal
             transparent={true}
@@ -212,12 +290,12 @@ export const addVehicle = () => {
                 {/* Select source buttons */}
                 <View className="bg-white px-4 py-3 rounded-lg">
                   <Text className="smallTextGray">Choose source</Text>
-                  <Pressable className="py-3 border-b border-stroke">
+                  <Pressable className="py-3 border-stroke" onPress={handleChooseFile}>
                     <Text className="smallText">Choose a file</Text>
                   </Pressable>
-                  <Pressable className="py-3">
+                  {/* <Pressable className="py-3">
                     <Text className="smallText">Choose from photos</Text>
-                  </Pressable>
+                  </Pressable> */}
                 </View>
 
                 {/* Cancel button */}
@@ -232,6 +310,7 @@ export const addVehicle = () => {
               </View>
             </View>
           </Modal>
+        
 
           {/* SAVE BUTTON */}
           <View className="mt-5">

@@ -4,7 +4,6 @@
     "slug": "JAC",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./public/assets/images/logo.png",
     "scheme": "jac",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -22,10 +21,16 @@
         "backgroundImage": "",
         "monochromeImage": ""
       },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.JAC",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.anonymous.JAC"
     },
     "web": {
       "bundler": "metro",
