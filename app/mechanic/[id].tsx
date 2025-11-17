@@ -105,7 +105,7 @@ const Details = () => {
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
         <KeyboardAvoidingView className='flex-1' behavior='padding' keyboardVerticalOffset={100}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 10, gap:10 }} showsHorizontalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 10, gap:10 }} showsVerticalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
                   {!mechanic.Image?(<images.defaultImage width={120} height={120} />):
                               <Image source={{uri:String(mechanic.Image)}} className='w-[120] h-[120]'/>
@@ -135,6 +135,8 @@ const Details = () => {
                     scrollEnabled={false}
                     columnWrapperClassName='gap-20 '
                     contentContainerClassName='gap-2'
+                    showsVerticalScrollIndicator={false}
+
                   />
                   {(!more && servicesData.length > 8) && <Text className='text-lightBlueText bold text-center' onPress={()=>{setMore(true)}}>show more...</Text>}
                   {(more && servicesData.length > 8) && <Text className='text-lightBlueText text-center' onPress={()=>{setMore(false)}}>show ...</Text>}           
