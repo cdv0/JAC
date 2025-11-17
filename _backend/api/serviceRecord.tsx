@@ -1,4 +1,4 @@
-export const BASE_URL = "https://ynwemrq0m2.execute-api.us-west-1.amazonaws.com/dev";
+export const BASE_URL = "https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev";
 
 export type ServiceRecord = {
     serviceRecordId: string;
@@ -7,6 +7,8 @@ export type ServiceRecord = {
     serviceDate: string;
     mileage: string;
     note: string;
+    files?: string[]
+    removedFiles?: string[]
 }
 
 // POST /vehicle/serviceRecord/createServiceRecord
@@ -16,6 +18,7 @@ export async function createServiceRecord(payload: {
   serviceDate: string;
   mileage: string;
   note: string;
+  files: string[];  // store list of file keys
 }) {
   const response = await fetch(BASE_URL+"/vehicle/serviceRecord/createServiceRecord", {
     method: "POST",

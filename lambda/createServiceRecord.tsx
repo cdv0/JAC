@@ -20,7 +20,7 @@ if (event.requestContext?.http?.method === "OPTIONS") {
 
 try {
   const body = JSON.parse(event.body)
-  const { vehicleId, title, serviceDate, mileage, note } = body
+  const { vehicleId, title, serviceDate, mileage, note, files } = body
 
   const serviceRecordId = crypto.randomUUID()
   const now = new Date().toISOString()
@@ -36,6 +36,7 @@ try {
         mileage,
         note,
         createdAt: now,
+        files: files ?? []
       }
     })
   )

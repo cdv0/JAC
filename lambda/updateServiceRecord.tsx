@@ -1,8 +1,10 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 const client = new DynamoDBClient({ region: "us-west-1" });
 const doc = DynamoDBDocumentClient.from(client);
+const s3 = new S3Client({ region: "us-west-1" });
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -49,7 +51,7 @@ export const handler = async (event) => {
       };
     }
 
-    const { serviceRecordId, vehicleId, title, serviceDate, mileage, note } = parsed || {};
+    const { serviceRecordId, vehicleId, title, serviceDate, mileage, note, removedFiles } = parsed || {};
     if ( !serviceRecordId || !vehicleId || !title || !serviceDate || !mileage || !note ) {
       return {
         statusCode: 400,
@@ -73,6 +75,19 @@ export const handler = async (event) => {
       },
       ReturnValues: "NONE",
     }));
+
+    if (Array.isArray(removedFiles) && removedFiles.length > 0 && process.env.BUCKET_NAME) {
+      await Promise.all(
+        removedFiles.map((key) =>
+          s3.send(
+            new DeleteObjectCommand({
+              Bucket: process.env.BUCKET_NAME,
+              Key: key,
+            })
+          )
+        )
+      );
+    }
 
     return {
       statusCode: 200,
