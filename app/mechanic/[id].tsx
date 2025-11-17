@@ -36,7 +36,6 @@ const Details = () => {
  
   const [mechanic, setMechanic] = useState<any>(null);
   const[reviews, setReviews] = useState<any[]>([])
-  const [ratingCount, setRatingCount] = useState<any[]>([])
   const [reviewAVG, setreviewAVG] = useState<Float>(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
@@ -73,7 +72,7 @@ const Details = () => {
   
   if (loading){
     return(
-      <View className='items-center justify-center'>
+      <View className='flex-1 items-center justify-center'>
         <ActivityIndicator size="large" />
       </View>
     )
@@ -114,13 +113,13 @@ const Details = () => {
                   <View className='ml-[5%] justify-center'>
                       <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
                       <View className='flex-row'>
-                        <Text>Ratings: </Text>
+                        <Text className='buttonTextBlack'>Ratings: </Text>
                         <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={reviewAVG}/>
                       </View>
-                      <Text>Reviews: {reviews.length}</Text>
+                      <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
                   </View>
-                  <View style={{marginTop:20, marginLeft:15, gap:10}}>
-                    {mechanic.Certified && <images.badge width={25} height={25}/>}            
+                  <View style={{marginTop:30, marginLeft:15, gap:10}}>
+                    {mechanic.Certified && <images.badge width={30} height={30}/>}            
                   </View>
                 
               </View>
