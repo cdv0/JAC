@@ -7,7 +7,8 @@ import MechanicView from "../components/MechanicView";
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
-import { set } from 'react-hook-form';
+import { useSearch } from "../components/SearchFilter";
+
 export default function Index() {
 
   //TODO: Apply filtering

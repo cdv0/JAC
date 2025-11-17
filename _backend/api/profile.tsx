@@ -7,7 +7,7 @@ export type UserProfile = {
 };
 
 export async function readUserProfile(userId: string, email: string): Promise<UserProfile>{
-    const url = `${BASE_URL}/readProfileInfo` +
+    const url = `${BASE_URL}/profile/readProfileInfo` +
     `?userId=${encodeURIComponent(userId)}` +
     `&email=${encodeURIComponent(email)}`;
     console.log("[readUserProfile] url:", url);
@@ -22,25 +22,27 @@ export async function readUserProfile(userId: string, email: string): Promise<Us
         throw new Error(text || `HTTP ${response.status}`);
     }
     return (text ? JSON.parse(text): {}) as UserProfile;
-    /*
-    console.log("[readUserProfile] status:", response.status);
-    console.log("[readUserProfile] raw text:", text);
-    */
+};
 
-
-    /*let parsed: any = {};
-    try { parsed = text ? JSON.parse(text) : {}; } catch {}
-
-    //const parsed = text ? JSON.parse(text) :{};
-    const payload =
-        parsed && typeof parsed === "object" && "body" in parsed
-            ? (typeof parsed.body === "string" ? JSON.parse(parsed.body) : parsed.body)
-            : parsed;
-
-    const src = payload?.item ?? payload?.data ?? payload ?? {};
-
-    return src as UserProfile;*/
-
-    //console.log("[readUserProfile] payload:", payload);
-    //return (payload || {}) as UserProfile;
+export async function updateProfileInfo(userId: string, oldEmail: string, newEmail: string) {
+    const res = await fetch(`${BASE_URL}/profile/updateProfileInfo`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, oldEmail, newEmail }),
+    });
+  
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    return JSON.parse(text);
+  }
+  
+export async function updateName(userId: string, email: string, firstName: string, lastName: string) {
+  const res = await fetch(`${BASE_URL}/profile/updateProfileName`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, email, firstName, lastName }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  return JSON.parse(text); 
 }

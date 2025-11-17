@@ -99,7 +99,7 @@ export const garage = () => {
             <Text className="mediumTitle">Garage</Text>
             <NormalButton
               text="Add vehicle"
-              paddingHorizontal={10}
+              paddingHorizontal={20}
               variant="primary"
               onClick={() => router.push("/garage/addVehicle")}
             />

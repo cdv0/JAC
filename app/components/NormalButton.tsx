@@ -18,6 +18,7 @@ type NormalButtonProps = {
   variant?: ButtonVariant
   icon?: ReactNode
   grow?: boolean
+  height?: number
 };
 
 export default function NormalButton({
@@ -28,7 +29,8 @@ export default function NormalButton({
   paddingVertical = 7,
   variant = 'primary',
   icon,
-  grow = false
+  grow = false,
+  height = 38
 }: NormalButtonProps) {
   /*
   Button Types:
@@ -71,10 +73,10 @@ export default function NormalButton({
       <View
         className={`${variantStyles[variant].container} items-center justify-center rounded-xl flex flex-row ${grow ? "self-stretch w-full" : "self-center"}`}
         style={{
-          width: width,
-          paddingHorizontal,
-          paddingVertical,
-          height: 38,
+          width: "auto",
+          paddingHorizontal : paddingHorizontal,
+          paddingVertical: paddingVertical,
+          height: height
         }}
       >
         {icon && <View className="mr-2">{icon}</View>}
