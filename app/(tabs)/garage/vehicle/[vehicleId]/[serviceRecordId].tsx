@@ -248,7 +248,7 @@ const ServiceRecord = () => {
           </Pressable>
         ),
       headerRight: () => (
-        <View className="flex-1 flex-row justify-end gap-3 items-center">
+        <View className={`flex-1 flex-row justify-end gap-3 items-center ${Platform.OS === "ios" ? "pr-16" : ""}`}>
           {!editDetails ? (
             <>
               <Pressable onPress={() => editPressed()}>
@@ -335,35 +335,53 @@ const ServiceRecord = () => {
                 </View>
 
                 {/* Date display and picker trigger */}
-                <Pressable 
+                <Pressable
                   onPress={() => setShowDatePicker(true)}
-                  className="border rounded-full px-4 py-3 border-stroke"
+                  className={`flex-1 flex-row border rounded-full px-4 py-3 justify-between items-center
+                    ${isNewServiceDateInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
                 >
                   <Text className="smallTextGray">
-                    {formatServiceDateNumber(newServiceDate)}
+                    {formatServiceDate(newServiceDate)}
                   </Text>
                 </Pressable>
 
-                {/*DATE TIME PICKER*/}
-                {(showDatePicker || Platform.OS === 'ios') && (
-                  <DateTimePicker
-                    testID="dateTimePicker"
-                    value={newServiceDate}
-                    mode="date"
-                    display="default"
-                    onChange={onDateChange}
-                    maximumDate={new Date()}
-                  />
-                )}
-
-                {/* iOS done button */}
-                {Platform.OS === 'ios' && showDatePicker && (
-                  <Pressable 
-                    onPress={() => setShowDatePicker(false)}
-                    className="bg-primary rounded-full px-4 py-2 mt-2"
+                {Platform.OS === "ios" ? (
+                  <Modal
+                    transparent={true}
+                    visible={showDatePicker}
+                    onRequestClose={() => setShowDatePicker(false)}
                   >
-                    <Text className="text-center text-white smallTextBold">Done</Text>
-                  </Pressable>
+                    <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                      <View className="bg-white p-8">
+                        <Pressable 
+                          onPress={() => setShowDatePicker(false)}
+                          className="self-end pb-5"
+                        >
+                          <Text className="text-primaryBlue font-semibold">Done</Text>
+                        </Pressable>
+                        <DateTimePicker
+                          testID="dateTimePicker"
+                          value={newServiceDate}
+                          mode="date"
+                          display="spinner"
+                          onChange={onDateChange}
+                          maximumDate={new Date()}
+                        />
+                      </View>
+                    </View>
+                  </Modal>
+                ) : (
+                  // ANDROID
+                  showDatePicker && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={newServiceDate}
+                      mode="date"
+                      display="default"
+                      onChange={onDateChange}
+                      maximumDate={new Date()}
+                    />
+                  )
                 )}
 
                 {/* Error message for empty input */}
