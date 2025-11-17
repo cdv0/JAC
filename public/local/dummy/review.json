@@ -1,0 +1,7 @@
+{"statusCode":200,
+"headers":{
+            "Access-Control-Allow-Origin":"*",
+            "Access-Control-Allow-Headers":"content-type,x-user-id,authorization",
+            "Access-Control-Allow-Methods":"OPTIONS,GET"},
+"body":"[{\"ReviewId\":\"001\",\"Review\":\"Amazing Mechanic! Helped my walk through my problems and was very informative. Prices matched what was said online and did not seem over the top. Quick and attentive service\",\"MechanicId\":\"001\",\"Rating\":5,\"userId\":\"001\"},{\"ReviewId\":\"003\",\"Review\":\"Awesome experience! Very friendly and professional\",\"MechanicId\":\"001\",\"Rating\":5,\"userId\":\"004\"},{\"ReviewId\":\"002\",\"Review\":\"Great mechanic, had some scheduling issues however overall a great experience. Service was quick\",\"MechanicId\":\"001\",\"Rating\":4,\"userId\":\"002\"}]"
+}

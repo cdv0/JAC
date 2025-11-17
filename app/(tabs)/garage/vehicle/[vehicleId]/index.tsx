@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, router } from "expo-router";
+import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import { readVehicle, updateVehicleDetails } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
@@ -13,7 +13,7 @@ export default function VehicleDetail() {
   const vehicleId = params.vehicleId;
 
   // Service record
-  const [records, setRecords] = useState<ServiceRecord[]>([]);  // List of vehicles
+  const [records, setRecords] = useState<ServiceRecord[]>([]);  // List of service records
 
   // Vehicle
   const [VIN, setVIN] = useState('')
@@ -44,6 +44,16 @@ export default function VehicleDetail() {
   const isNewModelInvalid = submittedEdit && !(newModel?.trim());
   const isNewYearInvalid = submittedEdit && !(newYear?.trim());
 
+  function formatServiceDate(date: string) {
+    const d = new Date(date);
+
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+  }
+
   // LOAD VEHICLE DETAILS
   useEffect(() => {(async () => {
       try {
@@ -69,7 +79,8 @@ export default function VehicleDetail() {
   }, [vehicleId]);
 
     // LOAD SERVICE RECORD METADATA
-  useEffect(() => {(async () => {
+    useFocusEffect(
+      useCallback(() => {(async () => {
       try {
         setLoading(true);
         if (!vehicleId) throw new Error("Missing vehicleId");
@@ -85,8 +96,12 @@ export default function VehicleDetail() {
       } finally {
         setLoading(false);
       }
-    })();
-  }, []); 
+      })();
+
+      return () => {};
+
+    }, [vehicleId])
+  );
 
   const handleSaveDetails = async() => {
     setSubmittedEdit(true);
@@ -400,19 +415,20 @@ export default function VehicleDetail() {
                       <Text className="smallTextGray">{loading ? "Loading..." : "No services yet."}</Text>
                     </View>
                   }
-                  renderItem={({ item }: { item: any }) => {
+                  renderItem={({ item, index }: { item: any, index: number }) => {
+                    const isLast = index === records.length - 1
                     return (
                       <Pressable 
                         onPress={() => router.push(`/garage/vehicle/${params.vehicleId}/${item.serviceRecordId}`)} 
                         style={{ flex: 1 }}
-                        className="py-3 border-b border-stroke"
+                        className={`py-3 border-stroke ${!isLast ? "border-b" : ""}`}
                         >
                         {/* Row */}
                         <View className="flex-1 flex-row items-center">
                           <Text className="buttonTextBlue">{item.title}</Text>
                           {/* Right side text column */}
                           <View className="flex-1 flex-col items-end justify-center">
-                            <Text className="smallTextBlue">{item.serviceDate}</Text>
+                            <Text className="smallTextBlue">{formatServiceDate(item.serviceDate)}</Text>
                             {item.mileage != "" ? (
                               <Text className="smallTextBlue">{item.mileage} mi</Text>
                             ) : <Text className="smallTextBlue">- mi</Text>
