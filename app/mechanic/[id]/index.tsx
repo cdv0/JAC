@@ -1,5 +1,7 @@
+import { readUserProfile } from '@/_backend/api/profile';
 import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
+import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
@@ -32,13 +34,48 @@ type ReviewProps ={
 }
 
 const Details = () => {
-  const {id} = useLocalSearchParams();
+  const { id } = useLocalSearchParams<{ id: string }>();
  
   const [mechanic, setMechanic] = useState<any>(null);
   const[reviews, setReviews] = useState<any[]>([])
   const [reviewAVG, setreviewAVG] = useState<Float>(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const displayName = firstName || lastName ? `${firstName} ${lastName}`.trim() : null;
+
+  
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { userId } = await getCurrentUser();
+        const attrs = await fetchUserAttributes();
+        const email = attrs.email;
+        if (!email) {
+          throw new Error(
+            'No email on the Cognito profile (check pool/app-client readable attributes).'
+          );
+        }
+
+        const userData = await readUserProfile(userId, email);
+
+        setFirstName(userData.firstName ?? '');
+        setLastName(userData.lastName ?? '');
+        setIsAuthenticated(true);
+      } catch (e: any) {
+        console.log('Details: Error loading user data:', e);
+        console.log('Details: Error message:', e?.message);
+        setFirstName('');
+        setLastName('');
+        setIsAuthenticated(false);
+      }
+    })();
+  }, []);
+
   const [query, setQuery] = useState('');
   useEffect(() => {
             const data = async () => {
@@ -205,12 +242,26 @@ const Details = () => {
                <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
                 <View className='items-center w-[30%] ml-[10%]'>
                       <Text className='text-center buttonTextBlack'>
-                        Want to add a review?
+                        {isAuthenticated
+                          ? `${ displayName || 'no_name'}`
+                          : 'Want to add a review?'}
                       </Text>
                       <StarRatingDisplay rating={0} color='black' starSize={20}/>
                 </View>
                 <View className='flex-1 justify-center'>
-                  <NormalButton text='Log in' onClick={()=>{}}/>
+                  <NormalButton text= {isAuthenticated ? 'Post a review' : 'Log in'} 
+                  onClick={() => {
+                  if (!isAuthenticated) {
+                    router.push("/profile"); 
+                    return;
+                  }
+
+                    router.push({
+                      pathname: "/mechanic/[id]/createReview",
+                      params: { id },
+                  });
+                }}
+              />
                 </View>
                 
               </View>
