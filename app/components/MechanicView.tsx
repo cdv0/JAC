@@ -1,7 +1,7 @@
 import { images } from '@/constants/images';
 import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 type MechanicViewProps = {
@@ -24,6 +24,7 @@ export default function MechanicView(
     }: MechanicViewProps){
         const[reviews, setReviews] = useState<any>([])
         const [reviewAVG, setreviewAVG] = useState<Float>(0);
+        const [loading, setLoading] = useState(true);
         useEffect(() => {
                     const data = async () => {
                         try {
@@ -35,7 +36,8 @@ export default function MechanicView(
                             reviews.forEach(x=>{
                                 sum+=x.Rating
                             }) 
-                            setreviewAVG(sum/reviews.length)                 
+                            setreviewAVG(sum/reviews.length)
+                            setLoading(false)            
                         } catch (error) {
                             console.error("Error loading mechanics data:", error);
                         }
@@ -43,6 +45,14 @@ export default function MechanicView(
                     }
                     data();
                 }, [mechanicID]);
+
+        if (loading){
+            return(
+              <View className='items-center justify-center border border-stroke py-[5%] w-[175] h-[250]' >
+                <ActivityIndicator size="large" />
+              </View>
+            )
+          }
           
                       
         return(
