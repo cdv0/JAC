@@ -1,9 +1,16 @@
 // app/mechanic/[id]/viewReview.tsx
 
-import React, { useEffect, useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import React, { useEffect, useState, useLayoutEffect } from "react";
+import {
+  Image,
+  ScrollView,
+  Text,
+  View,
+  Pressable,
+  Modal,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { getCurrentUser } from "aws-amplify/auth";
 
 import {
@@ -12,12 +19,16 @@ import {
   type Review,
   type Mechanic,
 } from "@/_backend/api/review";
+import { icons } from "@/constants/icons";
 
 const ViewReview = () => {
   const params = useLocalSearchParams<{
     id: string | string[];
     reviewId: string | string[];
   }>();
+
+  const navigation = useNavigation();
+  const router = useRouter();
 
   const mechanicId =
     typeof params.id === "string" ? params.id : params.id?.[0];
@@ -30,6 +41,24 @@ const ViewReview = () => {
   const [mechanic, setMechanic] = useState<Mechanic | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  // Header 3-dot menu
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "",
+      headerRight: () => (
+        <Pressable
+          onPress={() => setMenuVisible(true)}
+          hitSlop={8}
+          style={{ paddingHorizontal: 8, paddingVertical: 4 }}
+        >
+          {/* Vertical three-dot icon */}
+          <Text style={{ fontSize: 20, lineHeight: 20 }}>⋮</Text>
+        </Pressable>
+      ),
+    });
+  }, [navigation]);
 
   useEffect(() => {
     if (!mechanicId || !reviewId) {
@@ -88,6 +117,25 @@ const ViewReview = () => {
     return "★".repeat(rounded) + "☆".repeat(5 - rounded);
   }
 
+  const handleUpdateReview = () => {
+    setMenuVisible(false);
+    if (!mechanicId || !reviewId) return;
+
+    router.push({
+      pathname: "/mechanic/[id]/updateReview", 
+      params: {
+        id: mechanicId,
+        reviewId,
+      },
+    });
+  };
+
+  const handleDeleteReview = () => {
+    setMenuVisible(false);
+    // TODO: wire up delete API + confirm dialog
+    console.log("Delete review pressed", { mechanicId, reviewId });
+  };
+
   if (loading) {
     return (
       <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
@@ -112,9 +160,51 @@ const ViewReview = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      {/* Small popover menu near top-right */}
+      <Modal
+        visible={menuVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <Pressable
+          className="flex-1"
+          style={{ backgroundColor: "transparent" }}
+          onPress={() => setMenuVisible(false)}
+        >
+          <View className="flex-1 items-end pt-12 pr-4">
+            <View className="bg-white rounded-lg shadow-lg border border-stroke px-3 py-2">
+              {/* Update review */}
+              <Pressable
+                className="flex-row items-center gap-2 py-2"
+                onPress={handleUpdateReview}
+              >
+                {/* Use whatever icon you prefer; link/pencil etc. */}
+                <icons.pencil width={16} height={16} />
+                <Text className="smallTitle">Update review</Text>
+              </Pressable>
+
+              {/* Divider */}
+              <View className="h-[1px] bg-stroke my-1" />
+
+              {/* Delete review */}
+              <Pressable
+                className="flex-row items-center gap-2 py-2"
+                onPress={handleDeleteReview}
+              >
+                <icons.trash width={16} height={16} />
+                <Text className="smallTitle text-[#D32F2F]">
+                  Delete review
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
+
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         {/* MECHANIC BANNER */}
-        <View className="flex-row items-center gap-3 bg-white rounded-2xl border border-stroke px-3 py-3 mb-4">
+        <View className="flex-row items-center gap-3 bg-white mb-4">
           {mechanic?.imageUri ? (
             <Image
               source={{ uri: mechanic.imageUri }}

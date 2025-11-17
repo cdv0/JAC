@@ -19,6 +19,16 @@ export type Mechanic = {
   imageUri?: string;
 };
 
+export type UpdatedReview = {
+  reviewId: string;
+  userId: string;
+  mechanicId: string;
+  rating: number;
+  review: string;
+  createdAt: string;
+  updatedAt?: string;
+};
+
 async function handleJsonResponse(res: Response) {
   const text = await res.text();
   let data: any = null;
@@ -129,4 +139,38 @@ export async function getSingleMechanic(
 
   // Lambda already normalized it
   return data.mechanic;
+}
+
+export async function updateReview(
+  reviewId: string,
+  userId: string,
+  rating: number,
+  review: string
+): Promise<UpdatedReview> {
+  const url = `${BASE_URL}/reviews/updateReview`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      reviewId,
+      rating,
+      review,
+      userId, // also sent in body
+    }),
+  });
+
+  const data = await handleJsonResponse(res);
+  const r = data.review ?? data;
+
+  return {
+    reviewId: r.ReviewId ?? r.reviewId,
+    userId: r.userId ?? r.UserId,
+    mechanicId: r.mechanicId ?? r.MechanicId,
+    rating: Number(r.rating ?? r.Rating),
+    review: r.review ?? r.Review,
+    createdAt: r.CreatedAt ?? r.createdAt,
+  };
 }
