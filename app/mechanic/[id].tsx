@@ -2,7 +2,7 @@ import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
@@ -101,11 +101,12 @@ const Details = () => {
         acc[key] = temp[key];
         return acc;
     }, {} as Record<string, number>)
-
+    
+    const filterReviews = query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews;
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
-        <KeyboardAvoidingView className='flex-1' behavior='position' keyboardVerticalOffset={100}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:'1%' }}showsHorizontalScrollIndicator={false}>
+        <KeyboardAvoidingView className='flex-1' behavior='padding' keyboardVerticalOffset={100}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:10 }} showsHorizontalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
                   {!mechanic.Image?(<images.defaultImage width={100} height={100} />):
                               <Image source={{uri:String(mechanic.Image)}} className='w-[100] h-[100]'/>
@@ -118,7 +119,13 @@ const Details = () => {
                       </View>
                       <Text>Reviews: {reviews.length}</Text>
                   </View>
-                {mechanic.Certified && <images.badge width={25} height={25} style={{marginTop:20, marginLeft:15}}/>}
+                  <View style={{marginTop:20, marginLeft:15, gap:10}}>
+                    {mechanic.Certified && <images.badge width={25} height={25}/>}
+                    <Pressable onPress={()=>Linking.openURL("https://google.com/maps")}>
+                        <icons.start width={30} height={30}/>
+                    </Pressable>                
+                  </View>
+                
               </View>
 
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
@@ -154,7 +161,7 @@ const Details = () => {
                       (      
                       <>
                         <Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Hours</Text>
-                        <View className='mx-[5%] w-[50%]'>
+                        <View className='mx-[5%] w-[75%]'>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Mon</Text>
                             <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[0])}</Text>
@@ -205,7 +212,7 @@ const Details = () => {
               
               <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%] gap-2'>
                 <View className='items-center mt-[5%]'>
-                  <Text className='buttonTextBlack mb-[5%]'>{reviewAVG?reviewAVG.toFixed(2):0}</Text>
+                  <Text className='buttonTextBlack mb-[5%]'>{reviewAVG?reviewAVG.toFixed(1):0}</Text>
                   <StarRatingDisplay rating={reviewAVG} color='black' starSize={15}/>
                   <Text className='buttonTextBlack mt-[5%]'>{reviews.length} reviews</Text>
                 </View>
@@ -238,12 +245,14 @@ const Details = () => {
               </View>
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
                 <FlatList
-                data={query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews}
+                data={filterReviews}
                 renderItem={({item})=><ViewReviews {... item}/>}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{gap:10}}
                 ListEmptyComponent={<Text className='self-center buttonTextBlack'>No Reviews Available</Text>}
                 scrollEnabled={false}
+                keyExtractor={(item)=>item.ReviewId}
+                extraData={query}
                 />
               </View>
               
