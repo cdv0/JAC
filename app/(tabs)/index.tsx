@@ -70,7 +70,7 @@ export default function Index() {
   useEffect(() => {
           const data = async () => {
               try {
-                  const file = await fetch("/local/dummy/data2.json");
+                  const file = await fetch(process.env.PROCESS_ENV_GETMECHANICS_URL as string);
                   const mechanicsData = await file.json();    
                   const temp =  JSON.parse(mechanicsData.body).data as Mechanics[];    
                   temp.forEach((x:Mechanics)=>{
@@ -88,7 +88,7 @@ export default function Index() {
       }, []);
       
   const [mQuery, setMQuery] = useState('');
-  const [lQuery, setLQuery] = useState('');
+  const [lQuery, setLQuery] = useState('');user
   const [isFiltersModal, setisFiltersModal] = useState(false);
 
   const [isFiltersActive, setisFiltersActive] = useState(false);
