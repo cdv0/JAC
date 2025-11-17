@@ -7,6 +7,8 @@ import { Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { icons } from '@/constants/icons';
 import { getReviewsByUser } from '@/_backend/api/review'
+import { StarRatingDisplay } from 'react-native-star-rating-widget'
+import { images } from "@/constants/images"
 
 export const account = () => {
   const router = useRouter()
@@ -120,10 +122,9 @@ export const account = () => {
               </View>
             )}
 
-            {/* REVIEWS */}
-            {/* TODO: ADD LIST REVIEW LOGIC */}
             {/* REVIEW LIST */}
             <View className="gap-4 pb-10">
+              
               {reviews.length === 0 ? (
                 <Text className="smallTextGray text-center">No reviews yet.</Text>
               ) : (
@@ -132,17 +133,17 @@ export const account = () => {
                     key={rev.reviewId}
                     className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm"
                   >
-                    <Text className="text-lg font-semibold">{rev.mechanicName}</Text>
-
-                    {/* Rating */}
-                    <Text className="text-base font-bold mt-1">
-                      {rev.rating}/5
-                    </Text>
-
+                    <Text className="smallTitle">{rev.mechanicId}</Text>
                     {/* Description */}
-                    <Text className="text-sm text-gray-600 mt-2">
+                    <Text className="smallTextGray">
                       {rev.review}
                     </Text>
+                    {/* Rating */}
+                    <View className = "flex-row">
+                      <Text>Rating</Text>
+                    <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} rating={parseFloat(rev.rating)}/>
+                    <Text>   ({rev.rating}/5)</Text>
+                    </View>
                   </View>
                 ))
               )}
