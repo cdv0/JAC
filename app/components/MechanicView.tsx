@@ -71,15 +71,13 @@ export default function MechanicView(
                                 </View>  
                                 {Certified && <images.badge height={25} width={25} style={{marginTop:-20}}/> }
                             </View>
-                            
-                            {/* <Text className = {`text-l buttonTextGray`}>Type: {type}</Text> */}
-                           
+                                                       
                              <View className="flex-row ">
-                                <Text>Rating:</Text>
+                                <Text className='buttonTextBlack'>Rating:</Text>
                                 <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={reviewAVG}/>
                                 
                             </View> 
-                            <Text>Reviews: {reviews.length}</Text>
+                            <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
                         </View>
                     </View> 
                 </TouchableOpacity>    
