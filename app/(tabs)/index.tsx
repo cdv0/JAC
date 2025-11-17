@@ -436,7 +436,7 @@ export default function Index() {
                                 <View className='mt-[25%] items-center self-center ' >
                                   <ActivityIndicator size="large" />
                                 </View>:
-                                <Text className='buttonTextBlack'>No Mechanics found</Text>}
+                                <Text className='buttonTextBlack mt-[25%] '>No Mechanics found</Text>}
               />
         </View>
           
