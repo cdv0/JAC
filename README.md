@@ -12,6 +12,7 @@ npx expo install react-native-maps
 npx expo install expo-location
 
 **Effects can only be see in respective device emulators**
+**Make sure to disable emulator's google map's setting of opening the app when linking a google map url to force it to open browser version**
 
 # Android 
 

@@ -23,6 +23,8 @@ interface MechanicViewProps {
     address: string,
     Website: string,
     Phone: string,
+    lat:number,
+    lon:number
     
 }
 
@@ -158,7 +160,7 @@ const Details = () => {
                             <Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Address: <Text className='buttonTextBlue'>{mechanic.address} </Text>
                           </Text>
                           </View>
-                          <Pressable onPress={()=>Linking.openURL("https://google.com/maps")}>
+                          <Pressable onPress={()=>Linking.openURL(`https://google.com/maps/search/?api=1&query=${mechanic.lat},${mechanic.lon}&force_browser=true`)}>
                             <icons.start width={20} height={20}/>
                           </Pressable>
                         </View>)}
