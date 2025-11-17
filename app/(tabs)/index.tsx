@@ -8,7 +8,6 @@ import MechanicView from '../components/MechanicView';
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
-
 interface Mechanics {
     mechanicID: string,
     name: string,
