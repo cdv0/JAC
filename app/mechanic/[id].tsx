@@ -2,29 +2,45 @@ import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, DimensionValue, FlatList, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { SvgUri } from 'react-native-svg';
 import NormalButton from '../components/NormalButton';
 
 
-interface keyPair{
-  [key:string]:string
-};
 
 interface MechanicViewProps {
+    mechanicID: string,
+    name: string,
+    // type: string,
+    // certified:boolean,
+    // rating: string,
+    // ratingsDist:string[],
+    Review: string,
+    Image: string,
+    Services: string,
+    Hours: string[],
+    address: string,
+    Website: string,
+    Phone: string,
+    
+}
+
+
+interface MechanicDetailsProps {
     name: string,
     type: string,
     certified:boolean,
     rating: string,
-    ratingsDist:string[],
     reviews: string,
     image: string,
     services: string[],
-    additional_details: keyPair,
+    hours: string[],
+    website: string,
+    phone: string,
+    address: string,
 }
-
 const Details = () => {
   const {id} = useLocalSearchParams();
  
@@ -34,10 +50,10 @@ const Details = () => {
   useEffect(() => {
             const data = async () => {
                 try {
-                    const file = await fetch("/local/dummy/data.json");
+                    const file = await fetch("/local/dummy/data2.json");
                     const mechanicsData = await file.json();
-                    
-                    const found = mechanicsData.mechanics.find((x:MechanicViewProps) =>x.name ===id)
+                    //TODO update to use id mechanic attribute
+                    const found = JSON.parse(mechanicsData.body).data.find((x:MechanicViewProps) =>x.mechanicID ===id)
                     setMechanic(found|| null)
                     
                 } catch (error) {
@@ -68,9 +84,10 @@ const Details = () => {
     )
   }
   else{
+    const servicesData = mechanic.Services.split(',').map( (item:string) => item.trim());
+    const condition = (mechanic.Hours.length > 0) || (mechanic.address != '') || (mechanic.Website != '') || (mechanic.Phone !='');
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
-        {/* <View className='flex-1'> */}
         <KeyboardAvoidingView className='flex-1' behavior='position' keyboardVerticalOffset={100}>
         <ScrollView contentContainerStyle={{ paddingBottom: 60, gap:'1%' }}showsHorizontalScrollIndicator={false}>
               <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
@@ -78,7 +95,7 @@ const Details = () => {
                               <SvgUri  width={100} height={100} uri={mechanic.image}/>
                               }
                   <View className='ml-[5%] justify-center'>
-                      <Text className='text-[25px] buttonTextBlack'>{mechanic.name}</Text>
+                      <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
                       <View className='flex-row'>
                         <Text>Ratings: </Text>
                         <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={parseFloat(mechanic.rating)}/>
@@ -89,10 +106,10 @@ const Details = () => {
               </View>
 
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
-                  <Text className='text-[25px] buttonTextBlack mb-[5%] '> Services</Text>
+                  <Text className='text-2xl buttonTextBlack mb-[5%] '> Services</Text>
                   <FlatList
                     className='mx-[5%] mb-[5%]'
-                    data={more?mechanic.services:mechanic.services.slice(0,8)}
+                    data={more?servicesData:servicesData.slice(0,8)}
                     renderItem={({item})=> <Text className='flex-1 smallTextBlue'>{'\u2B24'} {item}</Text>}
                     numColumns={2}
                     initialNumToRender={2}
@@ -100,55 +117,55 @@ const Details = () => {
                     columnWrapperClassName='gap-20 '
                     contentContainerClassName='gap-2'
                   />
-                  {(!more && mechanic.services.length > 8) && <Text className='text-lightBlueText bold text-center' onPress={()=>{setMore(true)}}>show more...</Text>}
-                  {(more && mechanic.services.length > 8) && <Text className='text-lightBlueText text-center' onPress={()=>{setMore(false)}}>show ...</Text>}           
+                  {(!more && servicesData.length > 8) && <Text className='text-lightBlueText bold text-center' onPress={()=>{setMore(true)}}>show more...</Text>}
+                  {(more && servicesData.length > 8) && <Text className='text-lightBlueText text-center' onPress={()=>{setMore(false)}}>show ...</Text>}           
               </View>
 
-              {(Object.keys(mechanic.additional_details).length>0)&& 
+              {condition && 
                 <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
-                  <Text className='text-[25px] buttonTextBlack mb-[5%] ml-[2%]'>Additional Details</Text>
+                  <Text className='text-2xl buttonTextBlack mb-[5%] ml-[2%]'>Additional Details</Text>
                   <View className='mx-[5%]'>
-                    {'website' in mechanic.additional_details && 
-                        (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Website: <Text className='buttonTextBlue'>{mechanic.additional_details['website']}</Text>
+                    {mechanic.Website != '' && 
+                        (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Website: <Text className='buttonTextBlue'>{mechanic.Website}</Text>
                           </Text>)}
-                    {'phone' in mechanic.additional_details && 
-                        (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Phone: <Text className='buttonTextBlue'>{mechanic.additional_details['phone']}</Text>
+                    {mechanic.Phone != ''&& 
+                        (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Phone: <Text className='buttonTextBlue'>{mechanic.Phone}</Text>
                           </Text>)}
-                    {'address' in mechanic.additional_details && 
-                        (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Address: <Text className='buttonTextBlue'>{mechanic.additional_details['address']}</Text>
+                    {mechanic.address != ''&& 
+                        (<Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Address: <Text className='buttonTextBlue'>{mechanic.address}</Text>
                           </Text>)}
-                    {'hours' in mechanic.additional_details && 
+                    {mechanic.Hours.length > 0 && 
                       (      
                       <>
                         <Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Hours</Text>
                         <View className='mx-[5%] w-[50%]'>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Mon</Text>
-                            <Text className='buttonTextBlue'>{mechanic.additional_details['hours'][0]}</Text>
+                            <Text className='buttonTextBlue'>{mechanic.Hours[0]}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Tues</Text>
-                            <Text className='buttonTextBlue'>{mechanic.additional_details['hours'][1]}</Text>
+                            <Text className='buttonTextBlue'>{mechanic.Hours[1]}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Weds</Text>
-                            <Text className='buttonTextBlue'>{mechanic.additional_details['hours'][2]}</Text>
+                            <Text className='buttonTextBlue'>{mechanic.Hours[2]}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Thurs</Text>
-                            <Text className='buttonTextBlue'>{mechanic.additional_details['hours'][3]}</Text>
+                            <Text className='buttonTextBlue'>{mechanic.Hours[3]}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Fri</Text>
-                            <Text className='buttonTextBlue'>{mechanic.additional_details['hours'][4]}</Text>
+                            <Text className='buttonTextBlue'>{mechanic.Hours[4]}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Sat</Text>
-                            <Text className='buttonTextBlue'>{mechanic.additional_details['hours'][5]}</Text>
+                            <Text className='buttonTextBlue'>{mechanic.Hours[5]}</Text>
                           </View>
                           <View className='flex-row justify-between mb-[2%]'>
                             <Text className='buttonTextBlue'>Sun</Text>
-                            <Text className='buttonTextBlue'>{mechanic.additional_details['hours'][6]}</Text>
+                            <Text className='buttonTextBlue'>{mechanic.Hours[6]}</Text>
                           </View>
                           
                         </View>
@@ -157,7 +174,7 @@ const Details = () => {
                   
                 </View>
               }
-              <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
+              {/* <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
                 <View className='items-center w-[30%] ml-[10%]'>
                       <Text className='text-center buttonTextBlack'>
                         Want to add a review?
@@ -186,7 +203,7 @@ const Details = () => {
                     ))
                     }    
                 </View>
-              </View>
+              </View> */}
               
               <View className='flex-row w-[95%] justify-between self-center '>
                 <View className='flex-row border border-stroke rounded-full bg-white items-center '>
