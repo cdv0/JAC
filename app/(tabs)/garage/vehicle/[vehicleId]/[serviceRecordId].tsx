@@ -8,7 +8,9 @@ import { icons } from "@/constants/icons";
 import NormalButton from "@/app/components/NormalButton";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DeleteModal from "@/app/components/DeleteModal";
-import { type File } from "@/_backend/api/fileUpload";
+import { type File, MAX_RECORD_SIZE, ALLOWED_MIME_TYPES_RECORD } from "@/_backend/api/fileUpload";
+import * as DocumentPicker from "expo-document-picker";
+import uploadVehicleImage from "@/_backend/api/fileUpload";
 
 const ServiceRecord = () => {
   const navigation = useNavigation();
@@ -26,8 +28,9 @@ const ServiceRecord = () => {
   const [serviceDate, setServiceDate] = useState<Date>(new Date())
   const [mileage, setMileage] = useState('')
   const [note, setNote] = useState('')
-  const [fileDisplay, setFileDisplay] = useState<string[]>([]);
-  const [files, setFiles] = useState<File[]>([]);
+  const [fileDisplay, setFileDisplay] = useState<string[]>([]);  // Files initially loaded in. Name only
+  const [files, setFiles] = useState<File[]>([]); // New files added in
+  const [removedFiles, setRemovedFiles] = useState<string[]>([]);
 
   // New set of states to store temporary values until save is pressed
   const [newTitle, setNewTitle] = useState('');
@@ -49,6 +52,33 @@ const ServiceRecord = () => {
   const isNewServiceDateInvalid = submittedEdit && !newServiceDate;
   const isNewMileageInvalid = submittedEdit && !(newMileage?.trim());
   const isNewNoteInvalid = submittedEdit && !(newNote?.trim());
+  const isFileInvalid = submittedEdit && files.some(file => 
+    file.size > MAX_RECORD_SIZE || !ALLOWED_MIME_TYPES_RECORD.includes(file.mimeType ?? "")
+  );
+
+  const handleChooseFile = async () => {
+    const res = await DocumentPicker.getDocumentAsync({
+      type: ALLOWED_MIME_TYPES_RECORD,
+      multiple: true,
+      copyToCacheDirectory: true,
+    });
+
+    if (res.canceled) return;
+
+    const doc = res.assets[0];
+
+    const pickedFile: File = {
+      uri: doc.uri,
+      name: doc.name,
+      size: doc.size ?? 0,
+      mimeType: doc.mimeType ?? null,
+    };
+
+    setFiles([...files, pickedFile]);
+    setModalVisible(false);
+
+    setFileDisplay(prev => [...prev, pickedFile.name]);
+  };
 
   function formatServiceDate(date: Date) {
     return date.toLocaleDateString("en-US", {
@@ -63,7 +93,7 @@ const ServiceRecord = () => {
       year: "numeric",
       month: "numeric",
       day: "numeric",
-    }); // Ex. November 12, 2025
+    });
   }
 
   const onDateChange = (event: any, selectedDate?: Date) => {
@@ -85,28 +115,57 @@ const ServiceRecord = () => {
     const nt = (newTitle ?? "").trim();
     const nsdDate = newServiceDate;
     const nsd = nsdDate.toISOString();
-    const nm = (newMileage ?? "").trim();
-    const nn = (newNote ?? "").trim();
 
-    if (!nt || !nsd || !nm || !nn) {
+    if (!nt || !nsd ) {
+      return;
+    }
+
+    // If a file exists, make sure it's valid
+    if (files.some(file => file.size > MAX_RECORD_SIZE || !ALLOWED_MIME_TYPES_RECORD.includes(file.mimeType ?? ""))) {
+      console.log("Add service record: Invalid file selected");
       return;
     }
 
     try {
+      const fileKeys: string[] = []
+
+      // UPLOAD FILES TO S3 IF ANY
+      if (files.length > 0) {
+        try {
+          for (const file of files) {
+            const recordFileKey = await uploadVehicleImage(file, "record");
+            console.log("Add service record: Service records upload successful:", recordFileKey);
+            fileKeys.push(recordFileKey);
+          }
+          console.log("All file keys", fileKeys);
+        } catch (e: any) {
+          console.log("Add service record: Error uploading service records:", e);
+          console.log("Add service record: Error message:", e?.message);
+          return;
+        }
+      }
+
+      // Combine existing (without the removed files) and newly uploaded
+      const updatedFiles = Array.from(new Set([...(fileDisplay ?? []), ...fileKeys]));
+
       await updateServiceRecord({
         serviceRecordId: serviceRecordId,
         vehicleId: vehicleId,
         title: nt,
         serviceDate: nsd,
-        mileage: nm,
-        note: nn,
+        mileage: newMileage,
+        note: newNote,
+        files: updatedFiles,
+        removedFiles: removedFiles
       });
 
       setTitle(nt);
       setServiceDate(nsdDate);
       setServiceDateDisplay(formatServiceDate(nsdDate));
-      setMileage(nm);
-      setNote(nn);
+      setMileage(newMileage);
+      setNote(newNote);
+      setFileDisplay(updatedFiles);
+      setFiles([]);
 
       setEditDetails(false);
       setSubmittedEdit(false);
@@ -129,7 +188,9 @@ const ServiceRecord = () => {
         setServiceDate(loadedDate);
         setMileage(data.mileage ?? "");
         setNote(data.note ?? "");
-        setFileDisplay(data.files ?? [])
+
+        const filesFromDb = data.files ?? []
+        setFileDisplay(filesFromDb);        
 
         setRecord(true);
       } catch (e: any) {
@@ -317,7 +378,7 @@ const ServiceRecord = () => {
               // MILEAGE DISPLAY
               <View className="gap-1.5">
                 <Text className="smallTextBold">Mileage</Text>
-                <Text className="smallThinTextBlue">{mileage!= null && mileage != "" ? `${mileage} mi` : "- mi"}</Text>
+                <Text className={`${mileage === "" ? "italic smallTextGray" : "smallThinTextBlue"}`}>{mileage!= null && mileage != "" ? `${mileage} mi` : "- mi"}</Text>
               </View>
             ) : 
             (
@@ -332,11 +393,6 @@ const ServiceRecord = () => {
                   onChangeText={setNewMileage}
                   className={`border rounded-full px-4 py-2 smallTextGray border-stroke`}
                 />
-    
-                {/* Error message for empty input */}
-                {isNewMileageInvalid ? (
-                  <Text className="dangerText mx-2">Enter a valid mileage value</Text>
-                ): null}
               </View>
             )}
 
@@ -363,11 +419,6 @@ const ServiceRecord = () => {
                   onChangeText={setNewNote}
                   className={"border rounded-xl px-4 py-2 smallTextGray border-stroke"}
                 />
-
-                {/* Error message for empty input */}
-                {isNewNoteInvalid ? (
-                  <Text className="dangerText mx-2">Enter a valid note</Text>
-                ): null}
               </View>
             )}
 
@@ -384,7 +435,7 @@ const ServiceRecord = () => {
                       data={fileDisplay}
                       keyExtractor={(item) => item}
                       renderItem={({ item }) => (
-                        <View className="w-full flex-1 flex-row justify-between items-center mb-2.5">
+                        <View className="w-full flex-1 flex-row justify-between items-center mb-2.52">
                           <Text className="smallThinTextBlue italic">{item}</Text>
                         </View>
                       )}
@@ -406,10 +457,33 @@ const ServiceRecord = () => {
                   <icons.upload/>
                   <View className="flex-1 justify-center gap-0.5">
                     <Text className="xsTextGray">Upload</Text>
-                    {/* TODO: ADD DIMENSION HERE e.g. 1024(w) X 128(h) */}
                     <Text className="xsTextGray">No file selected</Text>
                   </View>
                 </Pressable>
+
+                {/* LIST EXISTING FILES */}
+                {fileDisplay.length === 0 ? null : (
+                  <View style={{ maxHeight: 200 }}>
+                    <FlatList
+                      data={fileDisplay}
+                      keyExtractor={(item) => item}
+                      renderItem={({ item, index }) => (
+                        <View className="w-full bg-secondary rounded-xl flex-1 flex-row justify-between items-center px-4 py-3 mt-1.5 mb-1">
+                          <Text>{item}</Text>
+                          <Pressable
+                            onPress={() => {
+                              setFileDisplay(prev => prev.filter((_, i) => i !== index));
+                              setRemovedFiles(prev => [...prev, item]);
+                            }}
+                            hitSlop={8}
+                          >
+                            <icons.trash width={24} height={24} />
+                          </Pressable>
+                        </View>
+                      )}
+                    />
+                  </View>
+                )}
               </View>
             )}
 
@@ -419,7 +493,17 @@ const ServiceRecord = () => {
                 <NormalButton
                   variant="cancel"
                   text="Cancel"
-                  onClick={() => setEditDetails(false)}
+                  onClick={() => {
+                    setEditDetails(false);
+
+                    setNewTitle(title ?? "");
+                    setNewServiceDate(serviceDate ?? new Date());
+                    setNewMileage(mileage ?? "");
+                    setNewNote(note ?? "");
+
+                    setFiles([]);
+                    setRemovedFiles([]);
+                  }}
                 />
 
                 <NormalButton
@@ -457,12 +541,12 @@ const ServiceRecord = () => {
                   {/* Select source buttons */}
                   <View className="bg-white px-4 py-3 rounded-lg">
                     <Text className="smallTextGray">Choose source</Text>
-                    <Pressable className="py-3 border-b border-stroke">
+                    <Pressable className="py-3 border-stroke" onPress={handleChooseFile}>
                       <Text className="smallText">Choose a file</Text>
                     </Pressable>
-                    <Pressable className="py-3">
+                    {/* <Pressable className="py-3">
                       <Text className="smallText">Choose from photos</Text>
-                    </Pressable>
+                    </Pressable> */}
                   </View>
 
                   {/* Cancel button */}

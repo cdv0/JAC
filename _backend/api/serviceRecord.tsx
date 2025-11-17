@@ -8,6 +8,7 @@ export type ServiceRecord = {
     mileage: string;
     note: string;
     files?: string[]
+    removedFiles?: string[]
 }
 
 // POST /vehicle/serviceRecord/createServiceRecord

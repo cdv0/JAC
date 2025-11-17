@@ -40,3 +40,28 @@ export default async function uploadVehicleImage(payload: File, type: "vehicle" 
   const data = await JSON.parse(text);
   return data.key as string;
 }
+
+// GET /vehicle/getVehicleImage
+export async function getVehicleImage(userId: string, vehicleId: string) {
+    const url = `${BASE_URL}/vehicle/getVehicleImage` +
+              `?userId=${encodeURIComponent(userId)}` +
+              `&vehicleId=${encodeURIComponent(vehicleId)}`;
+    const response = await fetch(url, {
+        method: "GET",
+        cache: "no-store"
+    });
+
+    const text = await response.text()
+    if (!response.ok) {
+        throw new Error(text || `HTTP ${response.status}`);
+    }
+
+    const data = await JSON.parse(text);
+
+    const base64wrapped = data.body as string;
+    const base64string = JSON.parse(base64wrapped);
+
+    const dataUrl = `data:image/jpeg;base64,${base64string}`;
+
+    return dataUrl;
+}
