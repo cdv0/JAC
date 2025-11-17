@@ -53,7 +53,7 @@ export const account = () => {
         contentContainerStyle={{ padding: 16 }}
         showsVerticalScrollIndicator={false}
       >
-
+        <View className="border border-stroke rounded-xl mb-6 p-4">
         <View className="flex-row mb-6">
           <Text className="buttonTextBlack mb-2">Rate your experience</Text>
           <StarRating
@@ -63,7 +63,6 @@ export const account = () => {
             starSize={26}
           />
         </View>
-
         <View className="mb-6">
           <TextInput
             className="border border-stroke rounded-xl p-3 min-h-[140px]"
@@ -72,6 +71,7 @@ export const account = () => {
             onChangeText={setReviewText}
             placeholder="Tell us about your experience..."
           />
+        </View>
         </View>
 
         <NormalButton text="Submit" onClick={handleSubmit} />
