@@ -21,7 +21,6 @@ interface Mechanics {
 
 export default function Index() {
 
-  //TODO: Refactor filters
   const [categories, setCategories] = useState<string[]>([]);
   //#region helper functions
   const insertCategory= (newCategory:string) => {
