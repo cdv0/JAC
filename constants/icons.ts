@@ -4,6 +4,7 @@ import chevBack from "@/public/assets/icons/chevron-back.svg"
 import pencil from "@/public/assets/icons/edit.svg"
 import garage from "@/public/assets/icons/garage-icon.svg"
 import garageH from "@/public/assets/icons/garageH-icon.svg"
+import start from "@/public/assets/icons/getStarted.svg"
 import home from "@/public/assets/icons/home-icon.svg"
 import location from "@/public/assets/icons/location.svg"
 import lock from "@/public/assets/icons/lock.svg"
@@ -15,7 +16,6 @@ import profileH from "@/public/assets/icons/profileH-icon.svg"
 import search from "@/public/assets/icons/search-icon.svg"
 import seachH from "@/public/assets/icons/searchH-icon.svg"
 import upload from "@/public/assets/icons/upload.svg"
-
 export const icons = {
     garage,
     garageH,
@@ -34,4 +34,5 @@ export const icons = {
     arrowUp,
     upload,
     location,
+    start
 };
