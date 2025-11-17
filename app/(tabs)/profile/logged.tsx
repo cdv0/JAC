@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { icons } from '@/constants/icons';
+import { getReviewsByUser } from '@/_backend/api/review'
+import { StarRatingDisplay } from 'react-native-star-rating-widget'
 
 export const account = () => {
   const router = useRouter()
@@ -15,6 +17,7 @@ export const account = () => {
   const [createdAt, setCreatedAt] = useState<string>('')
 
   const [filterOpen, setFilterOpen] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([])
 
   useEffect(() => {
     (async () => {
@@ -32,6 +35,11 @@ export const account = () => {
         setFirstName(userData.firstName ?? '')
         setLastName(userData.lastName ?? '')
         setCreatedAt(userData.createdAt ?? '')
+
+        const reviewData = await getReviewsByUser(userId)
+        console.log("Reviews:", reviewData)
+        setReviews(reviewData ?? [])
+
       } catch (e: any) {
         console.log('Account: Error loading user data:', e)
         console.log('Account: Error message:', e.message)
@@ -113,9 +121,44 @@ export const account = () => {
             )}
 
             {/* REVIEWS */}
-            {/* TODO: ADD LIST REVIEW LOGIC */}
-            <View>
-              <Text className="smallTextGray text-center">No reviews yet.</Text>
+            <View className="gap-4 pb-10">
+              {reviews.length === 0 ? (
+                <Text className="smallTextGray text-center">No reviews yet.</Text>
+              ) : (
+                reviews.map((rev) => (
+                  <Pressable
+                    key={rev.reviewId}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/mechanic/[id]/viewReview",
+                        params: {
+                          id: rev.mechanicId,
+                          reviewId: rev.ReviewId,
+                        },
+                      })
+                    }
+                    className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm"
+                  >
+                    {/* You’ll probably swap mechanicId for mechanic name later */}
+                    <Text className="smallTitle">{rev.mechanicId}</Text>
+
+                    {/* Description */}
+                    <Text className="smallTextGray">{rev.review}</Text>
+
+                    {/* Rating */}
+                    <View className="flex-row items-center mt-2">
+                      <Text className="mr-1">Rating</Text>
+                      <StarRatingDisplay
+                        color="black"
+                        starSize={16}
+                        starStyle={{ width: 4 }}
+                        rating={parseFloat(rev.rating)}
+                      />
+                      <Text className="ml-2">({rev.rating}/5)</Text>
+                    </View>
+                  </Pressable>
+                ))
+              )}
             </View>
           </View>
         </View>
