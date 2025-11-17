@@ -1,4 +1,5 @@
-import { useRef } from 'react'
+import * as Location from 'expo-location'
+import { useEffect, useRef } from 'react'
 import { Platform, Text, TouchableOpacity, View } from 'react-native'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 
@@ -13,6 +14,30 @@ const map = () => {
       { duration: 200 }
     )
   }
+
+  useEffect(() => {
+    const requestLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') return
+
+      const location = await Location.getCurrentPositionAsync({})
+    }
+
+    const data = async () => {
+      try {
+        const file = await fetch('/local/dummy/data.json')
+        const mechanicsData = await file.json()
+
+        console.log(mechanicsData)
+      } catch (error) {
+        console.error('Error loading mechanics data:', error)
+      } finally {
+      }
+    }
+    data()
+
+    requestLocation()
+  }, [])
 
   return (
     <View className="flex-1 bg-white">

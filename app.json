@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.JAC"
+      "bundleIdentifier": "com.anonymous.JAC",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to show mechanics near you."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +24,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.JAC"
+      "package": "com.anonymous.JAC",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
     },
     "web": {
       "bundler": "metro",
