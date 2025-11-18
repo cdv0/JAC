@@ -14,8 +14,8 @@ type MechanicViewProps = {
 }
 
 type ReviewProps ={
-    MechanicId:string,
-    Rating: Float
+    mechanicId:string,
+    rating: Float
 }
 
 export default function MechanicView(
@@ -28,13 +28,13 @@ export default function MechanicView(
         useEffect(() => {
                     const data = async () => {
                         try {
-                            const file = await fetch("/local/dummy/review.json");
+                            const file = await fetch("/local/dummy/review2.json");
                             const reviewData = await file.json();
-                            const reviews = JSON.parse(reviewData.body).filter((x:ReviewProps) =>x.MechanicId === mechanicID) as ReviewProps[]
+                            const reviews = reviewData.filter((x:ReviewProps) =>x.mechanicId === mechanicID) as ReviewProps[]
                             setReviews(reviews || [])     
                             let sum = 0;
                             reviews.forEach(x=>{
-                                sum+=x.Rating
+                                sum+=x.rating
                             }) 
                             setreviewAVG(sum/reviews.length)
                             setLoading(false)            

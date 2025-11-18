@@ -70,9 +70,11 @@ export default function Index() {
   useEffect(() => {
           const data = async () => {
               try {
-                  const file = await fetch("/local/dummy/data2.json");
-                  const mechanicsData = await file.json();    
-                  const temp =  JSON.parse(mechanicsData.body).data as Mechanics[];    
+                  // const file = await fetch(process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string);
+                  const file = await fetch("/local/dummy/mechanics2.json")
+                  const mechanicsData = await file.json();  
+                   const temp =  mechanicsData.data
+                  //const temp =  JSON.parse(mechanicsData.body).data as Mechanics[];    
                   temp.forEach((x:Mechanics)=>{
                      x.Services = x.Services.toLowerCase()
                   }) 
