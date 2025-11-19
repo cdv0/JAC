@@ -174,3 +174,24 @@ export async function updateReview(
     createdAt: r.CreatedAt ?? r.createdAt,
   };
 }
+
+export async function deleteReview(userId: string, ReviewId: string) {
+  const res = await fetch(`${BASE_URL}/reviews/deleteReview`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "x-user-id": userId
+    },
+    body: JSON.stringify({
+      ReviewId: ReviewId,  // PK
+      userId: userId       // SK (lowercase, matches lambda)
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error("Failed to delete review: " + err);
+  }
+
+  return true;
+}
