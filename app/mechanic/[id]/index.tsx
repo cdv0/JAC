@@ -26,14 +26,13 @@ interface MechanicViewProps {
     address: string,
     Website: string,
     Phone: string,
-    lat:number,
-    lon:number
+    Location:string[],
     
 }
 
 type ReviewProps ={
-    MechanicId:string,
-    Rating: number,
+    mechanicId:string,
+    rating: number,
 }
 
 const Details = () => {
@@ -83,18 +82,18 @@ const Details = () => {
   useEffect(() => {
             const data = async () => {
                 try {
-                    const file = await fetch("/local/dummy/data2.json");
+                    const file = await fetch("/local/dummy/mechanics2.json")
                     const mechanicsData = await file.json();
-                    const found = JSON.parse(mechanicsData.body).data.find((x:MechanicViewProps) =>x.mechanicID ===id)
+                    const found = mechanicsData.data.find((x:MechanicViewProps) =>x.mechanicID ===id)
                     setMechanic(found|| null)
-                    if (!mechanic){
-                      const file2 = await fetch("/local/dummy/review.json");
+                    if (found){
+                      const file2 = await fetch("/local/dummy/review2.json");
                       const reviewData = await file2.json();
-                      const reviews = JSON.parse(reviewData.body).filter((x:ReviewProps) =>x.MechanicId === id) as ReviewProps[]
+                      const reviews = reviewData.filter((x:ReviewProps) =>x.mechanicId === id) as ReviewProps[]
                       setReviews(reviews || [])     
                       let sum = 0;
                       reviews.forEach(x=>{
-                          sum+=x.Rating
+                          sum+=x.rating
                       })
                       setreviewAVG(sum/reviews.length)  
                   }
@@ -130,7 +129,7 @@ const Details = () => {
     const servicesData = mechanic.Services.split(',').map( (item:string) => item.trim());
     const condition = (mechanic.Hours.length > 0) || (mechanic.address != '') || (mechanic.Website != '') || (mechanic.Phone !='');
     const temp = reviews.reduce((acc, curr)=>{
-                        const val = String(Math.round(curr['Rating']))
+                        const val = String(Math.round(curr['rating']))
                         acc[val] = (acc[val] || 0) + 1
                         return acc
                       }, {'1': 0,'2': 0,'3': 0,'4': 0,'5': 0,} as Record<string, number>);
@@ -198,7 +197,7 @@ const Details = () => {
                             <Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Address: <Text className='buttonTextBlue'>{mechanic.address} </Text>
                           </Text>
                           </View>
-                          <Pressable onPress={()=>Linking.openURL(`https://google.com/maps/search/?api=1&query=${mechanic.lat},${mechanic.lon}&force_browser=true`)}>
+                          <Pressable onPress={()=>Linking.openURL(`https://google.com/maps/search/?api=1&query=${mechanic.Location[0]},${mechanic.Location[1]}&force_browser=true`)}>
                             <icons.start width={20} height={20}/>
                           </Pressable>
                         </View>)}
