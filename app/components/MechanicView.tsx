@@ -7,7 +7,6 @@ import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 type MechanicViewProps = {
     mechanicID: string,
     name: string,
-    //rating: string,
     Image: string,
     Services: string,
     Certified:boolean,
@@ -15,7 +14,7 @@ type MechanicViewProps = {
 
 type ReviewProps ={
     mechanicId:string,
-    rating: Float
+    rating: number
 }
 
 export default function MechanicView(
@@ -48,7 +47,7 @@ export default function MechanicView(
 
         if (loading){
             return(
-              <View className='items-center justify-center border border-stroke py-[5%] w-[175] h-[250]' >
+              <View className='items-center rounded-xl justify-center border border-stroke py-[5%] w-[175] h-[250]' >
                 <ActivityIndicator size="large" />
               </View>
             )
