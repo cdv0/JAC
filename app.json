@@ -22,7 +22,10 @@
         "CAMERA",
         "ACCESS_FINE_LOCATION",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_COARSE_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION"
       ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -36,8 +39,8 @@
     },
     "plugins": [
       "expo-router",
-      
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-location"
     ],
     "experiments": {
       "typedRoutes": true,
