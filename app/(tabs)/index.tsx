@@ -1,6 +1,7 @@
 import Slider from '@react-native-community/slider';
 import * as Location from "expo-location";
 import { router } from 'expo-router';
+import * as geolib from "geolib";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, ImageBackground, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +9,7 @@ import MechanicView from '../components/MechanicView';
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
+
 interface Mechanics {
     mechanicID: string,
     name: string,
@@ -16,6 +18,7 @@ interface Mechanics {
     Certified:boolean,
     address:string,
     Review: number,
+    Location: string[]
 }
 
 export default function Index() {
@@ -75,6 +78,15 @@ export default function Index() {
       return temp.length != 0?sum/temp.length:0
     }
 
+    const distanceScore = (m:Mechanics) =>{
+      if(m.Location){
+        const mLoc =  {latitude: Number(m.Location[0]), longitude:Number(m.Location[1])}
+        return geolib.getDistance(userLoc, mLoc);
+      }
+      return Number.POSITIVE_INFINITY
+      
+    }
+
     const handleSort = (mechanics:Mechanics[]) =>{
       switch (sortOptApplied){
         case "1":
@@ -82,7 +94,7 @@ export default function Index() {
           return mechanics.sort((a,b)=> a.name.localeCompare(b.name))
         case "2":
           //distance
-          return null
+          return mechanics.sort((a,b) => distanceScore(a) - distanceScore(b))
         case "3":
           //review count
           return mechanics.sort((a,b)=> reviewCountScore(b) - reviewCountScore(a))
@@ -413,8 +425,8 @@ export default function Index() {
             const flag = services && status === 'granted'
             setLocationEnabled(flag);
             if (flag){
-                let location = await Location.getCurrentPositionAsync({});
-                setUserLoc(location.coords)
+                let location = await Location.getCurrentPositionAsync({}) as Location.LocationObject;
+                setUserLoc(location.coords || null)
             }
           };
   
@@ -534,8 +546,9 @@ export default function Index() {
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
                   <ToggleButton width={width} text="Name" flag={sortOpt == '1'} onPress={(newf)=>{newf?setSortOpt('1'):setSortOpt('0')}}/>
-                  <View style={{opacity:LocationEnabled?1:0.5}}>
-                       <ToggleButton width={width} text="Distance" flag={sortOpt == '2'} onPress={(newf)=>{newf?setSortOpt('2'):setSortOpt('0')}}/>
+                  <View style={{opacity:LocationEnabled?1:0.5, width:width}}>
+                       <ToggleButton width={"100%"} text="Distance" flag={sortOpt == '2'} onPress={(newf)=>{if(LocationEnabled)
+                        newf?setSortOpt('2'):setSortOpt('0')}}/>
                   </View>
                 </View>
 
@@ -616,7 +629,7 @@ export default function Index() {
                     {
                       !LocationEnabled
                        && <Text className='text-l buttonTextBlack text-subheaderGray mt-[10]'>
-                        *Enable location to use slider
+                        *Enable location to use slider or to sort by distance
                           </Text>
                     }
                     
