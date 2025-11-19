@@ -1,8 +1,7 @@
 import { Text, View } from 'react-native'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
-import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace'
 type ReviewProps ={
-    rating: Float,
+    rating: number,
     review: String,
     userId: string
 }
