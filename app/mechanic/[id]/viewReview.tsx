@@ -42,6 +42,7 @@ const ViewReview = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [userId, setUserId] = useState("");
 
   // Header 3-dot menu
   useLayoutEffect(() => {
@@ -77,6 +78,7 @@ const ViewReview = () => {
         setErrorMsg(null);
 
         const { userId } = await getCurrentUser();
+        setUserId(userId); 
         console.log("ViewReview: userId, mechanicId, reviewId", {
           userId,
           mechanicId,
@@ -122,18 +124,22 @@ const ViewReview = () => {
     if (!mechanicId || !reviewId) return;
 
     router.push({
-      pathname: "/mechanic/[id]/updateReview", 
-      params: {
+      pathname: "/mechanic/[id]/deleteReview",
+      params: { 
         id: mechanicId,
-        reviewId,
+        reviewId: reviewId,
+        userId: userId
       },
     });
   };
 
   const handleDeleteReview = () => {
     setMenuVisible(false);
-    // TODO: wire up delete API + confirm dialog
-    console.log("Delete review pressed", { mechanicId, reviewId });
+    console.log ("id", mechanicId, "reviewId", reviewId, "userid:", userId)
+    router.push({
+      pathname: "/mechanic/[id]/deleteReview",
+      params: { id: mechanicId, reviewId, userId: userId },
+    });
   };
 
   if (loading) {
