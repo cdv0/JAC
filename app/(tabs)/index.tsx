@@ -1,5 +1,5 @@
 import Slider from '@react-native-community/slider';
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
 import { router } from 'expo-router';
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, ImageBackground, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
@@ -15,7 +15,7 @@ interface Mechanics {
     Services: string,
     Certified:boolean,
     address:string,
-    
+    Review: number,
 }
 
 export default function Index() {
@@ -47,47 +47,61 @@ export default function Index() {
     }
    
   }
+    //use this to enter categories to filter
+    const handleCategories = (flag:boolean, Category:string) => {
+      if (flag)
+        insertCategory(Category.toLowerCase());
+      else
+        removeCategory(Category.toLowerCase())
+    };
 
+    const updateStates =(i:number, value:boolean, setFunc:React.Dispatch<React.SetStateAction<any[]>>) =>{
+      setFunc(arr =>
+        arr.map((item, index) =>(index ===i)?value:item)
+      );
+    };
+    const reviewCountScore =(m:Mechanics) =>{
+      //may adjust
+      const temp = reviews.filter(x=> x.mechanicId === m.mechanicID)
+      return temp.length
+    }
+
+    const ratingScore = (m: Mechanics) => {
+      let sum = 0;
+      const temp = reviews.filter(x=> x.mechanicId === m.mechanicID)
+      temp.forEach(x=>{
+          sum+=x.rating
+      })
+      return temp.length != 0?sum/temp.length:0
+    }
+
+    const handleSort = (mechanics:Mechanics[]) =>{
+      switch (sortOptApplied){
+        case "1":
+          //name
+          return mechanics.sort((a,b)=> a.name.localeCompare(b.name))
+        case "2":
+          //distance
+          return null
+        case "3":
+          //review count
+          return mechanics.sort((a,b)=> reviewCountScore(b) - reviewCountScore(a))
+        case "4":
+          //rating
+          return mechanics.sort((a,b)=> ratingScore(b) - ratingScore(a))
+        default:
+          return mechanics
+
+      }
+    }
   //#endregion
 
-  //use this to enter categories to filter
-  const handleCategories = (flag:boolean, Category:string) => {
-    if (flag)
-      insertCategory(Category.toLowerCase());
-    else
-      removeCategory(Category.toLowerCase())
-  };
 
-  const updateStates =(i:number, value:boolean, setFunc:React.Dispatch<React.SetStateAction<any[]>>) =>{
-    setFunc(arr =>
-      arr.map((item, index) =>(index ===i)?value:item)
-    );
-  };
 
   //#region constants
   const [mechanics, setMechanics] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any []>([])
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-          const data = async () => {
-              try {
-                  // const file = await fetch(process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string);
-                  const file = await fetch("/local/dummy/mechanics2.json")
-                  const mechanicsData = await file.json();  
-                   const temp =  mechanicsData.data
-                  //const temp =  JSON.parse(mechanicsData.body).data as Mechanics[];    
-                  temp.forEach((x:Mechanics)=>{
-                     x.Services = x.Services.toLowerCase()
-                  }) 
-                  setMechanics(temp);
-                  setLoading(false);
-                  
-                 
-              } catch (error) {
-                  console.error("Error loading mechanics data:", error);
-              }
-          }
-          data();
-      }, []);
       
   const [mQuery, setMQuery] = useState('');
   const [lQuery, setLQuery] = useState('');
@@ -365,14 +379,48 @@ export default function Index() {
   const [tempSliderValue, setTempSliderValue] = useState(sliderValue);
   const [warning, setWarning] = useState(false);
   const [LocationEnabled, setLocationEnabled] = useState<boolean>(false);
-    useEffect(() => {
-    (async () => {
-      const services = await Location.hasServicesEnabledAsync();
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      setLocationEnabled(services && status === 'granted');
-    })();
-  }, []);
+  const [userLoc, setUserLoc] = useState<any>(null)
   //#endregion
+  
+  useEffect(() => {
+          const data = async () => {
+              try {
+                  // const file = await fetch(process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string);
+                  const file = await fetch("/local/dummy/mechanics2.json")
+                  const mechanicsData = await file.json();  
+                  const temp =  mechanicsData.data
+                  //const temp =  JSON.parse(mechanicsData.body).data as Mechanics[];    
+                  temp.forEach((x:Mechanics)=>{
+                     x.Services = x.Services.toLowerCase()
+                  })    
+                  setMechanics(temp);
+                  if (temp){
+                      const file2 = await fetch("/local/dummy/review2.json");
+                      const reviewData = await file2.json();
+                      setReviews(reviewData || [])     
+                  }
+
+                  setLoading(false);
+                  
+                 
+              } catch (error) {
+                  console.error("Error loading mechanics data:", error);
+              }
+          }
+          const loc = async () => {
+            const services = await Location.hasServicesEnabledAsync();
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            const flag = services && status === 'granted'
+            setLocationEnabled(flag);
+            if (flag){
+                let location = await Location.getCurrentPositionAsync({});
+                setUserLoc(location.coords)
+            }
+          };
+  
+          data();
+          loc();
+      }, []);
   
   //#endregion
 
@@ -383,17 +431,18 @@ export default function Index() {
       >
         <View className="justify-center w-full h-[18%]">
         
+        {/*Banner */}
           <ImageBackground source={require("@/public/assets/images/test.png")} imageStyle={{width:'auto', height: 140 , marginTop:-60}} resizeMode='cover'>
             <View className='items-end mr-[5%]'>
                <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
             </View>
-           
           </ImageBackground>
           
         </View > 
         <SearchBar placeholder1="Search" value1={mQuery} onChangeText1={(newV)=>{setMQuery(newV)}}
                     placeholder2="Location" value2={lQuery} onChangeText2={(newL)=>{setLQuery(newL)}}/>
         <View >
+          {/*Filter Buttons */}
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10, marginLeft:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
             <NormalButton variant={`${isServicesActive?`primary`:`outline`}`} onClick={()=>{setIsServicesModal(!isServicesModal)}} text="Services"/>
@@ -423,12 +472,15 @@ export default function Index() {
         
         
         <Text className="text-2xl mt-5 ml-5 mb-5">Find Nearby</Text>
+        
+        {/*Rendering Mechanic cars */}
         <View style={{flex:1}}>
             <FlatList
                       
-                data={applyFilter()}
+                data={handleSort(applyFilter())}
                 keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
+                initialNumToRender={4}
                 renderItem={({item})=> <MechanicView {...item}/>}
                 contentContainerStyle={{alignItems:'center'}}
                 columnWrapperStyle={{justifyContent: "space-between",  marginBottom:'5%', gap:"3%"}}
@@ -481,12 +533,14 @@ export default function Index() {
                 </Text>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
-                  <ToggleButton width={width} text="Relevance" flag={sortOpt == '1'} onPress={(newf)=>{newf?setSortOpt('1'):setSortOpt('0')}}/>
-                  <ToggleButton width={width} text="Open Now" flag={sortOpt == '2'} onPress={(newf)=>{newf?setSortOpt('2'):setSortOpt('0')}}/>
+                  <ToggleButton width={width} text="Name" flag={sortOpt == '1'} onPress={(newf)=>{newf?setSortOpt('1'):setSortOpt('0')}}/>
+                  <View style={{opacity:LocationEnabled?1:0.5}}>
+                       <ToggleButton width={width} text="Distance" flag={sortOpt == '2'} onPress={(newf)=>{newf?setSortOpt('2'):setSortOpt('0')}}/>
+                  </View>
                 </View>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%] mt-[-2%]">
-                  <ToggleButton width={width} text="Popular" flag={sortOpt == '3'} onPress={(newf)=>{newf?setSortOpt('3'):setSortOpt('0')}}/>
+                  <ToggleButton width={width} text="Review Count" flag={sortOpt == '3'} onPress={(newf)=>{newf?setSortOpt('3'):setSortOpt('0')}}/>
                   <ToggleButton width={width} text="Rating" flag={sortOpt == '4'} onPress={(newf)=>{newf?setSortOpt('4'):setSortOpt('0')}}/>
                
                 </View>
@@ -539,6 +593,7 @@ export default function Index() {
                     </Text>
 
                     <Slider
+                          style={{opacity:LocationEnabled?1:0.5}}
                           minimumValue={minD}
                           maximumValue={maxD}
                           minimumTrackTintColor="#3A5779"
