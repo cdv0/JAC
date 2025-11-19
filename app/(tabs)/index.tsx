@@ -18,7 +18,9 @@ interface Mechanics {
     Certified:boolean,
     address:string,
     Review: number,
-    Location: string[]
+    Location: string[],
+    Distance: number,
+    Rating: number
 }
 
 export default function Index() {
@@ -79,7 +81,7 @@ export default function Index() {
     }
 
     const distanceScore = (m:Mechanics) =>{
-      if(m.Location){
+      if(m.Location && userLoc){
         const mLoc =  {latitude: Number(m.Location[0]), longitude:Number(m.Location[1])}
         return geolib.getDistance(userLoc, mLoc);
       }
@@ -390,8 +392,9 @@ export default function Index() {
   const [sliderValue, setSliderValue] = useState(maxD / 2); 
   const [tempSliderValue, setTempSliderValue] = useState(sliderValue);
   const [warning, setWarning] = useState(false);
-  const [LocationEnabled, setLocationEnabled] = useState<boolean>(false);
-  const [userLoc, setUserLoc] = useState<any>(null)
+  const [userLoc, setUserLoc] = useState<Location.LocationObjectCoords | undefined>(undefined)
+  const [dataReady, setDataReady] = useState(false);
+  const [locReady, setLocReady] = useState(false);
   //#endregion
   
   useEffect(() => {
@@ -401,7 +404,6 @@ export default function Index() {
                   const file = await fetch("/local/dummy/mechanics2.json")
                   const mechanicsData = await file.json();  
                   const temp =  mechanicsData.data
-                  //const temp =  JSON.parse(mechanicsData.body).data as Mechanics[];    
                   temp.forEach((x:Mechanics)=>{
                      x.Services = x.Services.toLowerCase()
                   })    
@@ -411,28 +413,62 @@ export default function Index() {
                       const reviewData = await file2.json();
                       setReviews(reviewData || [])     
                   }
-
-                  setLoading(false);
-                  
-                 
+          
               } catch (error) {
                   console.error("Error loading mechanics data:", error);
+              }
+              finally{
+                setDataReady(true)
               }
           }
           const loc = async () => {
             const services = await Location.hasServicesEnabledAsync();
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            const flag = services && status === 'granted'
-            setLocationEnabled(flag);
-            if (flag){
-                let location = await Location.getCurrentPositionAsync({}) as Location.LocationObject;
-                setUserLoc(location.coords || null)
+            //prompt user for location permision
+            const { status: curStat  } = await Location.requestForegroundPermissionsAsync();
+            let perm = curStat
+            const flag = services && perm  === 'granted'
+
+            if(!flag){
+              setLocReady(true);
+              return
             }
+              
+
+          let location: Location.LocationObject | undefined;
+
+            try{
+              location = await Location.getLastKnownPositionAsync({}) || undefined;
+              setUserLoc(location?.coords || undefined) 
+              try{
+                const temp = await Location.getCurrentPositionAsync({
+                                                                   accuracy: Location.Accuracy.Balanced,
+                                                                   mayShowUserSettingsDialog: true,  
+                                                                  });
+                if(temp)
+                  setUserLoc(temp.coords)
+              } catch (error){
+                  console.warn("getCurrentPositionAsync failed");
+              }
+            } catch (fallbackError){
+              console.error("Fallback to getLastKnownPositionAsync", fallbackError);
+            }
+            finally{
+              setLocReady(true);
+            }
+            
           };
-  
-          data();
-          loc();
+          const t = async () =>{
+            await Promise.allSettled([data(), loc()])
+          };
+
+          t()
       }, []);
+
+
+useEffect(() => {
+  //Ensure everything is ready before displaying thingsd
+  setLoading(!(dataReady && locReady));
+}, [dataReady, locReady]);
   
   //#endregion
 
@@ -485,7 +521,7 @@ export default function Index() {
         
         <Text className="text-2xl mt-5 ml-5 mb-5">Find Nearby</Text>
         
-        {/*Rendering Mechanic cars */}
+        {/*Rendering Mechanic cards */}
         <View style={{flex:1}}>
             <FlatList
                       
@@ -493,7 +529,7 @@ export default function Index() {
                 keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
                 initialNumToRender={4}
-                renderItem={({item})=> <MechanicView {...item}/>}
+                renderItem={({item})=> <MechanicView {...item} Distance={userLoc && item.Location?distanceScore(item)/1609:undefined}/>}
                 contentContainerStyle={{alignItems:'center'}}
                 columnWrapperStyle={{justifyContent: "space-between",  marginBottom:'5%', gap:"3%"}}
                 showsVerticalScrollIndicator={false}
@@ -546,8 +582,8 @@ export default function Index() {
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
                   <ToggleButton width={width} text="Name" flag={sortOpt == '1'} onPress={(newf)=>{newf?setSortOpt('1'):setSortOpt('0')}}/>
-                  <View style={{opacity:LocationEnabled?1:0.5, width:width}}>
-                       <ToggleButton width={"100%"} text="Distance" flag={sortOpt == '2'} onPress={(newf)=>{if(LocationEnabled)
+                  <View style={{opacity:userLoc?1:0.5, width:width}}>
+                       <ToggleButton width={"100%"} text="Distance" flag={sortOpt == '2'} onPress={(newf)=>{if(userLoc)
                         newf?setSortOpt('2'):setSortOpt('0')}}/>
                   </View>
                 </View>
@@ -606,7 +642,7 @@ export default function Index() {
                     </Text>
 
                     <Slider
-                          style={{opacity:LocationEnabled?1:0.5}}
+                          style={{opacity:userLoc?1:0.5}}
                           minimumValue={minD}
                           maximumValue={maxD}
                           minimumTrackTintColor="#3A5779"
@@ -615,7 +651,7 @@ export default function Index() {
                           step={1}
                           value={tempSliderValue}
                           onValueChange={(newVal)=>{setTempSliderValue(newVal)}}
-                          disabled={!LocationEnabled}
+                          disabled={!userLoc}
                       />
 
                     <View className="flex-row justify-between">
@@ -627,7 +663,7 @@ export default function Index() {
                       </Text> 
                     </View>
                     {
-                      !LocationEnabled
+                      !userLoc
                        && <Text className='text-l buttonTextBlack text-subheaderGray mt-[10]'>
                         *Enable location to use slider or to sort by distance
                           </Text>
