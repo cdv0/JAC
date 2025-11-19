@@ -48,7 +48,7 @@ const Details = () => {
                     const mechanicsData = await file.json();
                     const found = mechanicsData.data.find((x:MechanicViewProps) =>x.mechanicID ===id)
                     setMechanic(found|| null)
-                    if (!mechanic){
+                    if (found){
                       const file2 = await fetch("/local/dummy/review2.json");
                       const reviewData = await file2.json();
                       const reviews = reviewData.filter((x:ReviewProps) =>x.mechanicId === id) as ReviewProps[]
