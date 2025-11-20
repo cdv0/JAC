@@ -159,9 +159,9 @@ const Details = () => {
                             <Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Address: <Text className='buttonTextBlue'>{mechanic.address} </Text>
                           </Text>
                           </View>
-                          <Pressable onPress={()=>Linking.openURL(`https://google.com/maps/search/?api=1&query=${mechanic.Location[0]},${mechanic.Location[1]}&force_browser=true`)}>
+                          {mechanic.Location && <Pressable onPress={()=>Linking.openURL(`https://google.com/maps/search/?api=1&query=${mechanic.Location[0]},${mechanic.Location[1]}&force_browser=true`)}>
                             <icons.start width={20} height={20}/>
-                          </Pressable>
+                          </Pressable>}
                         </View>)}
                     {mechanic.Hours.length > 0 && 
                       (      
