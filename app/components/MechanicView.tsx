@@ -81,7 +81,7 @@ export default function MechanicView(
                                 
                             </View> 
                             <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
-                            {Distance && <Text className='text-s smallTextGray'>{Distance.toFixed(1)} mi</Text>}
+                            {(Distance && Distance !== Number.POSITIVE_INFINITY) && <Text className='text-s smallTextGray'>{Distance.toFixed(1)} mi</Text>}
                         </View>
                     </View> 
                 </TouchableOpacity>    
