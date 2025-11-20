@@ -67,25 +67,38 @@ export default function Index() {
     };
     const reviewCountScore =(m:Mechanics) =>{
       //may adjust
-      const temp = reviews.filter(x=> x.mechanicId === m.mechanicID)
-      return temp.length
+      if(!m.Review){
+        const temp = reviews.filter(x=> x.mechanicId === m.mechanicID)
+        m.Review = temp.length
+      }
+      
+      return m.Review 
     }
 
     const ratingScore = (m: Mechanics) => {
-      let sum = 0;
-      const temp = reviews.filter(x=> x.mechanicId === m.mechanicID)
-      temp.forEach(x=>{
-          sum+=x.rating
-      })
-      return temp.length != 0?sum/temp.length:0
+      if(!m.Rating){
+        let sum = 0;
+        const temp = reviews.filter(x=> x.mechanicId === m.mechanicID)
+        temp.forEach(x=>{
+            sum+=x.rating
+        })
+        m.Rating = temp.length != 0?sum/temp.length:0
+      }
+      
+      return m.Rating
     }
 
     const distanceScore = (m:Mechanics) =>{
-      if(m.Location && userLoc){
-        const mLoc =  {latitude: Number(m.Location[0]), longitude:Number(m.Location[1])}
-        return geolib.getDistance(userLoc, mLoc);
+      if(!m.Distance){
+        if(m.Location && userLoc){
+          const mLoc =  {latitude: Number(m.Location[0]), longitude:Number(m.Location[1])}
+          m.Distance = geolib.getDistance(userLoc, mLoc)/1609;
+        }
+        else{
+          Number.POSITIVE_INFINITY
+        }
       }
-      return Number.POSITIVE_INFINITY
+      return m.Distance
       
     }
 
@@ -406,13 +419,13 @@ export default function Index() {
                   const temp =  mechanicsData.data
                   temp.forEach((x:Mechanics)=>{
                      x.Services = x.Services.toLowerCase()
-                  })    
-                  setMechanics(temp);
+                  })     
                   if (temp){
                       const file2 = await fetch("/local/dummy/review2.json");
                       const reviewData = await file2.json();
                       setReviews(reviewData || [])     
                   }
+                  setMechanics(temp);
           
               } catch (error) {
                   console.error("Error loading mechanics data:", error);
@@ -434,11 +447,12 @@ export default function Index() {
             }
               
 
-          let location: Location.LocationObject | undefined;
+            let location: Location.LocationObject | undefined;
 
             try{
               location = await Location.getLastKnownPositionAsync({}) || undefined;
               setUserLoc(location?.coords || undefined) 
+              setLocReady(true);
               try{
                 const temp = await Location.getCurrentPositionAsync({
                                                                    accuracy: Location.Accuracy.Balanced,
@@ -451,9 +465,6 @@ export default function Index() {
               }
             } catch (fallbackError){
               console.error("Fallback to getLastKnownPositionAsync", fallbackError);
-            }
-            finally{
-              setLocReady(true);
             }
             
           };
@@ -468,10 +479,17 @@ export default function Index() {
 useEffect(() => {
   //Ensure everything is ready before displaying thingsd
   setLoading(!(dataReady && locReady));
+  if(mechanics && mechanics.every(x=>!x.Distance )){
+    mechanics.forEach(x=>{
+      x.Distance = distanceScore(x)
+    })
+  }
 }, [dataReady, locReady]);
   
   //#endregion
-
+const finalData =     userLoc && maxD == sliderValue?applyFilter().filter(x=>x.Distance < Number.POSITIVE_INFINITY):
+                      userLoc?applyFilter().filter(x=>x.Distance <= sliderValue):
+                      applyFilter()
   return (
    <SafeAreaView className="flex-1" edges={['right', 'top', 'left']}>
       <View
@@ -525,11 +543,12 @@ useEffect(() => {
         <View style={{flex:1}}>
             <FlatList
                       
-                data={handleSort(applyFilter())}
+                data={
+                      handleSort(finalData)}
                 keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
                 initialNumToRender={4}
-                renderItem={({item})=> <MechanicView {...item} Distance={userLoc && item.Location?distanceScore(item)/1609:undefined}/>}
+                renderItem={({item})=> <MechanicView {...item} Distance={distanceScore(item)}/>}
                 contentContainerStyle={{alignItems:'center'}}
                 columnWrapperStyle={{justifyContent: "space-between",  marginBottom:'5%', gap:"3%"}}
                 showsVerticalScrollIndicator={false}
