@@ -77,7 +77,8 @@ export default function MechanicView(
                                                        
                              <View className="flex-row ">
                                 <Text className='buttonTextBlack'>Rating:</Text>
-                                <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={reviewAVG}/>
+                                {/*todo: Fix inconsisent star sizes */}
+                                <StarRatingDisplay color={'black'} starSize={18} starStyle={{ marginHorizontal: -1 }} style={{ alignItems:'center'}} rating={reviewAVG } />
                                 
                             </View> 
                             <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
