@@ -13,9 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { getCurrentUser } from "aws-amplify/auth";
 
-import {
-  getSingleReview,
-  getSingleMechanic,
+import { getSingleReview, getSingleMechanic,
   type Review,
   type Mechanic,
 } from "@/_backend/api/review";
@@ -124,7 +122,7 @@ const ViewReview = () => {
     if (!mechanicId || !reviewId) return;
 
     router.push({
-      pathname: "/mechanic/[id]/deleteReview",
+      pathname: "/mechanic/[id]/updateReview",
       params: { 
         id: mechanicId,
         reviewId: reviewId,
@@ -187,7 +185,7 @@ const ViewReview = () => {
               >
                 {/* Use whatever icon you prefer; link/pencil etc. */}
                 <icons.pencil width={16} height={16} />
-                <Text className="smallTitle">Update review</Text>
+                <Text className="smallTitle">Update reviews</Text>
               </Pressable>
 
               {/* Divider */}

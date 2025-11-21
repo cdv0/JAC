@@ -412,6 +412,7 @@ const profile = () => {
           // router.push('/profile/logged')
           break
         case 'signInWithRedirect':
+          console.log('User signed in')
           router.push('/profile/logged')
           break
         default:
