@@ -464,12 +464,12 @@ export default function Index() {
                   console.warn("getCurrentPositionAsync failed");
               }
             } catch (fallbackError){
-              console.error("Fallback to getLastKnownPositionAsync", fallbackError);
+              console.error("Unable to getLastKnownPositionAsync", fallbackError);
             }
             
           };
           const t = async () =>{
-            await Promise.allSettled([data(), loc()])
+            await Promise.all([data(), loc()])
           };
 
           t()
