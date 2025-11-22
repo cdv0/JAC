@@ -235,7 +235,7 @@ const Details = () => {
                       <Text className='text-center buttonTextBlack'>
                         Want to add a review?
                       </Text>
-                      <StarRatingDisplay rating={0} color='black' starSize={20}/>
+                      <StarRatingDisplay rating={0} StarIconComponent={Star} color='black' starSize={20}/>
                 </View>
                 <View className='flex-1 justify-center'>
                   <NormalButton text='Log in' onClick={()=>{}}/>
@@ -243,11 +243,11 @@ const Details = () => {
                 
               </View>
               
-              <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%] gap-2'>
-                <View className='items-center justify-center gap-[5]'>
-                  <Text className='buttonTextBlack'>{reviewAVG?reviewAVG.toFixed(1):0}</Text>
-                  <StarRatingDisplay rating={reviewAVG} color='black'  StarIconComponent={Star} starSize={15}/>
-                  <Text className='buttonTextBlack'>{reviews.length} reviews</Text>
+              <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
+                <View className='items-center justify-center gap-[5] mx-[10]'>
+                  <Text className='buttonTextBlack text-2xl'>{reviewAVG?reviewAVG.toFixed(1):0}</Text>
+                  <StarRatingDisplay rating={reviewAVG} color='black'  StarIconComponent={Star}  starSize={18} />
+                  <Text className='buttonTextBlack text-l'>{reviews.length} reviews</Text>
                 </View>
                 <View className='items-center justify-center flex-1 mr-[2%]'> 
 
