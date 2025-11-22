@@ -6,8 +6,8 @@ import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingVie
 import { ReactNativeModal as Modal } from 'react-native-modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 import NormalButton from '../components/NormalButton';
+import Star from '../components/Star';
 import TimeConverter from '../components/TimeConverter';
 import ToggleButton from '../components/ToggleButton';
 import ViewReviews from '../components/ViewReviews';
@@ -39,7 +39,7 @@ const Details = () => {
  
   const [mechanic, setMechanic] = useState<any>(null);
   const[reviews, setReviews] = useState<any[]>([])
-  const [reviewAVG, setreviewAVG] = useState<Float>(0);
+  const [reviewAVG, setreviewAVG] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
   const [query, setQuery] = useState('');
@@ -142,7 +142,7 @@ const Details = () => {
                       <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
                       <View className='flex-row'>
                         <Text className='buttonTextBlack'>Ratings: </Text>
-                        <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={reviewAVG}/>
+                        <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
                       <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
                   </View>
@@ -246,7 +246,7 @@ const Details = () => {
               <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%] gap-2'>
                 <View className='items-center justify-center gap-[5]'>
                   <Text className='buttonTextBlack'>{reviewAVG?reviewAVG.toFixed(1):0}</Text>
-                  <StarRatingDisplay rating={reviewAVG} color='black' starSize={15}/>
+                  <StarRatingDisplay rating={reviewAVG} color='black'  StarIconComponent={Star} starSize={15}/>
                   <Text className='buttonTextBlack'>{reviews.length} reviews</Text>
                 </View>
                 <View className='items-center justify-center flex-1 mr-[2%]'> 

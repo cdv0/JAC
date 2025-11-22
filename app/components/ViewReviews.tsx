@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
+import Star from './Star'
 type ReviewProps ={
     rating: number,
     review: String,
@@ -38,7 +39,7 @@ const ViewReviews = ({rating, review, userId, createdAt}:ReviewProps) => {
             </Text>
             {/*todo: Fix inconsisent star sizes */}
 
-            <StarRatingDisplay color={'black'} starSize={18} starStyle={{marginHorizontal:-1}} style={{ alignItems:'center'}} rating={rating}/>
+            <StarRatingDisplay color={'black'} starSize={18} StarIconComponent={Star} starStyle={{marginHorizontal:-1}} style={{ alignItems:'center'}} rating={rating}/>
           </View>
         </View>
           

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
+import Star from './Star';
 type MechanicViewProps = {
     mechanicID: string,
     name: string,
@@ -78,7 +79,7 @@ export default function MechanicView(
                              <View className="flex-row ">
                                 <Text className='buttonTextBlack'>Rating:</Text>
                                 {/*todo: Fix inconsisent star sizes */}
-                                <StarRatingDisplay color={'black'} starSize={18} starStyle={{ marginHorizontal: -1 }} style={{ alignItems:'center'}} rating={reviewAVG } />
+                                <StarRatingDisplay color={'black'} starSize={18} starStyle={{ marginHorizontal: -1 }} StarIconComponent={Star} style={{ alignItems:'center'}} rating={reviewAVG } />
                                 
                             </View> 
                             <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
