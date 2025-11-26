@@ -20,7 +20,8 @@ interface Mechanics {
     Review: number,
     Location: string[],
     Distance: number,
-    Rating: number
+    Rating: number,
+    Price: number,
 }
 
 export default function Index() {
@@ -35,20 +36,34 @@ export default function Index() {
     setCategories(categories.filter(item => item!=Category));
   };
 
+  //condition for when looking up something using search
   const searchCondition = (n:string, l:string) => {
     return n.toLowerCase().includes(mQuery.toLowerCase()) && l.toLowerCase().includes(lQuery.toLowerCase());
   }
 
   const applyFilter = () =>{
+
+    let temp = isCertified? mechanics.filter(x => x.Certified):mechanics;
+    //price filter
+    if (maxP != ''&& minP != ''){
+      temp = temp.filter(x=> x.Price && x.Price >= Number(minP) && x.Price <= Number(maxP))
+    }
+    else if (minP != ''){
+      temp = temp.filter(x=> x.Price && x.Price >= Number(minP))
+    }
+    else if (maxP != ''){
+      temp = temp.filter(x=> x.Price && x.Price <= Number(maxP))
+    }
+    
+
     if(categories.length ==0){
-      let temp = mechanics.filter(element=> searchCondition(element.name, element.address));
-      return isCertified? temp.filter(x => x.Certified):temp;
+       return temp.filter(element=> searchCondition(element.name, element.address));
+      
     }
     else{
-      let temp = mechanics.filter(element=>{
+       return temp.filter(element=>{
         return categories.every(cat=> element.Services.includes(cat)) && searchCondition(element.name, element.address);
       });
-      return isCertified? temp.filter(x => x.Certified):temp;
     }
    
   }
@@ -576,7 +591,7 @@ const finalData =     userLoc && maxD == sliderValue?applyFilter().filter(x=>x.D
                       {
                         //undo the changes
                         setSortOpt(sortOptApplied);
-                        setTempMinP(minP);
+                        setTempMinP(minP===''?minP:`$${minP}`);
                         setTempMaxP(maxP);
                         setWarning(false);
                         setTempSliderValue(sliderValue);
@@ -714,8 +729,8 @@ const finalData =     userLoc && maxD == sliderValue?applyFilter().filter(x=>x.D
                       //filter logic goes here
 
                       setSortOptApplied(sortOpt);
-                      setminP(tempMinP);
-                      setmaxP(tempMaxP);
+                      setminP(tempMinP.replace('$',''));
+                      setmaxP(tempMaxP.replace('$',''));
                       setSliderValue(tempSliderValue);
                       setisFiltersModal(!isFiltersModal)
                     }
