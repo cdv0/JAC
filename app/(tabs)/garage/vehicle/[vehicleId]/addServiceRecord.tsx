@@ -144,7 +144,7 @@ export const ServiceRecord = () => {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       <ScrollView>
-        <View className="flex-1 mx-5 mt-3 gap-3 mb-5">
+        <View className="mx-5 mt-3 gap-3 mb-5">
 
           {/* TITLE INPUT */}
           <View className="gap-2">
@@ -174,35 +174,53 @@ export const ServiceRecord = () => {
             </View>
 
             {/* Date display and picker trigger */}
-            <Pressable 
+            <Pressable
               onPress={() => setShowDatePicker(true)}
-              className={`border rounded-full px-4 py-3 ${isDateInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
+              className={`flex-1 flex-row border rounded-full px-4 py-3 justify-between items-center
+                ${isDateInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
             >
               <Text className="smallTextGray">
                 {formatDate(date)}
               </Text>
             </Pressable>
 
-            {/*DATE TIME PICKER*/}
-            {(showDatePicker || Platform.OS === 'ios') && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={onDateChange}
-                maximumDate={new Date()}
-              />
-            )}
-
-            {/* iOS done button */}
-            {Platform.OS === 'ios' && showDatePicker && (
-              <Pressable 
-                onPress={() => setShowDatePicker(false)}
-                className="bg-primary rounded-full px-4 py-2 mt-2"
+            {Platform.OS === "ios" ? (
+              <Modal
+                transparent={true}
+                visible={showDatePicker}
+                onRequestClose={() => setShowDatePicker(false)}
               >
-                <Text className="text-center text-white smallTextBold">Done</Text>
-              </Pressable>
+                <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                  <View className="bg-white p-8">
+                    <Pressable 
+                      onPress={() => setShowDatePicker(false)}
+                      className="self-end pb-5"
+                    >
+                      <Text className="text-primaryBlue font-semibold">Done</Text>
+                    </Pressable>
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={date}
+                      mode="date"
+                      display="spinner"
+                      onChange={onDateChange}
+                      maximumDate={new Date()}
+                    />
+                  </View>
+                </View>
+              </Modal>
+            ) : (
+              // ANDROID
+              showDatePicker && (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={date}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                  maximumDate={new Date()}
+                />
+              )
             )}
 
             {/* <DatePicker
@@ -252,7 +270,7 @@ export const ServiceRecord = () => {
             <Text className="xsTextGray">Up to 1MB per file in PDF</Text>
             <Pressable
               onPress={() => setModalVisible(!modalVisible)}
-              className={`flex-1 flex-row gap-2 border border-dashed border-grayBorder rounded-lg px-2 py-3 
+              className={`flex-row gap-2 border border-dashed border-grayBorder rounded-lg px-2 py-3 
                 ${isFileInvalid ? "border-dangerBrightRed" : "border-grayBorder"}
                 `}
             >

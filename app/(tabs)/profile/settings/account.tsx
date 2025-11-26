@@ -90,7 +90,6 @@ export default function Account() {
                     d="m8.25 4.5 7.5 7.5-7.5 7.5"
                   />
                 </svg> */}{' '}
-                */
                 <ChevronRightIcon size={28} color="#000" />
               </View>
             </Pressable>

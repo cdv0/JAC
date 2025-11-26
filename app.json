@@ -9,7 +9,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.JAC"
+      "bundleIdentifier": "com.anonymous.JAC",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to show mechanics near you."
+      }
     },
     "android": {
       "adaptiveIcon": {
