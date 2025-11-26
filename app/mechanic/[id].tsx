@@ -46,7 +46,10 @@ const Details = () => {
   const [visible, setVisible] = useState(false);
   const [Verified, setVerified] = useState(false);
   const [choice, setChoice] = useState("");
-
+  const [isClaimed, setClaimed] = useState(false); //change to fetch query
+  const [asMechanic,setAsMechanic] = useState(false);
+  const [claimVisibile, setClaimVisibile] = useState(false);
+  const [claimLoading, setClaimLoading]= useState(true);
   const handleChoice = (flag:boolean, choice:string)=>{
     if (flag){
       setChoice(choice)
@@ -85,6 +88,10 @@ const Details = () => {
             data();
         }, [id]);
   
+  //temporary for testing
+  const claim = async() =>{
+    setTimeout(()=>{setClaimLoading(false)}, 10000)
+  }
   
   if (loading){
     return(
@@ -144,7 +151,27 @@ const Details = () => {
                         <Text className='buttonTextBlack'>Ratings: </Text>
                         <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
-                      <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
+                      <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
+                      {asMechanic && <ToggleButton flag={isClaimed} 
+                      text={isClaimed?'Claimed':'Claim Business'} 
+                      onPress={async ()=>{
+                                      /**
+                                       * 
+                                       * PsuedoCode
+                                       * if Claimed
+                                       *    prompt for confirmation modal
+                                       *    return
+                                       * 
+                                       * call modal
+                                       * call async func for claiming
+                                       *    
+                                       *  
+                                       * 
+                                       *  */
+                                          
+                                      // setClaimVisibile(true)  
+                                      // await claim()                                                                            
+                                    }}/>}
                   </View>
                   <View style={{marginTop:30, marginLeft:15, gap:10}}>
                     {mechanic.Certified && <images.badge width={30} height={30}/>}            
@@ -317,6 +344,25 @@ const Details = () => {
                       </View>
                   </View>
                     
+              </Modal>
+
+              {/*Claim response modal*/}
+              <Modal isVisible={claimVisibile} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => {setClaimVisibile(false); setClaimLoading(true)}}
+                backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'center', margin:0}}>
+                  <View className='w-[40%] h-[20%] bg-white border border-black rounded-xl items-center justify-center'>
+                      {/*Add loading*/}
+                      {(claimLoading)? 
+                      (<View className='flex-1 items-center justify-center'>
+                        <ActivityIndicator size="large" />  
+                      </View>):
+                        (isClaimed)?<Text className='buttonTextBlack'>
+                          Claim Succesful
+                        </Text>:
+                        //Add ways to ask for help
+                        <Text className='text-dangerDarkRed buttonTextBlack'>
+                          Failed to Claim 
+                          </Text>}
+                  </View> 
               </Modal>
                     
         </ScrollView>
