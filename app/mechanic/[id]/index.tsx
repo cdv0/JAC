@@ -1,6 +1,8 @@
 import { readUserProfile } from '@/_backend/api/profile';
 import NormalButton from '@/app/components/NormalButton';
+import Star from '@/app/components/Star';
 import TimeConverter from '@/app/components/TimeConverter';
+import ToggleButton from '@/app/components/ToggleButton';
 import ViewReviews from '@/app/components/ViewReviews';
 import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
@@ -11,8 +13,6 @@ import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingVie
 import { ReactNativeModal as Modal } from 'react-native-modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import Star from '../components/Star';
-import ToggleButton from '../components/ToggleButton';
 
 
 

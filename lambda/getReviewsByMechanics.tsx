@@ -26,10 +26,15 @@ export const handler = async(event) =>{
         TableName: TABLE_NAME
       }));
       const return_results = result.Items.filter((item) => item.mechanicId === event.queryStringParameters.mechanicId);
+      const object = {
+        length : return_results.length,
+        average : return_results.reduce((acc, curr) => acc + curr.rating, 0) / return_results.length,
+        reviews: return_results
+      }
       return {
         statusCode: 200,
         headers: corsHeaders,
-        body: JSON.stringify(return_results)
+        body: JSON.stringify(object)
       }
     }
     else{
