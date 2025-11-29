@@ -209,7 +209,7 @@ const profile = () => {
             )}
           </View>
 
-          <View className="items-center mt-5 mb-10">
+          <View className="items-center mt-5">
             <NormalButton
               onClick={handleSubmit((data) => signupOnClick(data))}
               text="Sign up"
@@ -231,6 +231,17 @@ const profile = () => {
               Sign in
             </Text>
           </View>
+
+          <View className="w-full h-px my-6 bg-stroke" />
+
+          <Pressable
+            onPress={() => router.push('/profile/mechanic/mechanicSignUp')}
+            className="flex items-center"
+          >
+            <Text className="underline text-primaryBlue">
+              Are you a mechanic?
+            </Text>
+          </Pressable>
         </View>
       )
       break
