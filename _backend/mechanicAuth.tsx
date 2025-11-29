@@ -1,6 +1,7 @@
 import {
   CognitoIdentityProvider,
   ConfirmSignUpCommand,
+  InitiateAuthCommand,
   SignUpCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
 
@@ -35,4 +36,30 @@ export async function mechanicConfirmSignUp(email: string, code: string) {
   })
 
   return cognitoClient.send(command)
+}
+
+export async function mechanicSignIn(email: string, password: string) {
+  const command = new InitiateAuthCommand({
+    AuthFlow: 'USER_PASSWORD_AUTH',
+    ClientId: process.env.MECHANIC_CLIENT_ID,
+    AuthParameters: {
+      USERNAME: email,
+      PASSWORD: password,
+    },
+  })
+
+  const response = await cognitoClient.send(command)
+
+  const result = response.AuthenticationResult
+
+  if (!result) return null
+
+  mechanicSession = {
+    accessToken: result.AccessToken,
+    idToken: result.IdToken,
+    refreshToken: result.RefreshToken,
+    username: email,
+  }
+
+  return mechanicSession
 }
