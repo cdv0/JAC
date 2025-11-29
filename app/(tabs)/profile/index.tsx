@@ -12,7 +12,7 @@ import { Hub } from 'aws-amplify/utils'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { JSX, useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { Text, TextInput, View } from 'react-native'
+import { Pressable, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export interface FormData {
@@ -345,6 +345,15 @@ const profile = () => {
 
           {/* hr */}
           <View className="w-full h-px my-6 bg-stroke" />
+
+          <Pressable
+            onPress={() => router.push('/profile/mechanic/mechanicSignIn')}
+            className="flex items-center"
+          >
+            <Text className="underline text-primaryBlue">
+              Are you a mechanic?
+            </Text>
+          </Pressable>
 
           {/* SIGN IN: Sign in with Google */}
           <View className="relative flex-row items-center justify-center mb-10">
