@@ -1,6 +1,7 @@
 import {
   CognitoIdentityProvider,
   ConfirmSignUpCommand,
+  GlobalSignOutCommand,
   InitiateAuthCommand,
   SignUpCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
@@ -62,4 +63,20 @@ export async function mechanicSignIn(email: string, password: string) {
   }
 
   return mechanicSession
+}
+
+export async function mechanicSignOut() {
+  if (mechanicSession.accessToken) {
+    try {
+      await cognitoClient.send(
+        new GlobalSignOutCommand({
+          AccessToken: mechanicSession.accessToken,
+        })
+      )
+    } catch (error) {
+      console.log('Mechanic Sign Out Error: ', error)
+    }
+  }
+
+  mechanicSession = {}
 }
