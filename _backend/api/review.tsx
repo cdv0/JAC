@@ -105,8 +105,7 @@ export async function getSingleReview(
 
   const data = await handleJsonResponse(res);
 
-  // Adjust if your Lambda returns a different shape
-  const r = data.review ?? data; // e.g. { review: {...} } or just {...}
+  const r = data.review ?? data; 
 
   return {
     reviewId: r.ReviewId,
@@ -117,8 +116,6 @@ export async function getSingleReview(
     createdAt: r.CreatedAt,
   };
 }
-
-// @/_backend/api/review.ts
 
 
 export async function getSingleMechanic(
@@ -137,7 +134,6 @@ export async function getSingleMechanic(
 
   const data = await handleJsonResponse(res);
 
-  // Lambda already normalized it
   return data.mechanic;
 }
 
@@ -158,7 +154,7 @@ export async function updateReview(
       reviewId,
       rating,
       review,
-      userId, // also sent in body
+      userId, 
     }),
   });
 
@@ -173,4 +169,24 @@ export async function updateReview(
     review: r.review ?? r.Review,
     createdAt: r.CreatedAt ?? r.createdAt,
   };
+}
+
+export async function deleteReview(userId: string, ReviewId: string) {
+  const res = await fetch(`${BASE_URL}/reviews/deleteReview`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ReviewId: ReviewId,  // PK
+      userId: userId       // SK (lowercase, matches lambda)
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error("Failed to delete review: " + err);
+  }
+
+  return true;
 }

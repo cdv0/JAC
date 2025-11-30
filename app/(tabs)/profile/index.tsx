@@ -12,7 +12,7 @@ import { Hub } from 'aws-amplify/utils'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { JSX, useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { Text, TextInput, View } from 'react-native'
+import { Pressable, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export interface FormData {
@@ -209,7 +209,7 @@ const profile = () => {
             )}
           </View>
 
-          <View className="items-center mt-5 mb-10">
+          <View className="items-center mt-5">
             <NormalButton
               onClick={handleSubmit((data) => signupOnClick(data))}
               text="Sign up"
@@ -231,6 +231,17 @@ const profile = () => {
               Sign in
             </Text>
           </View>
+
+          <View className="w-full h-px my-6 bg-stroke" />
+
+          <Pressable
+            onPress={() => router.push('/profile/mechanic/mechanicSignUp')}
+            className="flex items-center"
+          >
+            <Text className="underline text-primaryBlue">
+              Are you a mechanic?
+            </Text>
+          </Pressable>
         </View>
       )
       break
@@ -346,6 +357,15 @@ const profile = () => {
           {/* hr */}
           <View className="w-full h-px my-6 bg-stroke" />
 
+          <Pressable
+            onPress={() => router.push('/profile/mechanic/mechanicSignIn')}
+            className="flex items-center"
+          >
+            <Text className="underline text-primaryBlue">
+              Are you a mechanic?
+            </Text>
+          </Pressable>
+
           {/* SIGN IN: Sign in with Google */}
           <View className="relative flex-row items-center justify-center mb-10">
             <NormalButton
@@ -412,6 +432,7 @@ const profile = () => {
           // router.push('/profile/logged')
           break
         case 'signInWithRedirect':
+          console.log('User signed in')
           router.push('/profile/logged')
           break
         default:

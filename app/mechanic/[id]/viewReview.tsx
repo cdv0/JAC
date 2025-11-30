@@ -13,9 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { getCurrentUser } from "aws-amplify/auth";
 
-import {
-  getSingleReview,
-  getSingleMechanic,
+import { getSingleReview, getSingleMechanic,
   type Review,
   type Mechanic,
 } from "@/_backend/api/review";
@@ -42,6 +40,7 @@ const ViewReview = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [userId, setUserId] = useState("");
 
   // Header 3-dot menu
   useLayoutEffect(() => {
@@ -77,6 +76,7 @@ const ViewReview = () => {
         setErrorMsg(null);
 
         const { userId } = await getCurrentUser();
+        setUserId(userId); 
         console.log("ViewReview: userId, mechanicId, reviewId", {
           userId,
           mechanicId,
@@ -122,18 +122,22 @@ const ViewReview = () => {
     if (!mechanicId || !reviewId) return;
 
     router.push({
-      pathname: "/mechanic/[id]/updateReview", 
-      params: {
+      pathname: "/mechanic/[id]/updateReview",
+      params: { 
         id: mechanicId,
-        reviewId,
+        reviewId: reviewId,
+        userId: userId
       },
     });
   };
 
   const handleDeleteReview = () => {
     setMenuVisible(false);
-    // TODO: wire up delete API + confirm dialog
-    console.log("Delete review pressed", { mechanicId, reviewId });
+    console.log ("id", mechanicId, "reviewId", reviewId, "userid:", userId)
+    router.push({
+      pathname: "/mechanic/[id]/deleteReview",
+      params: { id: mechanicId, reviewId, userId: userId },
+    });
   };
 
   if (loading) {
@@ -181,7 +185,7 @@ const ViewReview = () => {
               >
                 {/* Use whatever icon you prefer; link/pencil etc. */}
                 <icons.pencil width={16} height={16} />
-                <Text className="smallTitle">Update review</Text>
+                <Text className="smallTitle">Update reviews</Text>
               </Pressable>
 
               {/* Divider */}
