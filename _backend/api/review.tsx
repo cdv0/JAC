@@ -13,10 +13,20 @@ export type Review = {
 
 
 export type Mechanic = {
-  mechanicId: string;
+  Phone: string;
+  Hours: string[];
+  Review: number;      
+  Website: string;
+  ImageId: string;
+  mechanicID: string;
+  address: string;
+  lat: number | null;
+  lon: number | null;
+  Services: string;
   name: string;
-  address?: string;
-  imageUri?: string;
+  Certified: boolean;
+  imageKey?: string | null;
+  Image?: string | null;  
 };
 
 export type UpdatedReview = {
@@ -189,4 +199,95 @@ export async function deleteReview(userId: string, ReviewId: string) {
   }
 
   return true;
+}
+
+export async function getAllMechanics(): Promise<Mechanic[]> {
+  const res = await fetch(`${BASE_URL}/mechanics/getMechanics`, {
+    method: "GET",
+  });
+
+  const raw = await handleJsonResponse(res);
+
+  // Case 1: API Gateway already unwrapped the Lambda body:
+  //   raw = { message, count, data: [...] }
+  if (raw && Array.isArray(raw.data)) {
+    return raw.data as Mechanic[];
+  }
+
+  // Case 2: You somehow get { statusCode, body: "<json string>" }
+  if (raw && typeof raw.body === "string") {
+    try {
+      const inner = JSON.parse(raw.body);
+      return (inner.data ?? []) as Mechanic[];
+    } catch (e) {
+      console.warn("Failed to parse inner body from Lambda:", e, raw.body);
+    }
+  }
+
+  return [];
+}
+
+export async function getMechanicById(
+  mechanicId: string
+): Promise<Mechanic | null> {
+  const mechanics = await getAllMechanics();
+  const found = mechanics.find(
+    (m: any) => m.mechanicID === mechanicId || m.mechanicId === mechanicId
+  );
+  return (found as Mechanic) ?? null;
+}
+
+
+export async function getReviewsByMechanic(mechanicId: string): Promise<{
+  length: number;
+  average: number;
+  reviews: any[];
+}> {
+  const res = await fetch(
+    `${BASE_URL}/reviews/getReviewsByMechanic?mechanicId=${encodeURIComponent(
+      mechanicId
+    )}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  const text = await res.text();
+  let data: any = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (e) {
+    console.warn("Failed to parse JSON response (reviews):", e, text);
+  }
+
+  if (!res.ok) {
+    const msg =
+      data?.message ||
+      `Request failed with status ${res.status} ${res.statusText}`;
+    throw new Error(msg);
+  }
+
+  // Handle both shapes: { length, average, reviews } OR { body: "<string>" }
+  if (data && typeof data.body === "string" && data.reviews === undefined) {
+    try {
+      const inner = JSON.parse(data.body);
+      return {
+        length: inner.length ?? 0,
+        average: inner.average ?? 0,
+        reviews: inner.reviews ?? [],
+      };
+    } catch (e) {
+      console.warn("Failed to parse inner reviews body:", e, data.body);
+    }
+  }
+
+  return {
+    length: data.length ?? 0,
+    average: data.average ?? 0,
+    reviews: data.reviews ?? [],
+  };
 }

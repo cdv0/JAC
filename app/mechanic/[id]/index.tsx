@@ -2,7 +2,7 @@ import { readUserProfile } from '@/_backend/api/profile';
 import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,30 +11,33 @@ import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 import NormalButton from '@/app/components/NormalButton';
 import TimeConverter from '@/app/components/TimeConverter';
 import ViewReviews from '@/app/components/ViewReviews';
-import { router } from 'expo-router'
+import { getMechanicById, getReviewsByMechanic } from '@/_backend/api/review';
+
 
 
 
 interface MechanicViewProps {
-    mechanicID: string,
-    name: string,
-    Certified:boolean,
-    Review: string,
-    Image: string,
-    Services: string,
-    Hours: string[],
-    address: string,
-    Website: string,
-    Phone: string,
-    lat:number,
-    lon:number
-    
+  mechanicID: string;
+  name: string;
+  Certified: boolean;
+  Review: number;
+  Image: string;
+  Services: string;
+  Hours: string[];
+  address: string;
+  Website: string;
+  Phone: string;
+  lat: number;
+  lon: number;
 }
 
-type ReviewProps ={
-    MechanicId:string,
-    Rating: number,
-}
+type ReviewProps = {
+  ReviewId: string;
+  MechanicId: string;
+  Rating: number;
+  Review: string;
+  UserId: string;
+};
 
 const Details = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -81,67 +84,113 @@ const Details = () => {
 
   const [query, setQuery] = useState('');
   useEffect(() => {
-            const data = async () => {
-                try {
-                    const file = await fetch("/local/dummy/data2.json");
-                    const mechanicsData = await file.json();
-                    const found = JSON.parse(mechanicsData.body).data.find((x:MechanicViewProps) =>x.mechanicID ===id)
-                    setMechanic(found|| null)
-                    if (!mechanic){
-                      const file2 = await fetch("/local/dummy/review.json");
-                      const reviewData = await file2.json();
-                      const reviews = JSON.parse(reviewData.body).filter((x:ReviewProps) =>x.MechanicId === id) as ReviewProps[]
-                      setReviews(reviews || [])     
-                      let sum = 0;
-                      reviews.forEach(x=>{
-                          sum+=x.Rating
-                      })
-                      setreviewAVG(sum/reviews.length)  
-                  }
-                    
-                } catch (error) {
-                    console.error("Error loading mechanics data:", error);
-                }
-                finally{
-                  setLoading(false)
-                }
-            }
-            data();
-        }, [id]);
-  
-  
-  if (loading){
-    return(
-      <View className='flex-1 items-center justify-center'>
+    const fetchData = async () => {
+      if (!id) {
+        setMechanic(null);
+        setReviews([]);
+        setreviewAVG(0);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        // 1. Mechanic details
+        console.log("id", id)
+        const mech = await getMechanicById(String(id));
+        setMechanic(mech as any);
+
+        // 2. Reviews for this mechanic
+        const { reviews: backendReviews, average } = await getReviewsByMechanic(
+          String(id)
+        );
+
+        setReviews(
+          backendReviews.map((r: any) => ({
+            ReviewId: r.ReviewId ?? r.reviewId,
+            MechanicId: r.MechanicId ?? r.mechanicId,
+            Rating: Number(r.Rating ?? r.rating ?? 0),
+            Review: r.Review ?? r.review ?? '',
+            UserId: r.UserId ?? r.userId,
+          }))
+        );
+
+        if (backendReviews.length > 0) {
+          // Prefer backend average, fallback to computed
+          const avg =
+            typeof average === 'number' && !Number.isNaN(average)
+              ? average
+              : backendReviews.reduce(
+                  (acc: number, r: any) =>
+                    acc + Number(r.Rating ?? r.rating ?? 0),
+                  0
+                ) / backendReviews.length;
+
+          setreviewAVG(avg as Float);
+        } else {
+          setreviewAVG(0);
+        }
+      } catch (error) {
+        console.error('Error loading mechanic/reviews:', error);
+        setMechanic(null);
+        setReviews([]);
+        setreviewAVG(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
       </View>
-    )
-  }
-  else if(!mechanic){
+    );
+  } else if (!mechanic) {
     return (
-      <View>
-        <Text>
-          {id} could not be found
-        </Text>
+      <View className="flex-1 items-center justify-center">
+        <Text>{id} could not be found</Text>
       </View>
-    )
-  }
-  else{
-    const servicesData = mechanic.Services.split(',').map( (item:string) => item.trim());
-    const condition = (mechanic.Hours.length > 0) || (mechanic.address != '') || (mechanic.Website != '') || (mechanic.Phone !='');
-    const temp = reviews.reduce((acc, curr)=>{
-                        const val = String(Math.round(curr['Rating']))
-                        acc[val] = (acc[val] || 0) + 1
-                        return acc
-                      }, {'1': 0,'2': 0,'3': 0,'4': 0,'5': 0,} as Record<string, number>);
+    );
+  } else {
+    const servicesData = mechanic.Services.split(',').map((item: string) =>
+      item.trim()
+    );
+    const condition =
+      (mechanic.Hours?.length ?? 0) > 0 ||
+      mechanic.address !== '' ||
+      mechanic.Website !== '' ||
+      mechanic.Phone !== '';
+
+    // Histogram buckets
+    const temp = reviews.reduce(
+      (acc, curr) => {
+        const ratingNum = Number(curr.Rating ?? 0);
+        const val = String(Math.round(ratingNum));
+        acc[val] = (acc[val] || 0) + 1;
+        return acc;
+      },
+      { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } as Record<string, number>
+    );
+
     const sortedTemp = Object.keys(temp)
-    .sort((a, b) => Number(b) - Number(a)) // Sort keys numerically
-    .reduce((acc, key) => {
+      .sort((a, b) => Number(b) - Number(a))
+      .reduce((acc, key) => {
         acc[key] = temp[key];
         return acc;
-    }, {} as Record<string, number>)
-    
-    const filterReviews = query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews;
+      }, {} as Record<string, number>);
+
+    // Search filter
+    const filterReviews =
+      query !== ''
+        ? reviews.filter((x) =>
+            x.Review.toLowerCase().includes(query.toLowerCase())
+          )
+        : reviews;
+
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
         <KeyboardAvoidingView className='flex-1' behavior='padding' keyboardVerticalOffset={100}>
@@ -303,19 +352,40 @@ const Details = () => {
                 <NormalButton text='Filter' onClick={()=> {}}/>
               </View>
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
-                <FlatList
+              <FlatList
                 data={filterReviews}
-                renderItem={({item})=><ViewReviews {... item}/>}
+                renderItem={({ item }) => (
+                  <Pressable
+                    onPress={() =>
+                      router.push({
+                        pathname: "/mechanic/[id]/viewOtherUser",
+                        params: {
+                          // required because the file is in [id]
+                          id: String(id),
+
+                          // extras you might want in viewOtherUser
+                          reviewId: item.ReviewId,
+                          mechanicId: item.MechanicId,
+                          // userId: item.UserId, // add this if you have it
+                        },
+                      })
+                    }
+                  >
+                    <ViewReviews {...item} />
+                  </Pressable>
+                )}
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{gap:10}}
-                ListEmptyComponent={<Text className='self-center buttonTextBlack'>No Reviews Available</Text>}
+                contentContainerStyle={{ gap: 10 }}
+                ListEmptyComponent={
+                  <Text className="self-center buttonTextBlack">
+                    No Reviews Available
+                  </Text>
+                }
                 scrollEnabled={false}
-                keyExtractor={(item)=>item.ReviewId}
+                keyExtractor={(item) => item.ReviewId}
                 extraData={query}
-                />
-              </View>
-              
-                    
+              />
+              </View>      
         </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
