@@ -424,12 +424,6 @@ export default function Index() {
                      x.Rating = response?.average ?? 0;
                      x.Review = response?.length ?? 0;
                   })     
-                  if (temp){
-                      // const file2 = await fetch(process.env['EXPO_PUBLIC_GET_REVIEWS_URL'] as string);
-                      const file2 = await fetch("/local/dummy/review2.json");
-                      const reviewData = await file2.json();
-                      setReviews(reviewData || [])     
-                  }
                   setMechanics(temp);
           
               } catch (error) {

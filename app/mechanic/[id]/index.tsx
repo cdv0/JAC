@@ -93,6 +93,7 @@ const Details = () => {
     }
   }
 
+  
   useEffect(() => {
             const data = async () => {
                 try {
