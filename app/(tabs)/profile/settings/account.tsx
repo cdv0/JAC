@@ -49,20 +49,6 @@ export default function Account() {
                 <Text className="xsText">
                   {firstName} {lastName}
                 </Text>
-                {/* <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 2 28 28"
-                  stroke-width="2.5"
-                  stroke="currentColor"
-                  className="w-6 h-6 font-extrabold text-textBlack"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                  />
-                </svg> */}
                 <ChevronRightIcon size={28} color="#000" />
               </View>
             </Pressable>
@@ -76,20 +62,6 @@ export default function Account() {
               <Text className="font-semibold text-textBlack">Email</Text>
               <View className="flex-row gap-3">
                 <Text className="xsText">{email}</Text>
-                {/* <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 2 28 28"
-                  stroke-width="2.5"
-                  stroke="currentColor"
-                  className="w-6 h-6 font-extrabold text-textBlack"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                  />
-                </svg> */}{' '}
                 <ChevronRightIcon size={28} color="#000" />
               </View>
             </Pressable>
@@ -105,24 +77,16 @@ export default function Account() {
               <Text className="font-semibold text-textBlack">Password</Text>
               <View className="flex-row gap-3">
                 <Text className="xsText">*********</Text>
-                {/* <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 2 28 28"
-                  stroke-width="2.5"
-                  stroke="currentColor"
-                  className="w-6 h-6 font-extrabold text-textBlack"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                  />
-                </svg> */}
                 <ChevronRightIcon size={28} color="#000" />
               </View>
             </Pressable>
           </View>
+
+          <Pressable className="mt-10 border-2 border-black">
+            <Text className="text-lg font-extrabold text-dangerBrightRed">
+              Delete Account
+            </Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>

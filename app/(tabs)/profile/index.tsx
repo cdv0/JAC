@@ -42,7 +42,8 @@ const profile = () => {
     const { nextStep, userId } = await registerHandler(
       data.name,
       data.email,
-      data.password
+      data.password,
+      'User'
     )
 
     if (nextStep === 'CONFIRM_SIGN_UP') {

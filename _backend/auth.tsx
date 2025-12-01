@@ -38,7 +38,8 @@ export const ensureSignedOut = async () => {
 export const registerHandler = async (
   name: string,
   email: string,
-  password: string
+  password: string,
+  userType?: string
 ) => {
   const { isSignUpComplete, userId, nextStep } = await signUp({
     username: email,
@@ -46,6 +47,7 @@ export const registerHandler = async (
     options: {
       userAttributes: {
         name: name,
+        locale: userType,
       },
     },
   })
