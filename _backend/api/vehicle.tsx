@@ -117,3 +117,19 @@ export async function getVehicleImage(userId: string, vehicleId: string) {
 
     return dataUrl;
 }
+
+// DELETE /vehicle/deleteVehicle
+export async function deleteVehicle (payload: {userId: string, vehicleId: string}) {
+  const response = await fetch(`${BASE_URL}/vehicle/deleteVehicle`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
+
+  return (text ? JSON.parse(text) : {}) as { message: string; vehicleId: string };
+}
