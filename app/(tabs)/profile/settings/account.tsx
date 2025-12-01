@@ -1,16 +1,19 @@
-import { readUserProfile } from '@/_backend/api/profile'
+import { deleteAccount, readUserProfile } from '@/_backend/api/profile'
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { ChevronRightIcon } from 'react-native-heroicons/outline'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import NormalButton from '../../../components/NormalButton'
 
 export default function Account() {
   const [firstName, setFirstName] = useState<string>('')
   const [lastName, setLastName] = useState<string>('')
   const [createdAt, setCreatedAt] = useState<string>('')
+  const [userId, setUserId] = useState<string>('')
   const [email, setEmail] = useState<string>('')
+  const [deleteAccountModal, setDeleteAccountModal] = useState<boolean>(false)
 
   useEffect(() => {
     ;(async () => {
@@ -28,6 +31,7 @@ export default function Account() {
         setLastName(userData.lastName ?? '')
         setEmail(attrs.email ?? '')
         setCreatedAt(attrs.createdAt ?? '')
+        setUserId(attrs.sub ?? '')
       } catch (e: any) {
         console.log('Account: Error loading user data:', e)
         console.log('Account: Error message:', e.message)
@@ -35,18 +39,50 @@ export default function Account() {
     })()
   }, [firstName, lastName])
 
+  const deleteAccountHandler = async () => {
+    // call lambda to delete content from DB
+    console.log('Deleting Account')
+
+    const result = await deleteAccount(userId, email)
+  }
+
   return (
     <SafeAreaView className="flex-col" edges={['top', 'bottom']}>
       <View className="flex-col justify-start">
-        <View className="h-full px-2 pt-3">
-          <View className="bg-white rounded-xl">
+        <View className="flex items-center h-full px-2">
+          {deleteAccountModal && (
+            <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 border-black rounded-xl">
+              <Text className="text-4xl font-extrabold text-center text-black ">
+                Delete Account
+              </Text>
+              <Text className="w-full text-xl text-center text-dangerDarkRed">
+                Are you sure you want to delete your account?
+              </Text>
+
+              <View className="flex flex-row gap-8">
+                <NormalButton
+                  text="Cancel"
+                  onClick={() => setDeleteAccountModal(false)}
+                  variant="outline"
+                />
+
+                <NormalButton
+                  text="Confirm"
+                  onClick={deleteAccountHandler}
+                  variant="danger"
+                />
+              </View>
+            </View>
+          )}
+
+          <View className="flex w-full gap-6 bg-white rounded-xl">
             <Pressable
               className="flex-row justify-between px-5 pt-5 pb-3"
               onPress={() => router.push('/profile/settings/editName')}
             >
               <Text className="font-semibold text-textBlack">Name</Text>
               <View className="flex-row gap-3">
-                <Text className="xsText">
+                <Text className=" smallText">
                   {firstName} {lastName}
                 </Text>
                 <ChevronRightIcon size={28} color="#000" />
@@ -61,7 +97,7 @@ export default function Account() {
             >
               <Text className="font-semibold text-textBlack">Email</Text>
               <View className="flex-row gap-3">
-                <Text className="xsText">{email}</Text>
+                <Text className="smallText">{email}</Text>
                 <ChevronRightIcon size={28} color="#000" />
               </View>
             </Pressable>
@@ -76,14 +112,17 @@ export default function Account() {
             >
               <Text className="font-semibold text-textBlack">Password</Text>
               <View className="flex-row gap-3">
-                <Text className="xsText">*********</Text>
+                <Text className="smallText">*********</Text>
                 <ChevronRightIcon size={28} color="#000" />
               </View>
             </Pressable>
           </View>
 
-          <Pressable className="mt-10 border-2 border-black">
-            <Text className="text-lg font-extrabold text-dangerBrightRed">
+          <Pressable
+            className="items-center mt-10 "
+            onPress={() => setDeleteAccountModal(true)}
+          >
+            <Text className="p-2 text-lg font-extrabold text-white border-2 border-secondary bg-dangerBrightRed rounded-xl">
               Delete Account
             </Text>
           </Pressable>
