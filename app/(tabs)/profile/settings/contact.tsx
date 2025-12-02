@@ -1,29 +1,52 @@
 import NormalButton from '@/app/components/NormalButton';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Alert, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { sendContactEmail } from '@/_backend/api/profile';
 
 export default function Contact() {
   const[Name, setName] = useState('')
   const[Email, setEmail] = useState('')
   const[Message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const submitForm = () => {
+
+  const submitForm = async () => {
     setSubmitted(true);
 
     if (!Name.trim() || !Email.trim() || !Message.trim()) {
     return;
     }
-    let formData = {
-      Name: Name,
-      Email: Email,
-      Message: Message,
+    const formData = {
+      Name,
+      Email,
+      Message,
+    };
+    console.log('Contact form submitted (frontend):', formData);
+
+    try {
+      setLoading(true);
+      const payload = {
+        name: Name,
+        email: Email,
+        message: Message,
+      };
+      console.log('Sending payload to API:', payload);
+      await sendContactEmail(payload);
+
+      router.push('/(tabs)/profile/settings/contactConfirm');
+    } catch (error: any) {
+      console.error('Error sending contact email:', error);
+      Alert.alert(
+        'Error',
+        error?.message || 'Something went wrong while sending your message.'
+      );
+    } finally {
+      setLoading(false);
     }
-    console.log('Contact form submitted:', formData)
-    router.push('/(tabs)/profile/settings/contactConfirm');
-  }
+  };
 
   //Check for empty input upon submission
   const isNameInvalid = submitted && !Name.trim();
@@ -35,12 +58,12 @@ export default function Contact() {
       <View className="rounded-xl px-5 pt-3 pb-5 gap-3 mt-3 mx-3">
         <View className="gap-2">
                     <View className="flex-1 flex-row">
-                      <Text className="font-semibold text-textBlack">Name</Text>
+                      <Text className="font-semibold text-textBlack" >Name</Text>
                       <Text className="dangerText"> *</Text>
                     </View>
                     <TextInput
                       value={Name}
-                      placeholder="Type here"
+                      placeholder="Name"
                       keyboardType="default"
                       onChangeText={setName}
                       className={`border rounded-full px-4 py-2 smallTextGray ${isNameInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
@@ -58,7 +81,7 @@ export default function Contact() {
                     </View>
                     <TextInput
                       value={Email}
-                      placeholder="Type here"
+                      placeholder="Email"
                       keyboardType="default"
                       onChangeText={setEmail}
                       className={`border rounded-full px-4 py-2 smallTextGray ${isEmailInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
@@ -78,7 +101,7 @@ export default function Contact() {
                       value={Message}
                       multiline = { true }
                       numberOfLines = { 6 }
-                      placeholder="Type here"
+                      placeholder="Message"
                       keyboardType="default"
                       onChangeText={setMessage}
                       className={`border rounded-xl px-4 py-2 smallTextGray ${isMessageInvalid ? "border-dangerBrightRed" : "border-stroke"}`}
@@ -89,13 +112,13 @@ export default function Contact() {
                       <Text className="dangerText mx-2">Message is required</Text>
                     ): null}
                   </View>
-          <View className="pt-5">
-            <NormalButton
-              variant="primary"
-              text="Submit"
-              onClick= {submitForm}
-            ></NormalButton>
-          </View>
+                  <View className="pt-5">
+          <NormalButton
+            variant="primary"
+            text={loading ? 'Sending...' : 'Submit'}
+            onClick={submitForm}
+          />
+        </View>
         </View>
     </SafeAreaView>
     )

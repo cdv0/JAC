@@ -360,13 +360,9 @@ const Details = () => {
                       router.push({
                         pathname: "/mechanic/[id]/viewOtherUser",
                         params: {
-                          // required because the file is in [id]
                           id: String(id),
-
-                          // extras you might want in viewOtherUser
                           reviewId: item.ReviewId,
                           mechanicId: item.MechanicId,
-                          // userId: item.UserId, // add this if you have it
                         },
                       })
                     }
