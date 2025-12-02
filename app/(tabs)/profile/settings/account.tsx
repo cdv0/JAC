@@ -1,5 +1,10 @@
 import { deleteAccount, readUserProfile } from '@/_backend/api/profile'
-import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth'
+import {
+  deleteUser,
+  fetchUserAttributes,
+  getCurrentUser,
+  signOut,
+} from 'aws-amplify/auth'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
@@ -14,6 +19,7 @@ export default function Account() {
   const [userId, setUserId] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [deleteAccountModal, setDeleteAccountModal] = useState<boolean>(false)
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<boolean>(false)
 
   useEffect(() => {
     ;(async () => {
@@ -43,6 +49,19 @@ export default function Account() {
     // call lambda to delete content from DB
 
     const result = await deleteAccount(userId, email)
+
+    try {
+      setDeleteAccountModal(false)
+      await deleteUser()
+      setDeleteConfirmModal(true)
+
+      await new Promise((r) => setTimeout(r, 3000))
+
+      await signOut()
+      router.push('/(tabs)/profile')
+    } catch (error) {
+      console.error('Unable to delete user: ', error)
+    }
   }
 
   return (
@@ -71,6 +90,13 @@ export default function Account() {
                   variant="danger"
                 />
               </View>
+            </View>
+          )}
+          {deleteConfirmModal && (
+            <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 rounded-xl border-stroke">
+              <Text className="text-center text-black largeTitle ">
+                User Data Deleted
+              </Text>
             </View>
           )}
 
