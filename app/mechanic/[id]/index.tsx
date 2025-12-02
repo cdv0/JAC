@@ -5,14 +5,13 @@ import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { ReactNativeModal as Modal } from 'react-native-modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import NormalButton from '../components/NormalButton';
-import Star from '../components/Star';
-import TimeConverter from '../components/TimeConverter';
-import ToggleButton from '../components/ToggleButton';
-import ViewReviews from '../components/ViewReviews';
+import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
+import NormalButton from '@/app/components/NormalButton';
+import TimeConverter from '@/app/components/TimeConverter';
+import ViewReviews from '@/app/components/ViewReviews';
+import { router } from 'expo-router'
 
 
 
@@ -27,13 +26,14 @@ interface MechanicViewProps {
     address: string,
     Website: string,
     Phone: string,
-    Location:string[],
+    lat:number,
+    lon:number
     
 }
 
 type ReviewProps ={
-    mechanicId:string,
-    rating: number,
+    MechanicId:string,
+    Rating: number,
 }
 
 const Details = () => {
@@ -41,7 +41,7 @@ const Details = () => {
  
   const [mechanic, setMechanic] = useState<any>(null);
   const[reviews, setReviews] = useState<any[]>([])
-  const [reviewAVG, setreviewAVG] = useState<number>(0);
+  const [reviewAVG, setreviewAVG] = useState<Float>(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(false);
 
@@ -80,34 +80,21 @@ const Details = () => {
   }, []);
 
   const [query, setQuery] = useState('');
-  const [visible, setVisible] = useState(false);
-  const [Verified, setVerified] = useState(false);
-  const [choice, setChoice] = useState("");
-
-  const handleChoice = (flag:boolean, choice:string)=>{
-    if (flag){
-      setChoice(choice)
-    }
-    else{
-      setChoice('')
-    }
-  }
-
   useEffect(() => {
             const data = async () => {
                 try {
-                    const file = await fetch("/local/dummy/mechanics2.json")
+                    const file = await fetch("/local/dummy/data2.json");
                     const mechanicsData = await file.json();
-                    const found = mechanicsData.data.find((x:MechanicViewProps) =>x.mechanicID ===id)
+                    const found = JSON.parse(mechanicsData.body).data.find((x:MechanicViewProps) =>x.mechanicID ===id)
                     setMechanic(found|| null)
-                    if (found){
-                      const file2 = await fetch("/local/dummy/review2.json");
+                    if (!mechanic){
+                      const file2 = await fetch("/local/dummy/review.json");
                       const reviewData = await file2.json();
-                      const reviews = reviewData.filter((x:ReviewProps) =>x.mechanicId === id) as ReviewProps[]
+                      const reviews = JSON.parse(reviewData.body).filter((x:ReviewProps) =>x.MechanicId === id) as ReviewProps[]
                       setReviews(reviews || [])     
                       let sum = 0;
                       reviews.forEach(x=>{
-                          sum+=x.rating
+                          sum+=x.Rating
                       })
                       setreviewAVG(sum/reviews.length)  
                   }
@@ -143,7 +130,7 @@ const Details = () => {
     const servicesData = mechanic.Services.split(',').map( (item:string) => item.trim());
     const condition = (mechanic.Hours.length > 0) || (mechanic.address != '') || (mechanic.Website != '') || (mechanic.Phone !='');
     const temp = reviews.reduce((acc, curr)=>{
-                        const val = String(Math.round(curr['rating']))
+                        const val = String(Math.round(curr['Rating']))
                         acc[val] = (acc[val] || 0) + 1
                         return acc
                       }, {'1': 0,'2': 0,'3': 0,'4': 0,'5': 0,} as Record<string, number>);
@@ -154,19 +141,7 @@ const Details = () => {
         return acc;
     }, {} as Record<string, number>)
     
-    const searchReviews = query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews;
-    const applyFilter = () =>{
-      const temp =searchReviews
-      if (choice ==''){
-        return temp
-      }
-      else if (choice =='5')
-        return temp.filter(x=> x.rating == Number(choice))
-      else{
-        const bound = Number(choice)
-        return temp.filter(x=> bound<=x.rating && x.rating<bound + 1)
-      }
-    }
+    const filterReviews = query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews;
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
         <KeyboardAvoidingView className='flex-1' behavior='padding' keyboardVerticalOffset={100}>
@@ -179,7 +154,7 @@ const Details = () => {
                       <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
                       <View className='flex-row'>
                         <Text className='buttonTextBlack'>Ratings: </Text>
-                        <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
+                        <StarRatingDisplay color={'black'} starSize={16} starStyle={{width:4}} style={{ alignItems:'center'}} rating={reviewAVG}/>
                       </View>
                       <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
                   </View>
@@ -223,9 +198,9 @@ const Details = () => {
                             <Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Address: <Text className='buttonTextBlue'>{mechanic.address} </Text>
                           </Text>
                           </View>
-                          {mechanic.Location && <Pressable onPress={()=>Linking.openURL(`https://google.com/maps/search/?api=1&query=${mechanic.Location[0]},${mechanic.Location[1]}&force_browser=true`)}>
+                          <Pressable onPress={()=>Linking.openURL(`https://google.com/maps/search/?api=1&query=${mechanic.lat},${mechanic.lon}&force_browser=true`)}>
                             <icons.start width={20} height={20}/>
-                          </Pressable>}
+                          </Pressable>
                         </View>)}
                     {mechanic.Hours.length > 0 && 
                       (      
@@ -274,7 +249,7 @@ const Details = () => {
                           ? `${ displayName || 'no_name'}`
                           : 'Want to add a review?'}
                       </Text>
-                      <StarRatingDisplay rating={0} StarIconComponent={Star} color='black' starSize={20}/>
+                      <StarRatingDisplay rating={0} color='black' starSize={20}/>
                 </View>
                 <View className='flex-1 justify-center'>
                   <NormalButton text= {isAuthenticated ? 'Post a review' : 'Log in'} 
@@ -294,11 +269,11 @@ const Details = () => {
                 
               </View>
               
-              <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%]'>
-                <View className='items-center justify-center gap-[5] mx-[10]'>
-                  <Text className='buttonTextBlack text-2xl'>{reviewAVG?reviewAVG.toFixed(1):0}</Text>
-                  <StarRatingDisplay rating={reviewAVG} color='black'  StarIconComponent={Star}  starSize={18} />
-                  <Text className='buttonTextBlack text-l'>{reviews.length} reviews</Text>
+              <View className='w-[95%] bg-white rounded-xl self-center flex-row py-[5%] gap-2'>
+                <View className='items-center justify-center gap-[5]'>
+                  <Text className='buttonTextBlack'>{reviewAVG?reviewAVG.toFixed(1):0}</Text>
+                  <StarRatingDisplay rating={reviewAVG} color='black' starSize={15}/>
+                  <Text className='buttonTextBlack'>{reviews.length} reviews</Text>
                 </View>
                 <View className='items-center justify-center flex-1 mr-[2%]'> 
 
@@ -325,11 +300,11 @@ const Details = () => {
                     <icons.search/>
                     <TextInput className='w-[50%]'value={query} onChangeText={(newf) =>{setQuery(newf)}}/>
                 </View>
-                <NormalButton text='Filter' onClick={()=> {setVisible(true)}}/>
+                <NormalButton text='Filter' onClick={()=> {}}/>
               </View>
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
                 <FlatList
-                data={applyFilter()}
+                data={filterReviews}
                 renderItem={({item})=><ViewReviews {... item}/>}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{gap:10}}
@@ -340,35 +315,6 @@ const Details = () => {
                 />
               </View>
               
-              {/*Review Filter page*/}
-              <Modal isVisible={visible} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => setVisible(false)}
-                backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'flex-end', margin:0}}>
-                  <View className='w-[40%] h-[70%] flex-row items-center'>
-                      <Pressable className="w-[20px] h-[40px] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black" onPress={()=>setVisible(false)}>
-                        <Text className='text-2xl text-bold buttonTextBlack'>
-                          {">"}
-                        </Text>
-                      </Pressable>
-                      <View className='bg-white flex-1 h-full rounded-l-xl justify-around items-center border border-black'>
-                        <View className='w-full border-b border-stroke'>
-                          <Text className='buttonTextBlack self-center text-2xl'>
-                            Filters
-                          </Text>
-                        </View>
-                        
-                          <ToggleButton flag={Verified}  onPress={(newf)=>{setVerified(newf)}} text="Verified"/>
-
-                        <View className='w-full items-center border-t pt-[10%] border-stroke'>
-                          <ToggleButton flag={choice == '5'}   onPress={(newf)=>{handleChoice(newf, '5')}} text="5 stars"/>
-                        </View>                      
-                        <ToggleButton flag={choice == '4'}   onPress={(newf)=>{handleChoice(newf, '4')}} text="4 stars"/> 
-                        <ToggleButton flag={choice == '3'}   onPress={(newf)=>{handleChoice(newf, '3')}} text="3 stars"/>   
-                        <ToggleButton flag={choice == '2'}  onPress={(newf)=>{handleChoice(newf, '2')}} text="2 stars"/> 
-                        <ToggleButton flag={choice == '1'}  onPress={(newf)=>{handleChoice(newf, '1')}} text="1 star"/>     
-                      </View>
-                  </View>
-                    
-              </Modal>
                     
         </ScrollView>
         </KeyboardAvoidingView>
