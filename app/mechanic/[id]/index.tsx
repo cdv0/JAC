@@ -130,6 +130,7 @@ const Details = () => {
             Rating: Number(r.Rating ?? r.rating ?? 0),
             Review: r.Review ?? r.review ?? '',
             UserId: r.UserId ?? r.userId,
+            CreatedAt: r.CreatedAt ?? r.createdAt,
           }))
         );
 
