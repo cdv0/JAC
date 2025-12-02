@@ -434,10 +434,17 @@ export default function Index() {
                   const temp =  mechanicsData.data
                   temp.forEach(async (x:Mechanics)=>{
                      x.Services = x.Services.toLowerCase()
-                     const data = await fetch((process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) + `?mechanicId=${x.mechanicID}`)
-                     const response = await data.json();
-                     x.Rating = response?.average ?? 0;
-                     x.Review = response?.length ?? 0;
+                     try{
+                      const data = await fetch((process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) + `?mechanicId=${x.mechanicID}`)
+                      const response = await data.json();
+                      x.Rating = response?.average ?? 0;
+                      x.Review = response?.length ?? 0;
+                     }
+                     catch{
+                      x.Rating = 0;
+                      x.Review = 0;
+                     }
+                    
                   })     
                   setMechanics(temp);
           
