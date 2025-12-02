@@ -46,3 +46,34 @@ export async function updateName(userId: string, email: string, firstName: strin
   if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
   return JSON.parse(text); 
 }
+
+export async function sendContactEmail(payload: {
+  name: string;
+  email: string;
+  message: string;
+}) {
+  console.log('Calling contact API at:', `${BASE_URL}/profile/sendContactEmail`);
+
+  const res = await fetch(`${BASE_URL}/profile/sendContactEmail`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {
+    // ignore
+  }
+
+  if (!res.ok) {
+    const message =
+      data?.error ||
+      data?.message ||
+      `Request failed with status ${res.status}`;
+    throw new Error(message);
+  }
+
+  return data;
+}
