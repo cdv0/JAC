@@ -2,14 +2,14 @@ import { Text, View } from 'react-native'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import Star from './Star'
 type ReviewProps ={
-    rating: number,
-    review: String,
-    userId: string,
-    createdAt: string
+    Rating: number,
+    Review: String,
+    UserId: string,
+    CreatedAt: string
 }
-const ViewReviews = ({rating, review, userId, createdAt}:ReviewProps) => {
+const ViewReviews = ({Rating, Review, UserId, CreatedAt}:ReviewProps) => {
 
-  const time = new Date(createdAt)
+  const time = new Date(CreatedAt)
   const options = {
     year: 'numeric',
     month: '2-digit',
@@ -32,20 +32,20 @@ const ViewReviews = ({rating, review, userId, createdAt}:ReviewProps) => {
         <View className='w-full'>
           <View className='ml-5'>
             <Text className='ml-2 buttonTextBlack'>
-              User {userId}
+              User {UserId}
             </Text>
             <Text className='ml-2 buttonTextBlack'>
               {formattedDate}
             </Text>
             {/*todo: Fix inconsisent star sizes */}
 
-            <StarRatingDisplay color={'black'} starSize={18} StarIconComponent={Star} starStyle={{marginHorizontal:-1}} style={{ alignItems:'center'}} rating={rating}/>
+            <StarRatingDisplay color={'black'} starSize={18} StarIconComponent={Star} starStyle={{marginHorizontal:-1}} style={{ alignItems:'center'}} rating={Rating}/>
           </View>
         </View>
           
       </View>
       <Text className='buttonTextBlack mx-5 mt-5'>
-        {review}
+        {Review}
       </Text>
     </View>
   )
