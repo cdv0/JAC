@@ -7,6 +7,8 @@ export type File = {
     name: string;
     size: number;
     mimeType: string | null;
+    userId?: string;
+    email?: string;
 }
 
 // IMAGE CONDITIONS
@@ -49,9 +51,11 @@ export async function uploadProfilePicture(payload: File) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-        fileName: payload.name,
-        fileContent: base64,
-        contentType: payload.mimeType,
+      fileName: payload.name,
+      fileContent: base64,
+      contentType: payload.mimeType,
+      userId: payload.userId,
+      email: payload.email,
     }),
   });
 
