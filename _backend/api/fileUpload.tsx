@@ -9,16 +9,16 @@ export type File = {
     mimeType: string | null;
 }
 
-// VEHICLE IMAGE CONDITIONS
+// IMAGE CONDITIONS
 export const MAX_IMAGE_SIZE = 256 * 1024; // 256 KB
-export const ALLOWED_MIME_TYPES_VEHICLE = ["image/jpeg", "image/jpg"];
+export const ALLOWED_MIME_TYPES_IMAGE = ["image/jpeg", "image/jpg"];
 
-// VEHICLE IMAGE CONDITIONS
+// IMAGE CONDITIONS
 export const MAX_RECORD_SIZE = 1000 * 1024; // 1 MB
 export const ALLOWED_MIME_TYPES_RECORD = ["application/pdf", "pdf"];
 
 // POST /vehicle/uploadVehicleImage
-export default async function uploadVehicleImage(payload: File, type: "vehicle" | "record") {
+export async function uploadVehicleImage(payload: File, type: "vehicle" | "record") {
   const base64 = Base64.encode(payload.uri);
 
   const response = await fetch(BASE_URL+"/vehicle/uploadVehicleImage", {
@@ -29,6 +29,29 @@ export default async function uploadVehicleImage(payload: File, type: "vehicle" 
         fileContent: base64,
         contentType: payload.mimeType,
         type
+    }),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
+
+  const data = await JSON.parse(text);
+  return data.key as string;
+}
+
+// POST /profile/uploadProfilePicture
+export async function uploadProfilePicture(payload: File) {
+  const base64 = Base64.encode(payload.uri);
+
+  const response = await fetch(BASE_URL+"/profile/uploadProfilePicture", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        fileName: payload.name,
+        fileContent: base64,
+        contentType: payload.mimeType,
     }),
   });
 
