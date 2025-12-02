@@ -11,6 +11,7 @@ import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ReactNativeModal as Modal } from 'react-native-modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
@@ -203,12 +204,19 @@ const Details = () => {
       }, {} as Record<string, number>);
 
     // Search filter
-    const filterReviews =
-      query !== ''
-        ? reviews.filter((x) =>
-            x.Review.toLowerCase().includes(query.toLowerCase())
-          )
-        : reviews;
+    const searchReviews = query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews;
+    const applyFilter = () =>{
+      const temp =searchReviews
+      if (choice ==''){
+        return temp
+      }
+      else if (choice =='5')
+        return temp.filter(x=> x.Rating == Number(choice))
+      else{
+        const bound = Number(choice)
+        return temp.filter(x=> bound<=x.Rating && x.Rating<bound + 1)
+      }
+    }
 
     return(
       <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
@@ -392,7 +400,7 @@ const Details = () => {
               </View>
               <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
               <FlatList
-                data={filterReviews}
+                data={applyFilter()}
                 renderItem={({ item }) => (
                   <Pressable
                     onPress={() =>
@@ -420,7 +428,35 @@ const Details = () => {
                 keyExtractor={(item) => item.ReviewId}
                 extraData={query}
               />
-              </View>      
+              </View>
+
+               <Modal isVisible={visible} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => setVisible(false)}
+                backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'flex-end', margin:0}}>
+                  <View className='w-[40%] h-[70%] flex-row items-center'>
+                      <Pressable className="w-[20px] h-[40px] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black" onPress={()=>setVisible(false)}>
+                        <Text className='text-2xl text-bold buttonTextBlack'>
+                          {">"}
+                        </Text>
+                      </Pressable>
+                      <View className='bg-white flex-1 h-full rounded-l-xl justify-around items-center border border-black'>
+                        <View className='w-full border-b border-stroke'>
+                          <Text className='buttonTextBlack self-center text-2xl'>
+                            Filters
+                          </Text>
+                        </View>
+                        
+                          <ToggleButton flag={Verified}  onPress={(newf)=>{setVerified(newf)}} text="Verified"/>
+
+                        <View className='w-full items-center border-t pt-[10%] border-stroke'>
+                          <ToggleButton flag={choice == '5'}   onPress={(newf)=>{handleChoice(newf, '5')}} text="5 stars"/>
+                        </View>                      
+                        <ToggleButton flag={choice == '4'}   onPress={(newf)=>{handleChoice(newf, '4')}} text="4 stars"/> 
+                        <ToggleButton flag={choice == '3'}   onPress={(newf)=>{handleChoice(newf, '3')}} text="3 stars"/>   
+                        <ToggleButton flag={choice == '2'}  onPress={(newf)=>{handleChoice(newf, '2')}} text="2 stars"/> 
+                        <ToggleButton flag={choice == '1'}  onPress={(newf)=>{handleChoice(newf, '1')}} text="1 star"/>     
+                      </View>
+                  </View>            
+              </Modal>      
         </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
