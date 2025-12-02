@@ -1,22 +1,22 @@
 // app/mechanic/[id]/updateReview.tsx
 
 import {
-  updateReview,
-  getSingleReview,
   getSingleMechanic,
-  type Review,
+  getSingleReview,
+  updateReview,
   type Mechanic,
+  type Review,
 } from "@/_backend/api/review";
 import { getCurrentUser } from "aws-amplify/auth";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
   ScrollView,
   Text,
   TextInput,
   View,
-  ActivityIndicator,
-  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StarRating from "react-native-star-rating-widget";
