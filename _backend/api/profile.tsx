@@ -67,6 +67,9 @@ export async function deleteAccount(userId: string, email: string) {
     email: email,
   }
 
+  console.log(`${BASE_URL}/profile/deleteAccount`)
+  console.log('Payload: ', payload)
+
   const response = await fetch(`${BASE_URL}/profile/deleteAccount`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },

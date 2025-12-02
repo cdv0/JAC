@@ -41,7 +41,6 @@ export default function Account() {
 
   const deleteAccountHandler = async () => {
     // call lambda to delete content from DB
-    console.log('Deleting Account')
 
     const result = await deleteAccount(userId, email)
   }
@@ -51,8 +50,8 @@ export default function Account() {
       <View className="flex-col justify-start">
         <View className="flex items-center h-full px-2">
           {deleteAccountModal && (
-            <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 border-black rounded-xl">
-              <Text className="text-4xl font-extrabold text-center text-black ">
+            <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 rounded-xl border-stroke">
+              <Text className="text-center text-black largeTitle ">
                 Delete Account
               </Text>
               <Text className="w-full text-xl text-center text-dangerDarkRed">
