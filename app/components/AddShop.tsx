@@ -304,7 +304,7 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
                   data={shop.Services}
                   keyExtractor={(item) => item}
                   renderItem={({ item }) => (
-                    <TouchableOpacity className='bg-lightBlueText  rounded-xl' activeOpacity={0.5}>
+                    <TouchableOpacity className='bg-lightBlueText rounded-xl' activeOpacity={0.5}>
                       <Text className='buttonTextWhite px-2'>
                         {item}
                       </Text>
