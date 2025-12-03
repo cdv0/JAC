@@ -127,6 +127,11 @@ const Details = () => {
           String(id)
         );
 
+        console.log(
+          "Raw backendReviews from Lambda:",
+          JSON.stringify(backendReviews, null, 2)
+        );
+
         setReviews(
           backendReviews.map((r: any) => ({
             ReviewId: r.ReviewId ?? r.reviewId,
@@ -164,7 +169,7 @@ const Details = () => {
     };
 
     fetchData();
-  }, [id]);
+  }, [id]); 
 
   if (loading) {
     return (
@@ -178,10 +183,16 @@ const Details = () => {
         <Text>{id} could not be found</Text>
       </View>
     );
-  } else {
-    const servicesData = mechanic.Services.map((item: string) =>
-      item.trim()
-    );
+    } else {
+      const rawServices = mechanic?.Services;
+    
+      const servicesData =
+        Array.isArray(rawServices)
+          ? rawServices.map((item: string) => item.trim())
+          : typeof rawServices === 'string'
+            ? rawServices.split(',').map((item: string) => item.trim())
+            : [];
+  
     const condition =
       (mechanic.Hours?.length ?? 0) > 0 ||
       mechanic.address !== '' ||
@@ -200,7 +211,7 @@ const Details = () => {
     );
 
     const sortedTemp = Object.keys(temp)
-      .sort((a, b) => Number(b) - Number(a))
+      .sort((a, b) => Number(b) - Number(a)) 
       .reduce((acc, key) => {
         acc[key] = temp[key];
         return acc;
@@ -416,6 +427,7 @@ const Details = () => {
                           id: String(id),
                           reviewId: item.ReviewId,
                           mechanicId: item.MechanicId,
+                          userId: item.UserId, 
                         },
                       })
                     }
