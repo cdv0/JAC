@@ -14,7 +14,7 @@ interface Mechanics {
     mechanicID: string,
     name: string,
     Image: string,
-    Services: string,
+    Services: string[],
     Certified:boolean,
     address:string,
     Review: number,
@@ -433,7 +433,7 @@ export default function Index() {
                   const mechanicsData = await file.json();  
                   const temp =  mechanicsData.data
                   temp.forEach(async (x:Mechanics)=>{
-                     x.Services = x.Services.toLowerCase()
+                     x.Services = x.Services.map(serv=>serv.toLocaleLowerCase())
                      try{
                       const data = await fetch((process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) + `?mechanicId=${x.mechanicID}`)
                       const response = await data.json();
