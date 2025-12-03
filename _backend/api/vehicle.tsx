@@ -116,8 +116,7 @@ export async function getVehicleImage(userId: string, vehicleId: string) {
     const base64string = data.body as string;
 
     const binaryString = Buffer.from(base64string, 'base64').toString('binary');
-    const dataUrl = Buffer.from(binaryString, 'binary');
-
+    const dataUrl = `data:image/jpeg;base64,${base64string}`;
 
     return dataUrl;
 }
