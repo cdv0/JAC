@@ -1,7 +1,6 @@
 import Slider from '@react-native-community/slider'
 import * as Location from 'expo-location'
 import { router } from 'expo-router'
-import * as geolib from 'geolib'
 import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
@@ -27,10 +26,6 @@ interface Mechanics {
   Services: string
   Certified: boolean
   address: string
-  Review: number
-  Location: string[]
-  Distance: number
-  Rating: number
 }
 
 export default function Index() {
@@ -84,69 +79,27 @@ export default function Index() {
     setFunc((arr) => arr.map((item, index) => (index === i ? value : item)))
   }
 
-  const reviewCountScore = (m: Mechanics) => {
-    //may adjust
-    if (!m.Review) {
-      const temp = reviews.filter((x) => x.mechanicId === m.mechanicID)
-      m.Review = temp.length
-    }
-
-    return m.Review
-  }
-
-  const ratingScore = (m: Mechanics) => {
-    if (!m.Rating) {
-      let sum = 0
-      const temp = reviews.filter((x) => x.mechanicId === m.mechanicID)
-      temp.forEach((x) => {
-        sum += x.rating
-      })
-      m.Rating = temp.length != 0 ? sum / temp.length : 0
-    }
-
-    return m.Rating
-  }
-
-  const distanceScore = (m: Mechanics) => {
-    if (!m.Distance) {
-      if (m.Location && userLoc) {
-        const mLoc = {
-          latitude: Number(m.Location[0]),
-          longitude: Number(m.Location[1]),
-        }
-        m.Distance = geolib.getDistance(userLoc, mLoc) / 1609
-      } else {
-        Number.POSITIVE_INFINITY
-      }
-    }
-    return m.Distance
-  }
-
-  const handleSort = (mechanics: Mechanics[]) => {
-    switch (sortOptApplied) {
-      case '1':
-        //name
-        return mechanics.sort((a, b) => a.name.localeCompare(b.name))
-      case '2':
-        //distance
-        return mechanics.sort((a, b) => distanceScore(a) - distanceScore(b))
-      case '3':
-        //review count
-        return mechanics.sort(
-          (a, b) => reviewCountScore(b) - reviewCountScore(a)
-        )
-      case '4':
-        //rating
-        return mechanics.sort((a, b) => ratingScore(b) - ratingScore(a))
-      default:
-        return mechanics
-    }
-  }
-
   //#region constants
   const [mechanics, setMechanics] = useState<any[]>([])
-  const [reviews, setReviews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    const data = async () => {
+      try {
+        const file = await fetch('/local/dummy/data2.json')
+        const mechanicsData = await file.json()
+        const temp = JSON.parse(mechanicsData.body).data as Mechanics[]
+        temp.forEach((x: Mechanics) => {
+          x.Services = x.Services.toLowerCase()
+        })
+        setMechanics(temp)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error loading mechanics data:', error)
+      }
+    }
+    data()
+  }, [])
+
   const [mQuery, setMQuery] = useState('')
   const [lQuery, setLQuery] = useState('')
   const [isFiltersModal, setisFiltersModal] = useState(false)
@@ -648,11 +601,6 @@ export default function Index() {
   const [tempSliderValue, setTempSliderValue] = useState(sliderValue)
   const [warning, setWarning] = useState(false)
   const [LocationEnabled, setLocationEnabled] = useState<boolean>(false)
-  const [userLoc, setUserLoc] = useState<
-    Location.LocationObjectCoords | undefined
-  >(undefined)
-  const [dataReady, setDataReady] = useState(false)
-  const [locReady, setLocReady] = useState(false)
   useEffect(() => {
     ;(async () => {
       const services = await Location.hasServicesEnabledAsync()
@@ -661,81 +609,6 @@ export default function Index() {
     })()
   }, [])
   //#endregion
-
-  useEffect(() => {
-    const data = async () => {
-      try {
-        const file = await fetch(
-          process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string
-        )
-        //const file = await fetch("/local/dummy/mechanics2.json")
-        const mechanicsData = await file.json()
-        const temp = mechanicsData.data
-        temp.forEach(async (x: Mechanics) => {
-          x.Services = x.Services.toLowerCase()
-          const data = await fetch(
-            (process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) +
-              `?mechanicId=${x.mechanicID}`
-          )
-          const response = await data.json()
-          x.Rating = response?.average ?? 0
-          x.Review = response?.length ?? 0
-        })
-        setMechanics(temp)
-      } catch (error) {
-        console.error('Error loading mechanics data:', error)
-      } finally {
-        setDataReady(true)
-      }
-    }
-    const loc = async () => {
-      const services = await Location.hasServicesEnabledAsync()
-      //prompt user for location permision
-      const { status: curStat } =
-        await Location.requestForegroundPermissionsAsync()
-      let perm = curStat
-      const flag = services && perm === 'granted'
-
-      if (!flag) {
-        setLocReady(true)
-        return
-      }
-
-      let location: Location.LocationObject | undefined
-
-      try {
-        location = (await Location.getLastKnownPositionAsync({})) || undefined
-        setUserLoc(location?.coords || undefined)
-        setLocReady(true)
-        try {
-          const temp = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-            mayShowUserSettingsDialog: true,
-          })
-          if (temp) setUserLoc(temp.coords)
-        } catch (error) {
-          console.warn('getCurrentPositionAsync failed')
-        }
-      } catch (fallbackError) {
-        console.error('Unable to getLastKnownPositionAsync', fallbackError)
-      }
-    }
-    const t = async () => {
-      await Promise.all([data(), loc()])
-    }
-
-    t()
-  }, [])
-
-  useEffect(() => {
-    //Ensure everything is ready before displaying thingsd
-    setLoading(!(dataReady && locReady))
-    if (mechanics && mechanics.every((x) => !x.Distance)) {
-      mechanics.forEach((x) => {
-        x.Distance = distanceScore(x)
-      })
-    }
-  }, [dataReady, locReady])
 
   //#endregion
 
