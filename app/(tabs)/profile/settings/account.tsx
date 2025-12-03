@@ -178,97 +178,95 @@ export default function Account() {
               <Text className="mt-2 text-xs text-gray-500">Uploading...</Text>
             )}
           </View>
-        </View>
-        <View className="flex items-center h-full px-2">
-          {deleteAccountModal && (
-            <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 rounded-xl border-stroke">
-              <Text className="text-center text-black largeTitle ">
-                Delete Account
-              </Text>
-              <Text className="w-full text-xl text-center text-dangerDarkRed">
-                Are you sure you want to delete your account?
-              </Text>
-
-              <View className="flex flex-row gap-8">
-                <NormalButton
-                  text="Cancel"
-                  onClick={() => setDeleteAccountModal(false)}
-                  variant="outline"
-                />
-
-                <NormalButton
-                  text="Confirm"
-                  onClick={deleteAccountHandler}
-                  variant="danger"
-                />
-              </View>
-            </View>
-          )}
-          {deleteConfirmModal && (
-            <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 rounded-xl border-stroke">
-              <Text className="text-center text-black largeTitle ">
-                User Data Deleted
-              </Text>
-            </View>
-          )}
-
-          <View className="flex w-full gap-6 bg-white rounded-xl">
-            <Pressable
-              className="flex-row justify-between px-5 pt-5 pb-3"
-              onPress={() => router.push('/profile/settings/editName')}
-            >
-              <Text className="font-semibold text-textBlack">Name</Text>
-              <View className="flex-row gap-3">
-                <Text className=" smallText">
-                  {firstName} {lastName}
+          <View className="flex items-center h-full px-2">
+            {deleteAccountModal && (
+              <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 rounded-xl border-stroke">
+                <Text className="text-center text-black largeTitle ">
+                  Delete Account
                 </Text>
-                <ChevronRightIcon size={20} color="#000" />
-              </View>
-            </Pressable>
+                <Text className="w-full text-xl text-center text-dangerDarkRed">
+                  Are you sure you want to delete your account?
+                </Text>
 
-            <Pressable
-              className="flex-row justify-between px-5 py-3"
-              onPress={() => {
-                router.push('/profile/settings/editEmail')
-              }}
-            >
-              <Text className="font-semibold text-textBlack">Email</Text>
-              <View className="flex-row gap-3">
-                <Text className="xsText">{email}</Text>
-                <ChevronRightIcon size={20} color="#000" />
-              </View>
-            </Pressable>
+                <View className="flex flex-row gap-8">
+                  <NormalButton
+                    text="Cancel"
+                    onClick={() => setDeleteAccountModal(false)}
+                    variant="outline"
+                  />
 
-            <Pressable
-              className="flex-row justify-between px-5 py-3"
-              onPress={() =>
-                router.push({
-                  pathname: '/profile/settings/editPassword',
-                  params: { email: email },
-                })
-              }
-            >
-              <Text className="font-semibold text-textBlack">Password</Text>
-              <View className="flex-row gap-3">
-                <Text className="xsText">*********</Text>
-                <ChevronRightIcon size={20} color="#000" />
+                  <NormalButton
+                    text="Confirm"
+                    onClick={deleteAccountHandler}
+                    variant="danger"
+                  />
+                </View>
               </View>
-            </Pressable>
-
-            <Pressable
-              className="flex-row justify-between px-5 py-3"
-              onPress={handleChangeProfilePicture}
-            >
-              <Text className="font-semibold text-textBlack">
-                Change profile picture
-              </Text>
-              <View className="flex-row gap-3">
-                <ChevronRightIcon size={20} color="#000" />
+            )}
+            {deleteConfirmModal && (
+              <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 rounded-xl border-stroke">
+                <Text className="text-center text-black largeTitle ">
+                  User Data Deleted
+                </Text>
               </View>
-            </Pressable>
-          </View>
+            )}
 
-          <View className="bg-black">
+            <View className="flex w-full gap-6 bg-white rounded-xl">
+              <Pressable
+                className="flex-row justify-between px-5 pt-5 pb-3"
+                onPress={() => router.push('/profile/settings/editName')}
+              >
+                <Text className="font-semibold text-textBlack">Name</Text>
+                <View className="flex-row gap-3">
+                  <Text className=" smallText">
+                    {firstName} {lastName}
+                  </Text>
+                  <ChevronRightIcon size={20} color="#000" />
+                </View>
+              </Pressable>
+
+              <Pressable
+                className="flex-row justify-between px-5 py-3"
+                onPress={() => {
+                  router.push('/profile/settings/editEmail')
+                }}
+              >
+                <Text className="font-semibold text-textBlack">Email</Text>
+                <View className="flex-row gap-3">
+                  <Text className="xsText">{email}</Text>
+                  <ChevronRightIcon size={20} color="#000" />
+                </View>
+              </Pressable>
+
+              <Pressable
+                className="flex-row justify-between px-5 py-3"
+                onPress={() =>
+                  router.push({
+                    pathname: '/profile/settings/editPassword',
+                    params: { email: email },
+                  })
+                }
+              >
+                <Text className="font-semibold text-textBlack">Password</Text>
+                <View className="flex-row gap-3">
+                  <Text className="xsText">*********</Text>
+                  <ChevronRightIcon size={20} color="#000" />
+                </View>
+              </Pressable>
+
+              <Pressable
+                className="flex-row justify-between px-5 py-3"
+                onPress={handleChangeProfilePicture}
+              >
+                <Text className="font-semibold text-textBlack">
+                  Change profile picture
+                </Text>
+                <View className="flex-row gap-3">
+                  <ChevronRightIcon size={20} color="#000" />
+                </View>
+              </Pressable>
+            </View>
+
             <Pressable
               className="items-center mt-10 "
               onPress={() => setDeleteAccountModal(true)}
