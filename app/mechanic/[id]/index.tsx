@@ -271,6 +271,7 @@ const Details = () => {
                   <View style={{marginTop:30, marginLeft:15, gap:10}}>
                     {mechanic.Certified && <images.badge width={30} height={30}/>}            
                   </View>
+                  {/*TODO modify to only allow claiming mechanic*/}
                   <TouchableOpacity onPress={() => setEditVisible(true)}>
                     <icons.editIcon style={{height:50, width:50}}/>                 
                   </TouchableOpacity>
