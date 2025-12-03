@@ -309,8 +309,9 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
                       </Text>
                     </View>
                   )}
-                  numColumns={4}
-                  columnWrapperStyle={{gap:2}}
+                  numColumns={3}
+                  contentContainerClassName='border border-stroke w-full items-center py-5'
+                  columnWrapperStyle={{gap:2, marginVertical:4}}
                   scrollEnabled={false}
                   ListEmptyComponent={<Text className='buttonTextBlack self-center'>
                     No Services Added
