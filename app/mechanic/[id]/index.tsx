@@ -90,7 +90,7 @@ const Details = () => {
   const [Verified, setVerified] = useState(false);
   const [choice, setChoice] = useState("");
   const [isClaimed, setClaimed] = useState(false); //change to fetch query
-  const [asMechanic,setAsMechanic] = useState(false);
+  const [asMechanic,setAsMechanic] = useState(true);
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading]= useState(true);
   const handleChoice = (flag:boolean, choice:string)=>{
@@ -176,7 +176,7 @@ const Details = () => {
       </View>
     );
   } else {
-    const servicesData = mechanic.Services.split(',').map((item: string) =>
+    const servicesData = mechanic.Services.map((item: string) =>
       item.trim()
     );
     const condition =
@@ -233,7 +233,7 @@ const Details = () => {
                         <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
                       <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
-                      {asMechanic && <ToggleButton flag={isClaimed} 
+                      {isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
                       text={isClaimed?'Claimed':'Claim Business'} 
                       onPress={async ()=>{
                                       /**
@@ -405,7 +405,7 @@ const Details = () => {
                   <Pressable
                     onPress={() =>
                       router.push({
-                        pathname: "./mechanic/[id]/viewOtherUser",
+                        pathname: "/mechanic/[id]/viewOtherUser",
                         params: {
                           id: String(id),
                           reviewId: item.ReviewId,
@@ -429,34 +429,54 @@ const Details = () => {
                 extraData={query}
               />
               </View>
-
-               <Modal isVisible={visible} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => setVisible(false)}
-                backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'flex-end', margin:0}}>
-                  <View className='w-[40%] h-[70%] flex-row items-center'>
-                      <Pressable className="w-[20px] h-[40px] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black" onPress={()=>setVisible(false)}>
-                        <Text className='text-2xl text-bold buttonTextBlack'>
-                          {">"}
+              
+              {/*Filter reviews*/}
+              <Modal isVisible={visible} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => setVisible(false)}
+              backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'flex-end', margin:0}}>
+                <View className='w-[40%] h-[70%] flex-row items-center'>
+                    <Pressable className="w-[20px] h-[40px] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black" onPress={()=>setVisible(false)}>
+                      <Text className='text-2xl text-bold buttonTextBlack'>
+                        {">"}
+                      </Text>
+                    </Pressable>
+                    <View className='bg-white flex-1 h-full rounded-l-xl justify-around items-center border border-black'>
+                      <View className='w-full border-b border-stroke'>
+                        <Text className='buttonTextBlack self-center text-2xl'>
+                          Filters
                         </Text>
-                      </Pressable>
-                      <View className='bg-white flex-1 h-full rounded-l-xl justify-around items-center border border-black'>
-                        <View className='w-full border-b border-stroke'>
-                          <Text className='buttonTextBlack self-center text-2xl'>
-                            Filters
-                          </Text>
-                        </View>
-                        
-                          <ToggleButton flag={Verified}  onPress={(newf)=>{setVerified(newf)}} text="Verified"/>
-
-                        <View className='w-full items-center border-t pt-[10%] border-stroke'>
-                          <ToggleButton flag={choice == '5'}   onPress={(newf)=>{handleChoice(newf, '5')}} text="5 stars"/>
-                        </View>                      
-                        <ToggleButton flag={choice == '4'}   onPress={(newf)=>{handleChoice(newf, '4')}} text="4 stars"/> 
-                        <ToggleButton flag={choice == '3'}   onPress={(newf)=>{handleChoice(newf, '3')}} text="3 stars"/>   
-                        <ToggleButton flag={choice == '2'}  onPress={(newf)=>{handleChoice(newf, '2')}} text="2 stars"/> 
-                        <ToggleButton flag={choice == '1'}  onPress={(newf)=>{handleChoice(newf, '1')}} text="1 star"/>     
                       </View>
+                      
+                        <ToggleButton flag={Verified}  onPress={(newf)=>{setVerified(newf)}} text="Verified"/>
+
+                      <View className='w-full items-center border-t pt-[10%] border-stroke'>
+                        <ToggleButton flag={choice == '5'}   onPress={(newf)=>{handleChoice(newf, '5')}} text="5 stars"/>
+                      </View>                      
+                      <ToggleButton flag={choice == '4'}   onPress={(newf)=>{handleChoice(newf, '4')}} text="4 stars"/> 
+                      <ToggleButton flag={choice == '3'}   onPress={(newf)=>{handleChoice(newf, '3')}} text="3 stars"/>   
+                      <ToggleButton flag={choice == '2'}  onPress={(newf)=>{handleChoice(newf, '2')}} text="2 stars"/> 
+                      <ToggleButton flag={choice == '1'}  onPress={(newf)=>{handleChoice(newf, '1')}} text="1 star"/>     
+                    </View>
                   </View>            
-              </Modal>      
+                </Modal> 
+
+                {/*Claim modal*/}
+                <Modal isVisible={claimVisibile} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => {setClaimVisibile(false); setClaimLoading(true)}}
+                backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'center', margin:0}}>
+                  <View className='w-[40%] h-[20%] bg-white border border-black rounded-xl items-center justify-center'>
+                      {/*Add loading*/}
+                      {(claimLoading)? 
+                      (<View className='flex-1 items-center justify-center'>
+                        <ActivityIndicator size="large" />  
+                      </View>):
+                        (isClaimed)?<Text className='buttonTextBlack'>
+                          Claim Succesful
+                        </Text>:
+                        //Add ways to ask for help
+                        <Text className='text-dangerDarkRed buttonTextBlack'>
+                          Failed to Claim 
+                          </Text>}
+                  </View> 
+                </Modal>     
         </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
