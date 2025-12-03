@@ -1,11 +1,5 @@
-import {
-  handleGoogleSignIn,
-  loginHandler,
-  registerHandler,
-  verifyAccountHandler,
-} from '@/_backend/auth'
+import { registerHandler, verifyAccountHandler } from '@/_backend/auth'
 import NormalButton from '@/app/components/NormalButton'
-import GoogleLogo from '@/public/assets/icons/google-logo.svg'
 import AppLogo from '@/public/assets/images/group-name.svg'
 import { getCurrentUser } from 'aws-amplify/auth'
 import { Hub } from 'aws-amplify/utils'
@@ -13,7 +7,6 @@ import { useFocusEffect, useRouter } from 'expo-router'
 import { JSX, useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Pressable, Text, TextInput, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 export interface FormData {
   name: string
@@ -23,9 +16,7 @@ export interface FormData {
 
 const profile = () => {
   const [verifyCode, setVerifyCode] = useState<string>('')
-  const [profileStatus, setProfileStatus] = useState<
-    'SignIn' | 'SignUp' | 'User' | 'VerifyAccount'
-  >('SignIn')
+  const [profileStatus, setProfileStatus] = useState<string>('')
   const {
     control,
     handleSubmit,
@@ -35,7 +26,11 @@ const profile = () => {
     clearErrors,
     reset,
   } = useForm<FormData>({
-    defaultValues: { name: '', email: '', password: '' },
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
   })
 
   const signupOnClick = async (data: FormData) => {
@@ -43,29 +38,22 @@ const profile = () => {
       data.name,
       data.email,
       data.password,
-      'User'
+      'Mechanic'
     )
-
-    if (nextStep === 'CONFIRM_SIGN_UP') {
+    if (nextStep === 'CONFIRM_SIGNUP') {
       setProfileStatus('VerifyAccount')
     }
   }
-
   const verifyAccountClick = async () => {
     const email: string = getValues('email')
-    const result = await verifyAccountHandler(verifyCode, email)
+    const result = await verifyAccountHandler(email)
 
-    // handle success account
     if (result === 'success') {
       setVerifyCode('')
       reset()
       setProfileStatus('SignIn')
-    } else {
-      // notify user about wrong code or other error
     }
   }
-
-  const router = useRouter()
 
   const signinOnClick = async (data: FormData) => {
     if (data.email.trim() === '' || data.password.trim() === '') return
@@ -114,10 +102,9 @@ const profile = () => {
     reset()
   }
 
+  const router = useRouter()
+
   let content: JSX.Element = <View />
-
-  console.log('profile page')
-
   switch (profileStatus) {
     case 'SignUp':
       content = (
@@ -236,13 +223,11 @@ const profile = () => {
           <View className="w-full h-px my-6 bg-stroke" />
 
           <Pressable
-            onPress={() =>
-              router.push('/(tabs)/profile/mechanic/mechanicSignUp')
-            }
+            onPress={() => router.push('/profile')}
             className="flex items-center"
           >
             <Text className="underline text-primaryBlue">
-              Are you a mechanic?
+              Are you a customer?
             </Text>
           </Pressable>
         </View>
@@ -361,31 +346,11 @@ const profile = () => {
           <View className="w-full h-px my-6 bg-stroke" />
 
           <Pressable
-            onPress={() =>
-              router.push('/(tabs)/profile/mechanic/mechanicSignIn')
-            }
+            onPress={() => router.push('/profile')}
             className="flex items-center"
           >
-            <Text className="underline text-primaryBlue">
-              Are you a mechanic?
-            </Text>
+            <Text className="underline text-primaryBlue">Are you a user?</Text>
           </Pressable>
-
-          {/* SIGN IN: Sign in with Google */}
-          <View className="relative flex-row items-center justify-center mb-10">
-            <NormalButton
-              text="Sign in with Google"
-              variant="outline"
-              onClick={async () => {
-                reset()
-                const result = await handleGoogleSignIn('Google')
-                if (result?.message === 'SignedIn') {
-                  router.push('/profile/logged')
-                }
-              }}
-              icon={<GoogleLogo width={20} height={20} />}
-            />
-          </View>
 
           {/* SIGN IN: Sign up navigation */}
           <View className="flex flex-row justify-center gap-1.5">
@@ -406,20 +371,15 @@ const profile = () => {
       )
       break
     default:
-      content = (
-        <View>
-          <Text>Empty View</Text>
-        </View>
-      )
+      content = <View></View>
       break
   }
-
   useFocusEffect(
     useCallback(() => {
       const checkUser = async () => {
         try {
           await getCurrentUser()
-          router.push('/profile/logged')
+          router.push('/profile/mechanic/mechanicMain')
         } catch (error) {
           //   console.log('Check User Error: ', error)
         }
@@ -438,7 +398,7 @@ const profile = () => {
           break
         case 'signInWithRedirect':
           console.log('User signed in')
-          router.push('/profile/logged')
+          router.push('/profile/mechanic/mechanicMain')
           break
         default:
           break
@@ -447,15 +407,4 @@ const profile = () => {
 
     return () => listener()
   }, [])
-
-  return (
-    <SafeAreaView
-      edges={['top', 'bottom']}
-      className="justify-center w-full h-full overflow-hidden bg-white"
-    >
-      <View>{content}</View>
-    </SafeAreaView>
-  )
 }
-
-export default profile
