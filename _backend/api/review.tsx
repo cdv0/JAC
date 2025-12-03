@@ -39,6 +39,15 @@ export type UpdatedReview = {
   updatedAt?: string;
 };
 
+export type PublicUser = {
+  userId: string;
+  firstName?: string;
+  lastName?: string;
+  createdAt?: string;
+  totalReviews?: number;
+  averageRating?: number; // optional, in case you add it later
+};
+
 async function handleJsonResponse(res: Response) {
   const text = await res.text();
   let data: any = null;
@@ -281,4 +290,51 @@ export async function getSingleMechanic(
   mechanicId: string
 ): Promise<Mechanic | null> {
   return getMechanicById(mechanicId);
+}
+
+export async function getUserById(userId: string): Promise<PublicUser> {
+  const url = `${BASE_URL}/reviews/getUserById?userId=${encodeURIComponent(
+    userId
+  )}`;
+
+  // Lambda is GET, no body
+  const res = await fetch(url);
+
+  const text = await res.text();
+
+  if (!res.ok) {
+    let message = text;
+    try {
+      const parsed = text ? JSON.parse(text) : {};
+      message = parsed.message || message;
+    } catch {
+      // ignore parse errors
+    }
+    throw new Error(message || `Request failed with status ${res.status}`);
+  }
+
+  // Lambda returns result.Items (array)
+  let items: any[] = [];
+  try {
+    items = text ? JSON.parse(text) : [];
+  } catch (e) {
+    throw new Error("Invalid JSON returned from getUserById");
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error("User not found");
+  }
+
+  const item = items[0];
+
+  const publicUser: PublicUser = {
+    userId: item.userId ?? item.UserId,
+    firstName: item.firstName ?? item.FirstName ?? "",
+    lastName: item.lastName ?? item.LastName ?? "",
+    createdAt: item.createdAt ?? item.CreatedAt ?? undefined,
+    totalReviews: item.totalReviews ?? item.TotalReviews ?? 0,
+    averageRating: item.averageRating ?? item.AverageRating ?? undefined,
+  };
+
+  return publicUser;
 }
