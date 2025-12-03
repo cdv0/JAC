@@ -1,4 +1,4 @@
-import { listVehicles, type Vehicle } from "@/_backend/api/vehicle";
+import { listVehicles, type Vehicle, getVehicleImage } from "@/_backend/api/vehicle";
 import NormalButton from "@/app/components/NormalButton";
 import { icons } from "@/constants/icons";
 import { useFocusEffect } from "@react-navigation/native";
@@ -6,7 +6,7 @@ import { getCurrentUser } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const garage = () => {
@@ -14,6 +14,8 @@ export const garage = () => {
   const [items, setItems] = useState<Vehicle[]>([]);  // List of vehicles
   const [loading, setLoading] = useState(false);
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+
+  const [vehicleImages, setVehicleImages] = useState<Record<string, string | null>>({});
 
   const numColumns = 2;
 
@@ -37,9 +39,32 @@ export const garage = () => {
         (a.model).localeCompare(b.model)
       );
       setItems(sorted);
+
+      // Get vehicle images
+      const imageResults = await Promise.all(
+        sorted.map(async (v) => {
+          try {
+            const dataUrl = await getVehicleImage(userId, v.vehicleId);
+            return { vehicleId: v.vehicleId, dataUrl };
+          } catch (e: any) {
+            console.log("getVehicleImage error for", v.vehicleId, e?.message);
+            return { vehicleId: v.vehicleId, dataUrl: null };
+          }
+        })
+      );
+
+      setVehicleImages((prev) => {
+        const next = { ...prev };
+        for (const { vehicleId, dataUrl } of imageResults) {
+          next[vehicleId] = dataUrl;
+        }
+        return next;
+      });
+
     } catch (e: any) {
       console.log("Garage vehicle list error:", e?.message);
       setItems([]);
+      setVehicleImages({});
     } finally {
       setLoading(false);
     }
@@ -127,15 +152,24 @@ export const garage = () => {
                 );
               }
 
+              const img = vehicleImages[item.vehicleId];
+
               return (
                 <Pressable onPress={() => router.push(`/garage/vehicle/${item.vehicleId}`)} style={{ flex: 1 }}>
                   {/* Vehicle card */}
                   <View className="border border-stroke rounded-lg p-4 gap-4 ">
                     {/* Vehicle image */}
                     <View className="items-center justify-center h-24">
-                      <icons.noImage height={50} width={70}/>
+                      {img ? (
+                        <Image
+                          source={{ uri: img }}
+                          className="h-full w-full rounded-lg"
+                        />
+                      ) : (
+                        <icons.noImage height={50} width={70} />
+                      )}
                     </View>
-                    {/* Vehicle card's text */}
+                                {/* Vehicle card's text */}
                     <View>
                       <Text className="buttonTextBlue text-center">{item.model}</Text>
                       <Text className="smallThinTextBlue text-center">{item.make} {item.year}</Text>

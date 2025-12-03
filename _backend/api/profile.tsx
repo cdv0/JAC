@@ -84,32 +84,30 @@ export async function deleteAccount(userId: string, email: string) {
 }
 
 export async function sendContactEmail(payload: {
-  name: string;
-  email: string;
-  message: string;
+  name: string
+  email: string
+  message: string
 }) {
-  console.log('Calling contact API at:', `${BASE_URL}/profile/sendContactEmail`);
+  console.log('Calling contact API at:', `${BASE_URL}/profile/sendContactEmail`)
 
   const res = await fetch(`${BASE_URL}/profile/sendContactEmail`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
-  });
+  })
 
-  let data: any = null;
+  let data: any = null
   try {
-    data = await res.json();
+    data = await res.json()
   } catch {
     // ignore
   }
 
   if (!res.ok) {
     const message =
-      data?.error ||
-      data?.message ||
-      `Request failed with status ${res.status}`;
-    throw new Error(message);
+      data?.error || data?.message || `Request failed with status ${res.status}`
+    throw new Error(message)
   }
 
-  return data;
+  return data
 }
