@@ -10,12 +10,10 @@ import { icons } from '@/constants/icons';
 import { getReviewsByUser } from '@/_backend/api/review'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import { useFocusEffect } from '@react-navigation/native' 
-import { useFocusEffect } from '@react-navigation/native' 
 
 const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
 const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
 
-type SortOption = 'dateNewest' | 'dateOldest' | 'ratingHigh' | 'ratingLow'
 type SortOption = 'dateNewest' | 'dateOldest' | 'ratingHigh' | 'ratingLow'
 
 export const account = () => {
@@ -24,7 +22,6 @@ export const account = () => {
   const [lastName, setLastName] = useState<string>('')
   const [createdAt, setCreatedAt] = useState<string>('')
   const [filterOpen, setFilterOpen] = useState(false)
-  const [profileImage, setProfileImage] = useState<string | null>(null)
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [reviews, setReviews] = useState<any[]>([])
   const [sortOption, setSortOption] = useState<SortOption>('dateNewest')
@@ -83,8 +80,6 @@ export const account = () => {
       } catch (e: any) {
         console.log('Account: Error loading user data:', e)
         console.log('Account: Error message:', e.message)
-      }
-    })()
       }
     })()
   }, [])
