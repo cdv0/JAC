@@ -121,7 +121,6 @@ export async function getVehicleImage(userId: string, vehicleId: string) {
     
     return dataUrl;
 }
-}
 
 // DELETE /vehicle/deleteVehicle
 export async function deleteVehicle (payload: {userId: string, vehicleId: string}) {
