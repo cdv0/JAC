@@ -15,13 +15,6 @@ const TabIcon = ({ Icon }: any) => {
     </View>
   )
 }
-const TabIcon = ({ Icon }: any) => {
-  return (
-    <View className="flex-1 justify-center items-center">
-      <Icon width={65} height="100%" />
-    </View>
-  );
-};
 
 const _layout = () => {
   const [firstName, setFirstName] = useState<string>('');
