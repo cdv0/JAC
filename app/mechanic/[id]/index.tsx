@@ -11,7 +11,7 @@ import { images } from '@/constants/images';
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ReactNativeModal as Modal } from 'react-native-modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
@@ -256,11 +256,13 @@ const Details = () => {
                                       // setClaimVisibile(true)  
                                       // await claim()                                                                            
                                     }}/>}
-                      <NormalButton onClick={() => setEditVisible(true)} text='edit'/>
                   </View>
                   <View style={{marginTop:30, marginLeft:15, gap:10}}>
                     {mechanic.Certified && <images.badge width={30} height={30}/>}            
                   </View>
+                  <TouchableOpacity onPress={() => setEditVisible(true)}>
+                    <icons.editIcon style={{height:50, width:50}}/>                 
+                  </TouchableOpacity>
                 
               </View>
 
