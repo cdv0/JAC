@@ -127,26 +127,6 @@ export async function getSingleReview(
   };
 }
 
-
-export async function getSingleMechanic(
-  mechanicId: string
-): Promise<Mechanic> {
-  const url = `${BASE_URL}/reviews/getSingleMechanic?mechanicId=${encodeURIComponent(
-    mechanicId
-  )}`;
-
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await handleJsonResponse(res);
-
-  return data.mechanic;
-}
-
 export async function updateReview(
   reviewId: string,
   userId: string,
@@ -181,25 +161,30 @@ export async function updateReview(
   };
 }
 
-export async function deleteReview(userId: string, ReviewId: string) {
+export async function deleteReview(userId: string, reviewId: string) {
+  console.log("[deleteReview] called with", { userId, reviewId });
+
   const res = await fetch(`${BASE_URL}/reviews/deleteReview`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      ReviewId: ReviewId,  // PK
-      userId: userId       // SK (lowercase, matches lambda)
-    })
+      ReviewId: reviewId, 
+      userId: userId,     
+    }),
   });
 
+  const text = await res.text();
+  console.log("[deleteReview] status:", res.status, "body:", text);
+
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error("Failed to delete review: " + err);
+    throw new Error("Failed to delete review: " + text);
   }
 
   return true;
 }
+
 
 export async function getAllMechanics(): Promise<Mechanic[]> {
   const res = await fetch(`${BASE_URL}/mechanics/getMechanics`, {
@@ -290,4 +275,10 @@ export async function getReviewsByMechanic(mechanicId: string): Promise<{
     average: data.average ?? 0,
     reviews: data.reviews ?? [],
   };
+}
+
+export async function getSingleMechanic(
+  mechanicId: string
+): Promise<Mechanic | null> {
+  return getMechanicById(mechanicId);
 }
