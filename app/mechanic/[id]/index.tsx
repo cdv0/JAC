@@ -25,7 +25,7 @@ interface MechanicViewProps {
   Certified: boolean;
   Review: number;
   Image: string;
-  Services: string;
+  Services: string[];
   Hours: string[];
   address: string;
   Website: string;
@@ -90,6 +90,7 @@ const Details = () => {
   const [Verified, setVerified] = useState(false);
   const [choice, setChoice] = useState("");
   const [isClaimed, setClaimed] = useState(false); //change to fetch query
+  const [claimable, setClaimable] = useState(false);
   const [asMechanic,setAsMechanic] = useState(true);
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading]= useState(true);
@@ -233,7 +234,7 @@ const Details = () => {
                         <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
                       <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
-                      {isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
+                      {isAuthenticated && asMechanic && claimable && <ToggleButton flag={isClaimed} 
                       text={isClaimed?'Claimed':'Claim Business'} 
                       onPress={async ()=>{
                                       /**
