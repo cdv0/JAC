@@ -17,7 +17,32 @@ export default function ProfileLayout() {
           headerShown: false,
         }}
       />
-      {/* Forget Password */}
+      <Stack.Screen
+        name="logged"
+        options={{
+          title: '',
+          headerShown: true,
+          headerShadowVisible: false,
+          headerBackVisible: false,
+          headerLeft: () => null, // Put this here because simply using headerBackVisible isn't reliable
+          headerRight: () => (
+            <Pressable
+              onPress={() => router.replace('/profile/settings')}
+              hitSlop={8}
+              className="mr-4"
+            >
+              <icons.settings height={24} width={24} />
+            </Pressable>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          headerShown: false,
+        }}
+      />
       <Stack.Screen
         name="forgetPassword"
         options={{
