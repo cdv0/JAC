@@ -3,12 +3,16 @@ import NormalButton from '@/app/components/NormalButton'
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth'
 import { useRouter } from 'expo-router'
 import { useEffect, useMemo, useState, useCallback } from 'react'
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { Pressable, ScrollView, Text, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { icons } from '@/constants/icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { icons } from '@/constants/icons';
 import { getReviewsByUser } from '@/_backend/api/review'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
-import { useFocusEffect } from '@react-navigation/native'   // 🔹 add this
+import { useFocusEffect } from '@react-navigation/native' 
+
+const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
+const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
 
 type SortOption = 'dateNewest' | 'dateOldest' | 'ratingHigh' | 'ratingLow'
 
@@ -17,12 +21,11 @@ export const account = () => {
   const [firstName, setFirstName] = useState<string>('')
   const [lastName, setLastName] = useState<string>('')
   const [createdAt, setCreatedAt] = useState<string>('')
-
   const [filterOpen, setFilterOpen] = useState(false)
+  const [profileImage, setProfileImage] = useState<string | null>(null)
   const [reviews, setReviews] = useState<any[]>([])
   const [sortOption, setSortOption] = useState<SortOption>('dateNewest')
 
-  // 🔹 Wrap your data-loading logic so we can call it from both useEffect and useFocusEffect
   const loadAccountData = useCallback(async () => {
     try {
       const { userId } = await getCurrentUser()
@@ -48,13 +51,43 @@ export const account = () => {
       console.log('Account: Error message:', e.message)
     }
   }, [])
+  
+  useEffect(() => {
+    (async () => {
+      try {
+        const { userId } = await getCurrentUser()
+        const cacheKey = getProfileImageKey(userId)
+        const cachedUri = await AsyncStorage.getItem(cacheKey)
+        if (cachedUri) {
+          setProfileImage(cachedUri)
+        }
 
-  // 🔹 Initial load
+        const attrs = await fetchUserAttributes()
+        const email = attrs.email
+        if (!email) {
+          throw new Error(
+            'No email on the Cognito profile (check pool/app-client readable attributes).'
+          )
+        }
+
+        const userData = await readUserProfile(userId, email)
+        setFirstName(userData.firstName ?? '')
+        setLastName(userData.lastName ?? '')
+        setCreatedAt(userData.createdAt ?? '')
+
+        const reviewData = await getReviewsByUser(userId)
+        setReviews(reviewData ?? [])
+      } catch (e: any) {
+        console.log('Account: Error loading user data:', e)
+        console.log('Account: Error message:', e.message)
+      }
+    })()
+  }, [])
+
   useEffect(() => {
     loadAccountData()
   }, [loadAccountData])
 
-  // 🔹 Re-run every time the screen is focused (e.g. after back from viewReview/delete)
   useFocusEffect(
     useCallback(() => {
       loadAccountData()
@@ -80,11 +113,12 @@ export const account = () => {
     const copy = [...reviews]
 
     const getDate = (rev: any) => {
-      const raw = rev.createdAt ?? rev.CreatedAt
-      return raw ? new Date(raw).getTime() : 0
-    }
+      const raw = rev.createdAt ?? rev.CreatedAt;
+      return raw ? new Date(raw).getTime() : 0;
+    };
 
-    const getRating = (rev: any) => Number(rev.rating ?? rev.Rating ?? 0)
+    const getRating = (rev: any) =>
+      Number(rev.rating ?? rev.Rating ?? 0);
 
     switch (sortOption) {
       case 'dateNewest':
@@ -104,11 +138,20 @@ export const account = () => {
     <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
       <ScrollView>
         <View className="flex-1 mt-5 gap-5 mb-5">
-          {/* ACCOUNT BANNER */}
           <View className="flex-row items-center justify-center bg-white pb-12 gap-10 border-b border-secondary">
-            <View className="h-20 w-20 bg-accountOrange rounded-full items-center justify-center">
-              <Text className="text-4xl font-bold text-white">{fullInitials}</Text>
-            </View>
+            {profileImage ? (
+              <Image
+                source={{ uri: profileImage }}
+                className="h-20 w-20 rounded-full"
+              />
+            ) : (
+              <View className="h-20 w-20 bg-accountOrange rounded-full items-center justify-center">
+                <Text className="text-4xl font-bold text-white">
+                  {fullInitials}
+                </Text>
+              </View>
+            )}
+
             <View>
               <Text className="xsTitle">
                 {firstName} {lastName}
@@ -122,9 +165,7 @@ export const account = () => {
             </View>
           </View>
 
-          {/* REVIEW SECTION */}
           <View className="flex-1 mx-5 gap-6">
-            {/* TITLE AND FILTER BUTTON */}
             <View className="flex-row justify-between">
               <Text className="mediumTitle">Reviews</Text>
               <NormalButton
@@ -138,7 +179,6 @@ export const account = () => {
               />
             </View>
 
-            {/* FILTER OPEN */}
             {filterOpen && (
               <View className="mx-3 pt-4 pb-6 border-y border-stroke">
                 <View className="flex-1 flex-row justify-between">
@@ -190,7 +230,6 @@ export const account = () => {
               </View>
             )}
 
-            {/* REVIEWS */}
             <View className="gap-4 pb-10">
               {sortedReviews.length === 0 ? (
                 <Text className="smallTextGray text-center">
