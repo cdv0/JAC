@@ -1,50 +1,62 @@
 
-
+import {
+  handleGoogleSignIn,
+  loginHandler,
+  registerHandler,
+  verifyAccountHandler,
+} from '@/_backend/auth'
+import { Controller } from 'react-hook-form';
 import {JSX, useCallback, useEffect, useState} from "react";
 import {Pressable, Text, TextInput, View} from "react-native";
 import {useFocusEffect, useRouter} from "expo-router";
 import { useForm } from "react-hook-form";
 import { getCurrentUser } from 'aws-amplify/auth'
 import AppLogo from '@/public/assets/images/group-name.svg'
+import NormalButton from '@/app/components/NormalButton';
+import { Hub } from 'aws-amplify';
 
 
+export interface FormData{
+    name: string,
+    email: string,
+    password: string,
+    userType?: string,
 
-// export interface FormData{
-//     name: string,
-//     email: string,
-//     password: string,
 
-// }
+}
 
-// const profile = () => {
-//     const [profileStatus, setProfileStatus] = useState<string>("");
-//     const {
-//         control,
-//         handleSubmit,
-//         formState: {errors, isSubmitting},
-//         getValues,
-//         setError,
-//         clearErrors,
-//         reset
-//     } = useForm<FormData>({
-//         defaultValues: {
-//             name: "",
-//             email: "",
-//             password: ""} });
 
-//             const signupOnClick = async (data: FormData) => {
-//                 const {nextStep, userId} = await registerHandler(
-//                     data.name,
-//                     data.email,
-//                     data.password
-//                 )
-//         if (nextStep === "CONFIRM_SIGNUP") {
-//             setProfileStatus("VerifyAccount");
-//         }
-//     }
-//     const verifyAccountClick = async () =>{
-//         const email: string = getValues("email");
-//         const result = await verifyAccountHandler(verifyAccountHandler, email)
+const profile = () => {
+    const [verifyCode, setVerifyCode] = useState<string>("");
+    const [profileStatus, setProfileStatus] = useState<string>("");
+    const {
+        control,
+        handleSubmit,
+        formState: {errors, isSubmitting},
+        getValues,
+        setError,
+        clearErrors,
+        reset
+    } = useForm<FormData>({
+        defaultValues: {
+            name: "",
+            email: "",
+            password: ""} });
+
+            const signupOnClick = async (data: FormData) => {
+                const {nextStep, userId} = await registerHandler(
+                    data.name,
+                    data.email,
+                    data.password,
+                    data.userType = "Mechanic"
+                )
+        if (nextStep === "CONFIRM_SIGNUP") {
+            setProfileStatus("VerifyAccount");
+        }
+    }
+    const verifyAccountClick = async () =>{
+        const email: string = getValues("email");
+        const result = await verifyAccountHandler(verifyAccountHandler, email)
 
         if(result === "success") {
             setVerifyCode("");
@@ -53,7 +65,7 @@ import AppLogo from '@/public/assets/images/group-name.svg'
         }
     }
     const router = useRouter();
-    
+
     let content: JSX.Element = <View />
     switch (profileStatus){
         case "SignUp":
@@ -173,11 +185,11 @@ import AppLogo from '@/public/assets/images/group-name.svg'
           <View className="w-full h-px my-6 bg-stroke" />
 
           <Pressable
-            onPress={() => router.push('/profile/mechanic/mechanicSignUp')}
+            onPress={() => router.push('/profile/index')}
             className="flex items-center"
           >
             <Text className="underline text-primaryBlue">
-              Are you a mechanic?
+              Are you a customer?
             </Text>
           </Pressable>
         </View>
