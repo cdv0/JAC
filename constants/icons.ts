@@ -2,6 +2,7 @@ import add from "@/public/assets/icons/add.svg"
 import arrowDown from "@/public/assets/icons/arrowDown.svg"
 import arrowUp from "@/public/assets/icons/arrowUp.svg"
 import chevBack from "@/public/assets/icons/chevron-back.svg"
+import editIcon from "@/public/assets/icons/edit-icon.svg"
 import pencil from "@/public/assets/icons/edit.svg"
 import filter from "@/public/assets/icons/filter.svg"
 import garage from "@/public/assets/icons/garage-icon.svg"
@@ -44,5 +45,6 @@ export const icons = {
     trash,
     add,
     filter,
-    x
+    x,
+    editIcon
 };

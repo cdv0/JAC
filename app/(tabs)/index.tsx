@@ -1,6 +1,7 @@
 import Slider from '@react-native-community/slider';
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
 import { router } from 'expo-router';
+import * as geolib from "geolib";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, ImageBackground, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,14 +9,19 @@ import MechanicView from '../components/MechanicView';
 import NormalButton from "../components/NormalButton";
 import SearchBar from "../components/SearchBar";
 import ToggleButton from "../components/ToggleButton";
+
 interface Mechanics {
     mechanicID: string,
     name: string,
     Image: string,
-    Services: string,
+    Services: string[],
     Certified:boolean,
     address:string,
-    
+    Review: number,
+    Location: string[],
+    Distance: number,
+    Rating: number,
+    Price: number,
 }
 
 export default function Index() {
@@ -30,62 +36,114 @@ export default function Index() {
     setCategories(categories.filter(item => item!=Category));
   };
 
+  //condition for when looking up something using search
   const searchCondition = (n:string, l:string) => {
     return n.toLowerCase().includes(mQuery.toLowerCase()) && l.toLowerCase().includes(lQuery.toLowerCase());
   }
 
   const applyFilter = () =>{
+
+    let temp = isCertified? mechanics.filter(x => x.Certified):mechanics;
+    //price filter
+    if (maxP != ''&& minP != ''){
+      temp = temp.filter(x=> x.Price && x.Price >= Number(minP) && x.Price <= Number(maxP))
+    }
+    else if (minP != ''){
+      temp = temp.filter(x=> x.Price && x.Price >= Number(minP))
+    }
+    else if (maxP != ''){
+      temp = temp.filter(x=> x.Price && x.Price <= Number(maxP))
+    }
+    
+
     if(categories.length ==0){
-      let temp = mechanics.filter(element=> searchCondition(element.name, element.address));
-      return isCertified? temp.filter(x => x.Certified):temp;
+       return temp.filter(element=> searchCondition(element.name, element.address));
+      
     }
     else{
-      let temp = mechanics.filter(element=>{
+       return temp.filter(element=>{
         return categories.every(cat=> element.Services.includes(cat)) && searchCondition(element.name, element.address);
       });
-      return isCertified? temp.filter(x => x.Certified):temp;
     }
    
   }
+    //use this to enter categories to filter
+    const handleCategories = (flag:boolean, Category:string) => {
+      if (flag)
+        insertCategory(Category.toLowerCase());
+      else
+        removeCategory(Category.toLowerCase())
+    };
 
+    const updateStates =(i:number, value:boolean, setFunc:React.Dispatch<React.SetStateAction<any[]>>) =>{
+      setFunc(arr =>
+        arr.map((item, index) =>(index ===i)?value:item)
+      );
+    };
+    const reviewCountScore =(m:Mechanics) =>{
+      //may adjust
+      if(!m.Review){
+        const temp = reviews.filter(x=> x.mechanicId === m.mechanicID)
+        m.Review = temp.length
+      }
+      
+      return m.Review 
+    }
+
+    const ratingScore = (m: Mechanics) => {
+      if(!m.Rating){
+        let sum = 0;
+        const temp = reviews.filter(x=> x.mechanicId === m.mechanicID)
+        temp.forEach(x=>{
+            sum+=x.rating
+        })
+        m.Rating = temp.length != 0?sum/temp.length:0
+      }
+      
+      return m.Rating
+    }
+
+    const distanceScore = (m:Mechanics) =>{
+      if(!m.Distance){
+        if(m.Location && userLoc){
+          const mLoc =  {latitude: Number(m.Location[0]), longitude:Number(m.Location[1])}
+          m.Distance = geolib.getDistance(userLoc, mLoc)/1609;
+        }
+        else{
+          Number.POSITIVE_INFINITY
+        }
+      }
+      return m.Distance
+      
+    }
+
+    const handleSort = (mechanics:Mechanics[]) =>{
+      switch (sortOptApplied){
+        case "1":
+          //name
+          return mechanics.sort((a,b)=> a.name.localeCompare(b.name))
+        case "2":
+          //distance
+          return mechanics.sort((a,b) => distanceScore(a) - distanceScore(b))
+        case "3":
+          //review count
+          return mechanics.sort((a,b)=> reviewCountScore(b) - reviewCountScore(a))
+        case "4":
+          //rating
+          return mechanics.sort((a,b)=> ratingScore(b) - ratingScore(a))
+        default:
+          return mechanics
+
+      }
+    }
   //#endregion
 
-  //use this to enter categories to filter
-  const handleCategories = (flag:boolean, Category:string) => {
-    if (flag)
-      insertCategory(Category.toLowerCase());
-    else
-      removeCategory(Category.toLowerCase())
-  };
 
-  const updateStates =(i:number, value:boolean, setFunc:React.Dispatch<React.SetStateAction<any[]>>) =>{
-    setFunc(arr =>
-      arr.map((item, index) =>(index ===i)?value:item)
-    );
-  };
 
   //#region constants
   const [mechanics, setMechanics] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any []>([])
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-          const data = async () => {
-              try {
-                  const file = await fetch("/local/dummy/data2.json");
-                  const mechanicsData = await file.json();    
-                  const temp =  JSON.parse(mechanicsData.body).data as Mechanics[];    
-                  temp.forEach((x:Mechanics)=>{
-                     x.Services = x.Services.toLowerCase()
-                  }) 
-                  setMechanics(temp);
-                  setLoading(false);
-                  
-                 
-              } catch (error) {
-                  console.error("Error loading mechanics data:", error);
-              }
-          }
-          data();
-      }, []);
       
   const [mQuery, setMQuery] = useState('');
   const [lQuery, setLQuery] = useState('');
@@ -362,18 +420,97 @@ export default function Index() {
   const [sliderValue, setSliderValue] = useState(maxD / 2); 
   const [tempSliderValue, setTempSliderValue] = useState(sliderValue);
   const [warning, setWarning] = useState(false);
-  const [LocationEnabled, setLocationEnabled] = useState<boolean>(false);
-    useEffect(() => {
-    (async () => {
-      const services = await Location.hasServicesEnabledAsync();
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      setLocationEnabled(services && status === 'granted');
-    })();
-  }, []);
+  const [userLoc, setUserLoc] = useState<Location.LocationObjectCoords | undefined>(undefined)
+  const [dataReady, setDataReady] = useState(false);
+  const [locReady, setLocReady] = useState(false);
   //#endregion
   
-  //#endregion
+  useEffect(() => {
+          const data = async () => {
+              try {
+                  const file = await fetch((process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string));
+                  //const file = await fetch("/local/dummy/mechanics2.json")
+                  const mechanicsData = await file.json();  
+                  const temp =  mechanicsData.data
+                  temp.forEach(async (x:Mechanics)=>{
+                     x.Services = x.Services.map(serv=>serv.toLocaleLowerCase())
+                     try{
+                      const data = await fetch((process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) + `?mechanicId=${x.mechanicID}`)
+                      const response = await data.json();
+                      x.Rating = response?.average ?? 0;
+                      x.Review = response?.length ?? 0;
+                     }
+                     catch{
+                      x.Rating = 0;
+                      x.Review = 0;
+                     }
+                    
+                  })     
+                  setMechanics(temp);
+          
+              } catch (error) {
+                  console.error("Error loading mechanics data:", error);
+              }
+              finally{
+                setDataReady(true)
+              }
+          }
+          const loc = async () => {
+            const services = await Location.hasServicesEnabledAsync();
+            //prompt user for location permision
+            const { status: curStat  } = await Location.requestForegroundPermissionsAsync();
+            let perm = curStat
+            const flag = services && perm  === 'granted'
 
+            if(!flag){
+              setLocReady(true);
+              return
+            }
+              
+
+            let location: Location.LocationObject | undefined;
+
+            try{
+              location = await Location.getLastKnownPositionAsync({}) || undefined;
+              setUserLoc(location?.coords || undefined) 
+              setLocReady(true);
+              try{
+                const temp = await Location.getCurrentPositionAsync({
+                                                                   accuracy: Location.Accuracy.Balanced,
+                                                                   mayShowUserSettingsDialog: true,  
+                                                                  });
+                if(temp)
+                  setUserLoc(temp.coords)
+              } catch (error){
+                  console.warn("getCurrentPositionAsync failed");
+              }
+            } catch (fallbackError){
+              console.error("Unable to getLastKnownPositionAsync", fallbackError);
+            }
+            
+          };
+          const t = async () =>{
+            await Promise.all([data(), loc()])
+          };
+
+          t()
+      }, []);
+
+
+useEffect(() => {
+  //Ensure everything is ready before displaying thingsd
+  setLoading(!(dataReady && locReady));
+  if(mechanics && mechanics.every(x=>!x.Distance )){
+    mechanics.forEach(x=>{
+      x.Distance = distanceScore(x)
+    })
+  }
+}, [dataReady, locReady]);
+  
+  //#endregion
+const finalData =     userLoc && maxD == sliderValue?applyFilter().filter(x=>x.Distance < Number.POSITIVE_INFINITY):
+                      userLoc?applyFilter().filter(x=>x.Distance <= sliderValue):
+                      applyFilter()
   return (
    <SafeAreaView className="flex-1" edges={['right', 'top', 'left']}>
       <View
@@ -381,17 +518,18 @@ export default function Index() {
       >
         <View className="justify-center w-full h-[18%]">
         
+        {/*Banner */}
           <ImageBackground source={require("@/public/assets/images/test.png")} imageStyle={{width:'auto', height: 140 , marginTop:-60}} resizeMode='cover'>
             <View className='items-end mr-[5%]'>
                <NormalButton onClick={()=>{router.push('/(tabs)/garage')}} text={"Enter Garage"}/>
             </View>
-           
           </ImageBackground>
           
         </View > 
         <SearchBar placeholder1="Search" value1={mQuery} onChangeText1={(newV)=>{setMQuery(newV)}}
                     placeholder2="Location" value2={lQuery} onChangeText2={(newL)=>{setLQuery(newL)}}/>
         <View >
+          {/*Filter Buttons */}
           <ScrollView  horizontal={true} contentContainerStyle={{gap:10, marginLeft:10}} showsHorizontalScrollIndicator={false}>
             <NormalButton variant={`${isFiltersActive?`primary`:`outline`}`} onClick={()=>{setisFiltersModal(!isFiltersModal)}} text="Filters"/>
             <NormalButton variant={`${isServicesActive?`primary`:`outline`}`} onClick={()=>{setIsServicesModal(!isServicesModal)}} text="Services"/>
@@ -421,13 +559,17 @@ export default function Index() {
         
         
         <Text className="text-2xl mt-5 ml-5 mb-5">Find Nearby</Text>
+        
+        {/*Rendering Mechanic cards */}
         <View style={{flex:1}}>
             <FlatList
                       
-                data={applyFilter()}
+                data={
+                      handleSort(finalData)}
                 keyExtractor={(item) => item.mechanicID}
                 numColumns={2}
-                renderItem={({item})=> <MechanicView {...item}/>}
+                initialNumToRender={4}
+                renderItem={({item})=> <MechanicView {...item} Distance={distanceScore(item)}/>}
                 contentContainerStyle={{alignItems:'center'}}
                 columnWrapperStyle={{justifyContent: "space-between",  marginBottom:'5%', gap:"3%"}}
                 showsVerticalScrollIndicator={false}
@@ -455,7 +597,7 @@ export default function Index() {
                       {
                         //undo the changes
                         setSortOpt(sortOptApplied);
-                        setTempMinP(minP);
+                        setTempMinP(minP===''?minP:`$${minP}`);
                         setTempMaxP(maxP);
                         setWarning(false);
                         setTempSliderValue(sliderValue);
@@ -479,12 +621,15 @@ export default function Index() {
                 </Text>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%]">
-                  <ToggleButton width={width} text="Relevance" flag={sortOpt == '1'} onPress={(newf)=>{newf?setSortOpt('1'):setSortOpt('0')}}/>
-                  <ToggleButton width={width} text="Open Now" flag={sortOpt == '2'} onPress={(newf)=>{newf?setSortOpt('2'):setSortOpt('0')}}/>
+                  <ToggleButton width={width} text="Name" flag={sortOpt == '1'} onPress={(newf)=>{newf?setSortOpt('1'):setSortOpt('0')}}/>
+                  <View style={{opacity:userLoc?1:0.5, width:width}}>
+                       <ToggleButton width={"100%"} text="Distance" flag={sortOpt == '2'} onPress={(newf)=>{if(userLoc)
+                        newf?setSortOpt('2'):setSortOpt('0')}}/>
+                  </View>
                 </View>
 
                 <View className="flex-row justify-between ml-[5%] mr-[5%] mt-[-2%]">
-                  <ToggleButton width={width} text="Popular" flag={sortOpt == '3'} onPress={(newf)=>{newf?setSortOpt('3'):setSortOpt('0')}}/>
+                  <ToggleButton width={width} text="Review Count" flag={sortOpt == '3'} onPress={(newf)=>{newf?setSortOpt('3'):setSortOpt('0')}}/>
                   <ToggleButton width={width} text="Rating" flag={sortOpt == '4'} onPress={(newf)=>{newf?setSortOpt('4'):setSortOpt('0')}}/>
                
                 </View>
@@ -537,6 +682,7 @@ export default function Index() {
                     </Text>
 
                     <Slider
+                          style={{opacity:userLoc?1:0.5}}
                           minimumValue={minD}
                           maximumValue={maxD}
                           minimumTrackTintColor="#3A5779"
@@ -545,7 +691,7 @@ export default function Index() {
                           step={1}
                           value={tempSliderValue}
                           onValueChange={(newVal)=>{setTempSliderValue(newVal)}}
-                          disabled={!LocationEnabled}
+                          disabled={!userLoc}
                       />
 
                     <View className="flex-row justify-between">
@@ -557,9 +703,9 @@ export default function Index() {
                       </Text> 
                     </View>
                     {
-                      !LocationEnabled
+                      !userLoc
                        && <Text className='text-l buttonTextBlack text-subheaderGray mt-[10]'>
-                        *Enable location to use slider
+                        *Enable location to use slider or to sort by distance
                           </Text>
                     }
                     
@@ -589,8 +735,8 @@ export default function Index() {
                       //filter logic goes here
 
                       setSortOptApplied(sortOpt);
-                      setminP(tempMinP);
-                      setmaxP(tempMaxP);
+                      setminP(tempMinP.replace('$',''));
+                      setmaxP(tempMaxP.replace('$',''));
                       setSliderValue(tempSliderValue);
                       setisFiltersModal(!isFiltersModal)
                     }

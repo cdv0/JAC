@@ -1,5 +1,6 @@
 import { Text } from 'react-native'
 
+
 const TimeConverter = (time:string) => {
   const array = time.split('-')
   const trimmed = array.map(x=>x.trim())
@@ -21,4 +22,4 @@ const TimeConverter = (time:string) => {
     return time
 }
 
-export default TimeConverter
+export default TimeConverter;

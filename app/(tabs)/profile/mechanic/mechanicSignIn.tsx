@@ -1,8 +1,7 @@
 import { Text, View } from 'react-native'
-
 const mechanicSignIn = () => {
   return (
-    <View>
+    <View className='flex-1 bg-white'>
       <Text>Mechanic Sign In</Text>
     </View>
   )
