@@ -13,11 +13,32 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { getCurrentUser } from "aws-amplify/auth";
 
-import { getSingleReview, getSingleMechanic,
+import {
+  getSingleReview,
+  getMechanicById,
   type Review,
   type Mechanic,
 } from "@/_backend/api/review";
 import { icons } from "@/constants/icons";
+
+// 🔹 Helper: turn imageKey into a full image URL
+// Update this to match how you usually build S3 URLs in your app.
+function getMechanicImageUri(mechanic: Mechanic | null): string | undefined {
+  if (!mechanic) return undefined;
+
+  // If you already store a full URL somewhere, use that directly:
+  // if ((mechanic as any).imageUrl) return (mechanic as any).imageUrl;
+
+  // Otherwise, build from imageKey + your base URL:
+  if ((mechanic as any).imageKey) {
+    const imageKey = (mechanic as any).imageKey as string;
+    // TODO: replace with your real public S3 URL / CloudFront domain
+    const BASE_IMAGE_URL = "https://YOUR-S3-PUBLIC-URL-HERE"; // <-- change this
+    return `${BASE_IMAGE_URL}/${imageKey}`;
+  }
+
+  return undefined;
+}
 
 const ViewReview = () => {
   const params = useLocalSearchParams<{
@@ -76,7 +97,7 @@ const ViewReview = () => {
         setErrorMsg(null);
 
         const { userId } = await getCurrentUser();
-        setUserId(userId); 
+        setUserId(userId);
         console.log("ViewReview: userId, mechanicId, reviewId", {
           userId,
           mechanicId,
@@ -88,10 +109,25 @@ const ViewReview = () => {
         console.log("ViewReview: reviewDetail", reviewDetail);
         setReview(reviewDetail);
 
-        // 2) Load mechanic banner info
-        const mechDetail = await getSingleMechanic(mechanicId);
-        console.log("ViewReview: mechDetail", mechDetail);
-        setMechanic(mechDetail);
+        // 2) Load mechanic info via getMechanicById
+        try {
+          const mechDetail = await getMechanicById(mechanicId);
+          console.log(
+            "ViewReview: mechDetail from getMechanicById",
+            mechDetail
+          );
+
+          if (!mechDetail) {
+            console.log(
+              "ViewReview: No mechanic found for mechanicId:",
+              mechanicId
+            );
+          }
+
+          setMechanic(mechDetail);
+        } catch (err: any) {
+          console.log("ViewReview: getMechanicById error", err);
+        }
       } catch (err: any) {
         console.log("ViewReview: error loading review detail:", err);
         setErrorMsg(err?.message ?? "Unable to load review.");
@@ -123,17 +159,17 @@ const ViewReview = () => {
 
     router.push({
       pathname: "/mechanic/[id]/updateReview",
-      params: { 
+      params: {
         id: mechanicId,
         reviewId: reviewId,
-        userId: userId
+        userId: userId,
       },
     });
   };
 
   const handleDeleteReview = () => {
     setMenuVisible(false);
-    console.log ("id", mechanicId, "reviewId", reviewId, "userid:", userId)
+    console.log("id", mechanicId, "reviewId", reviewId, "userid:", userId);
     router.push({
       pathname: "/mechanic/[id]/deleteReview",
       params: { id: mechanicId, reviewId, userId: userId },
@@ -162,6 +198,8 @@ const ViewReview = () => {
     );
   }
 
+  const mechanicImageUri = getMechanicImageUri(mechanic);
+
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
       {/* Small popover menu near top-right */}
@@ -183,9 +221,8 @@ const ViewReview = () => {
                 className="flex-row items-center gap-2 py-2"
                 onPress={handleUpdateReview}
               >
-                {/* Use whatever icon you prefer; link/pencil etc. */}
                 <icons.pencil width={16} height={16} />
-                <Text className="smallTitle">Update reviews</Text>
+                <Text className="smallTitle">Update review</Text>
               </Pressable>
 
               {/* Divider */}
@@ -207,29 +244,28 @@ const ViewReview = () => {
       </Modal>
 
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {/* MECHANIC BANNER */}
-        <View className="flex-row items-center gap-3 bg-white mb-4">
-          {mechanic?.imageUri ? (
-            <Image
-              source={{ uri: mechanic.imageUri }}
-              className="w-16 h-16 rounded-lg bg-secondary"
-              resizeMode="cover"
-            />
-          ) : (
-            <View className="w-16 h-16 rounded-lg bg-secondary" />
-          )}
+        {/* MECHANIC HEADER CARD: image + name + address */}
+        {mechanic && (
+          <View className="flex-row items-center bg-white rounded-2xl px-4 py-3 mb-4">
+            {/* Image */}
+            {mechanicImageUri && (
+              <Image
+                source={{ uri: mechanicImageUri }}
+                className="w-14 h-14 rounded-xl mr-3"
+              />
+            )}
 
-          <View className="flex-1">
-            <Text className="xsTitle">
-              {mechanic?.name ?? `Mechanic ${review.mechanicId}`}
-            </Text>
-            {mechanic?.address ? (
-              <Text className="xsTextGray" numberOfLines={2}>
+            {/* Name + address */}
+            <View className="flex-1">
+              <Text className="smallTitle" numberOfLines={1}>
+                {mechanic.name}
+              </Text>
+              <Text className="smallTextGray mt-1" numberOfLines={2}>
                 {mechanic.address}
               </Text>
-            ) : null}
+            </View>
           </View>
-        </View>
+        )}
 
         {/* REVIEW CARD */}
         <View className="bg-[#F5F7FB] rounded-2xl p-4">
@@ -245,9 +281,7 @@ const ViewReview = () => {
           </View>
 
           {/* Review text */}
-          <Text className="smallTextGray leading-5">
-            {review.review}
-          </Text>
+          <Text className="smallTextGray leading-5">{review.review}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

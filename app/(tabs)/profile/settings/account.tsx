@@ -2,8 +2,10 @@ import {
   ALLOWED_MIME_TYPES_IMAGE,
   MAX_IMAGE_SIZE,
   uploadProfilePicture,
+  type File,
 } from '@/_backend/api/fileUpload'
 import { deleteAccount, readUserProfile } from '@/_backend/api/profile'
+import NormalButton from '@/app/components/NormalButton'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   deleteUser,
@@ -11,15 +13,17 @@ import {
   getCurrentUser,
   signOut,
 } from 'aws-amplify/auth'
-import * as ImagePicker from 'expo-image-picker'
+import { Hub } from 'aws-amplify/utils'
+import * as DocumentPicker from 'expo-document-picker'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Alert, Image, Pressable, Text, View } from 'react-native'
 import { ChevronRightIcon } from 'react-native-heroicons/outline'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import NormalButton from '../../../components/NormalButton'
 
-const PROFILE_IMAGE_URI_KEY = 'profileImageUri'
+const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
+const getProfileImageKey = (userId: string) =>
+  `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
 
 export default function Account() {
   const [firstName, setFirstName] = useState<string>('')
@@ -35,73 +39,55 @@ export default function Account() {
   useEffect(() => {
     ;(async () => {
       try {
-        const cachedUri = await AsyncStorage.getItem(PROFILE_IMAGE_URI_KEY)
-        if (cachedUri) {
-          setProfileImage(cachedUri)
-        }
-
         const user = await getCurrentUser()
+        const currentUserId = user.userId
+        setUserId(currentUserId)
+
+        const cacheKey = getProfileImageKey(currentUserId)
+        const cachedUri = await AsyncStorage.getItem(cacheKey)
+        if (cachedUri) setProfileImage(cachedUri)
+
         const attrs = await fetchUserAttributes()
-        const emailAttr = attrs.email
-        if (!emailAttr) {
-          throw new Error(
-            'No email on the Cognito profile (check pool/app-client readable attributes).'
-          )
-        }
+        const emailAttr = attrs.email!.toString()
 
-        setUserId(user.userId)
-
-        const userData = await readUserProfile(user.userId, emailAttr)
+        const userData = await readUserProfile(currentUserId, emailAttr)
 
         setFirstName(userData.firstName ?? '')
         setLastName(userData.lastName ?? '')
         setEmail(emailAttr ?? '')
         setCreatedAt(attrs.createdAt ?? '')
-        setUserId(attrs.sub ?? '')
-      } catch (e: any) {
-        console.log('Account: Error loading user data:', e)
-        console.log('Account: Error message:', e.message)
-      }
+      } catch {}
     })()
   }, [])
 
   const handleChangeProfilePicture = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permission needed',
-          'We need access to your photos so you can pick a profile picture.'
-        )
-        return
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
+      const res = await DocumentPicker.getDocumentAsync({
+        type: ALLOWED_MIME_TYPES_IMAGE,
+        multiple: false,
+        copyToCacheDirectory: true,
       })
 
-      if (result.canceled || !result.assets || result.assets.length === 0) {
+      if (res.canceled) return
+
+      const doc = res.assets[0]
+
+      const pickedFile: File = {
+        uri: doc.uri,
+        name: doc.name,
+        size: doc.size ?? 0,
+        mimeType: doc.mimeType ?? null,
+      }
+
+      if (
+        !pickedFile.mimeType ||
+        !ALLOWED_MIME_TYPES_IMAGE.includes(pickedFile.mimeType)
+      ) {
+        Alert.alert('Unsupported file', 'Please choose a JPG image.')
         return
       }
 
-      const asset = result.assets[0]
-      const uri = asset.uri
-      const fileName = asset.fileName || `profile-${Date.now()}.jpg`
-      const fileSize = asset.fileSize ?? 0
-      const mimeType = asset.mimeType ?? 'image/jpeg'
-
-      if (!ALLOWED_MIME_TYPES_IMAGE.includes(mimeType)) {
-        Alert.alert(
-          'Unsupported file',
-          'Please choose a JPG image (.jpg or .jpeg).'
-        )
-        return
-      }
-
-      if (fileSize && fileSize > MAX_IMAGE_SIZE) {
+      if (pickedFile.size && pickedFile.size > MAX_IMAGE_SIZE) {
         Alert.alert(
           'Image too large',
           'Please choose an image smaller than 256 KB.'
@@ -117,21 +103,22 @@ export default function Account() {
       setUploading(true)
 
       const payload = {
-        uri,
-        name: fileName,
-        size: fileSize,
-        mimeType,
+        uri: pickedFile.uri,
+        name: pickedFile.name,
+        size: pickedFile.size,
+        mimeType: pickedFile.mimeType,
         userId,
         email,
       }
 
-      const key = await uploadProfilePicture(payload)
-      console.log('Uploaded profile image key:', key)
+      await uploadProfilePicture(payload)
 
-      setProfileImage(uri)
-      await AsyncStorage.setItem(PROFILE_IMAGE_URI_KEY, uri)
-    } catch (e: any) {
-      console.log('Error changing profile picture:', e?.message || e)
+      const cacheKey = getProfileImageKey(userId)
+      setProfileImage(pickedFile.uri)
+      await AsyncStorage.setItem(cacheKey, pickedFile.uri)
+
+      Hub.dispatch('profile', { event: 'profileImageUpdated' })
+    } catch {
       Alert.alert('Error', 'There was a problem uploading your picture.')
     } finally {
       setUploading(false)
@@ -227,9 +214,7 @@ export default function Account() {
 
               <Pressable
                 className="flex-row justify-between px-5 py-3"
-                onPress={() => {
-                  router.push('/profile/settings/editEmail')
-                }}
+                onPress={() => router.push('/profile/settings/editEmail')}
               >
                 <Text className="font-semibold text-textBlack">Email</Text>
                 <View className="flex-row gap-3">
@@ -243,7 +228,7 @@ export default function Account() {
                 onPress={() =>
                   router.push({
                     pathname: '/profile/settings/editPassword',
-                    params: { email: email },
+                    params: { email },
                   })
                 }
               >
@@ -266,15 +251,6 @@ export default function Account() {
                 </View>
               </Pressable>
             </View>
-
-            <Pressable
-              className="items-center mt-10 "
-              onPress={() => setDeleteAccountModal(true)}
-            >
-              <Text className="p-2 text-lg font-extrabold text-white border-2 border-secondary bg-dangerBrightRed rounded-xl">
-                Delete Account
-              </Text>
-            </Pressable>
           </View>
         </View>
       </View>

@@ -1,22 +1,22 @@
 // app/mechanic/[id]/updateReview.tsx
 
 import {
-  updateReview,
-  getSingleReview,
   getSingleMechanic,
-  type Review,
+  getSingleReview,
+  updateReview,
   type Mechanic,
+  type Review,
 } from "@/_backend/api/review";
 import { getCurrentUser } from "aws-amplify/auth";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
   ScrollView,
   Text,
   TextInput,
   View,
-  ActivityIndicator,
-  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StarRating from "react-native-star-rating-widget";
@@ -100,36 +100,21 @@ const UpdateReview = () => {
 
   const handleSubmit = async () => {
     if (!rating || !reviewText.trim()) return;
-    if (!userId) {
-      console.error("User ID is not loaded yet");
-      return;
-    }
-    if (!reviewId) {
-      console.error("Review ID is missing");
-      return;
-    }
-
+    if (!userId || !reviewId) return;
+  
     try {
       setSubmitting(true);
-      console.log("UpdateReview submit:", {
-        mechanicId: id,
-        userId,
-        rating,
-        reviewText: reviewText.trim(),
-      });
-      console.log("Updating reviewId:", reviewId, "userId:", userId, "rating:", rating, "review", reviewText.trim());
       await updateReview(reviewId, userId, rating, reviewText.trim());
-
-      router.replace({
-        pathname: "/mechanic/[id]/viewReview",
-        params: { id, reviewId },
-      });
+  
+      
+      router.replace("/profile/logged");     
     } catch (err) {
       console.error("UpdateReview: submit error", err);
     } finally {
       setSubmitting(false);
     }
   };
+  
 
   if (loading) {
     return (
