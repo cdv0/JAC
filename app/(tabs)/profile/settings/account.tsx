@@ -205,7 +205,7 @@ export default function Account() {
             )}
             {deleteConfirmModal && (
               <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 rounded-xl border-stroke">
-                <Text className="text-center text-black largeTitle ">
+                <Text className="font-extrabold text-center text-black largeTitle">
                   User Data Deleted
                 </Text>
               </View>
