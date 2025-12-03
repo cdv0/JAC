@@ -151,8 +151,8 @@ const Details = () => {
   const [Verified, setVerified] = useState(false);
   const [choice, setChoice] = useState("");
   const [isClaimed, setClaimed] = useState(false); //change to fetch query
-  const [claimable, setClaimable] = useState(false);
-  const [asMechanic,setAsMechanic] = useState(true);
+  const [claimable, setClaimable] = useState(true); //for testing
+  const [asMechanic,setAsMechanic] = useState(true);//for testing
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading]= useState(true);
   const [editVisible, setEditVisible] = useState(false);
@@ -238,6 +238,14 @@ const Details = () => {
 =======
     fetchData();
   }, [id]); 
+
+  //temporary for testing
+  const claim = async() =>{
+    setTimeout(()=>{
+      let temp = Math.random()
+      setClaimed(temp<0.5)
+      setClaimLoading(false)}, 5000)
+  }
 
   if (loading) {
     return (
@@ -358,18 +366,21 @@ const Details = () => {
                                        *  
                                        * 
                                        *  */
-                                          
-                                      // setClaimVisibile(true)  
-                                      // await claim()                                                                            
+                                      // just for simulation
+                                       if(!isClaimed) {
+                                        setClaimVisibile(true)  
+                                        await claim()
+                                       }
+                                                                                                                   
                                     }}/>}
                   </View>
                   <View style={{marginTop:30, marginLeft:15, gap:10}}>
                     {mechanic.Certified && <images.badge width={30} height={30}/>}            
                   </View>
                   {/*TODO modify to only allow claiming mechanic*/}
-                  <TouchableOpacity onPress={() => setEditVisible(true)}>
-                    <icons.editIcon style={{height:50, width:50}}/>                 
-                  </TouchableOpacity>
+                  {isClaimed &&<TouchableOpacity onPress={() => setEditVisible(true)}>
+                    <icons.editIcon style={{height:50, width:50, marginTop:10}}/>                 
+                  </TouchableOpacity>}
                 
               </View>
 
