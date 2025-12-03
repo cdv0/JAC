@@ -18,7 +18,7 @@ const MECHANIC_TABLE = "Mechanics";
 
 export const handler = async (event) => {
   const userId = event.headers["x-user-id"];
-  const mechanicId = event.pathParameters.mechanicId;
+  const mechanicId = event.queryStringParameters.mechanicId;
 
   if (!userId) {
     return {

@@ -54,7 +54,7 @@ export default function ProfileLayout() {
           headerBackVisible: false,
           headerLeft: () => (
             <Pressable
-              onPress={() => router.push('/(tabs)/profile')}
+              onPress={() => router.push('/mechanicMain')}
               className="flex-row items-center px-2"
               hitSlop={2}
             >
