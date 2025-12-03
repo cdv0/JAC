@@ -2,13 +2,14 @@ import { readUserProfile } from '@/_backend/api/profile'
 import NormalButton from '@/app/components/NormalButton'
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth'
 import { useRouter } from 'expo-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { Pressable, ScrollView, Text, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { icons } from '@/constants/icons';
 import { getReviewsByUser } from '@/_backend/api/review'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
+import { useFocusEffect } from '@react-navigation/native' 
 
 const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
 const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
@@ -24,6 +25,32 @@ export const account = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [reviews, setReviews] = useState<any[]>([])
   const [sortOption, setSortOption] = useState<SortOption>('dateNewest')
+
+  const loadAccountData = useCallback(async () => {
+    try {
+      const { userId } = await getCurrentUser()
+      const attrs = await fetchUserAttributes()
+      const email = attrs.email
+      if (!email) {
+        throw new Error(
+          'No email on the Cognito profile (check pool/app-client readable attributes).'
+        )
+      }
+
+      console.log('userid:', userId, 'email:', email)
+      const userData = await readUserProfile(userId, email)
+      setFirstName(userData.firstName ?? '')
+      setLastName(userData.lastName ?? '')
+      setCreatedAt(userData.createdAt ?? '')
+
+      const reviewData = await getReviewsByUser(userId)
+      console.log('Reviews:', reviewData)
+      setReviews(reviewData ?? [])
+    } catch (e: any) {
+      console.log('Account: Error loading user data:', e)
+      console.log('Account: Error message:', e.message)
+    }
+  }, [])
 
   useEffect(() => {
     (async () => {
@@ -57,12 +84,12 @@ export const account = () => {
     })()
   }, [])
 
-  // 🔹 Initial load
+  
   useEffect(() => {
     loadAccountData()
   }, [loadAccountData])
 
-  // 🔹 Re-run every time the screen is focused (e.g. after back from viewReview/delete)
+
   useFocusEffect(
     useCallback(() => {
       loadAccountData()
@@ -73,13 +100,6 @@ export const account = () => {
     (firstName?.[0] ?? '').toUpperCase() + (lastName?.[0] ?? '').toUpperCase()
 
   function formatMonthYear(iso?: string) {
-    if (!iso) return ''
-    const d = new Date(iso)
-    const fmt = new Intl.DateTimeFormat(undefined, {
-      month: 'long',
-      year: 'numeric',
-    })
-    return fmt.format(d)
     if (!iso) return ''
     const d = new Date(iso)
     const fmt = new Intl.DateTimeFormat(undefined, {
@@ -154,14 +174,7 @@ export const account = () => {
                 variant="primary"
                 text="Filter"
                 icon={<icons.filter height={24} width={24} />}
-              <NormalButton
-                variant="primary"
-                text="Filter"
-                icon={<icons.filter height={24} width={24} />}
                 paddingHorizontal={20}
-                onClick={() => {
-                  setFilterOpen((f) => !f)
-                }}
                 onClick={() => {
                   setFilterOpen((f) => !f)
                 }}
@@ -173,7 +186,6 @@ export const account = () => {
                 <View className="flex-1 flex-row justify-between">
                   <Text className="xsTitle mb-3">Sort by</Text>
                   <Pressable onPress={() => setFilterOpen(false)}>
-                    <icons.x height={24} width={24} />
                     <icons.x height={24} width={24} />
                   </Pressable>
                 </View>
