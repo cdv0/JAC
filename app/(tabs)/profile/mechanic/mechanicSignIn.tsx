@@ -1,7 +1,7 @@
+import AddShop from '@/app/components/AddShop'
 import NormalButton from '@/app/components/NormalButton'
 import { useState } from 'react'
 import { Text, View } from 'react-native'
-import AddShop from './AddShop'
 const mechanicSignIn = () => {
   const [addModalVisible, setAddModalVisible] = useState(false)
   const close =()=>{setAddModalVisible(false)};
