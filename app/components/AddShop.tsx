@@ -303,11 +303,11 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
                   data={shop.Services}
                   keyExtractor={(item) => item}
                   renderItem={({ item }) => (
-                    <View className='bg-lightBlueText  rounded-xl'>
+                    <TouchableOpacity className='bg-lightBlueText  rounded-xl' activeOpacity={0.5}>
                       <Text className='buttonTextWhite px-2'>
                         {item}
                       </Text>
-                    </View>
+                    </TouchableOpacity>
                   )}
                   numColumns={3}
                   contentContainerClassName='border border-stroke w-full items-center py-5'
