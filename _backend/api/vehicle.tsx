@@ -1,3 +1,5 @@
+import {Buffer} from "buffer";
+
 export const BASE_URL = "https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev";
 
 export type Vehicle = {
@@ -113,7 +115,9 @@ export async function getVehicleImage(userId: string, vehicleId: string) {
 
     const base64string = data.body as string;
 
-    const dataUrl = `data:image/jpeg;base64,${base64string}`;
+    const binaryString = Buffer.from(base64string, 'base64').toString('binary');
+    const dataUrl = Buffer.from(binaryString, 'binary');
+
 
     return dataUrl;
 }
