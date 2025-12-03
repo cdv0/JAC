@@ -1,8 +1,10 @@
-<<<<<<< HEAD
 import { readUserProfile } from '@/_backend/api/profile'
 import { getMechanicById, getReviewsByMechanic } from '@/_backend/api/review'
+import AddShop from '@/app/components/AddShop'
 import NormalButton from '@/app/components/NormalButton'
+import Star from '@/app/components/Star'
 import TimeConverter from '@/app/components/TimeConverter'
+import ToggleButton from '@/app/components/ToggleButton'
 import ViewReviews from '@/app/components/ViewReviews'
 import { icons } from '@/constants/icons'
 import { images } from '@/constants/images'
@@ -20,8 +22,10 @@ import {
   ScrollView,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native'
+import { ReactNativeModal as Modal } from 'react-native-modal'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace'
@@ -32,7 +36,7 @@ interface MechanicViewProps {
   Certified: boolean
   Review: number
   Image: string
-  Services: string
+  Services: string[]
   Hours: string[]
   address: string
   Website: string
@@ -48,59 +52,13 @@ type ReviewProps = {
   Review: string
   UserId: string
 }
-=======
-import { readUserProfile } from '@/_backend/api/profile';
-import { getMechanicById, getReviewsByMechanic } from '@/_backend/api/review';
-import AddShop from '@/app/components/AddShop';
-import NormalButton from '@/app/components/NormalButton';
-import Star from '@/app/components/Star';
-import TimeConverter from '@/app/components/TimeConverter';
-import ToggleButton from '@/app/components/ToggleButton';
-import ViewReviews from '@/app/components/ViewReviews';
-import { icons } from '@/constants/icons';
-import { images } from '@/constants/images';
-import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { ReactNativeModal as Modal } from 'react-native-modal';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
-
-
-
-
-interface MechanicViewProps {
-  mechanicID: string;
-  name: string;
-  Certified: boolean;
-  Review: number;
-  Image: string;
-  Services: string[];
-  Hours: string[];
-  address: string;
-  Website: string;
-  Phone: string;
-  lat: number;
-  lon: number;
-}
-
-type ReviewProps = {
-  ReviewId: string;
-  MechanicId: string;
-  Rating: number;
-  Review: string;
-  UserId: string;
-};
->>>>>>> origin/main
 
 const Details = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
 
   const [mechanic, setMechanic] = useState<any>(null)
   const [reviews, setReviews] = useState<any[]>([])
-  const [reviewAVG, setreviewAVG] = useState<Float>(0)
+  const [reviewAVG, setreviewAVG] = useState<number>(0)
   const [loading, setLoading] = useState(true)
   const [more, setMore] = useState(false)
 
@@ -137,28 +95,18 @@ const Details = () => {
     })()
   }, [])
 
-<<<<<<< HEAD
   const [query, setQuery] = useState('')
   const [visible, setVisible] = useState(false)
   const [Verified, setVerified] = useState(false)
   const [choice, setChoice] = useState('')
-
+  const [isClaimed, setClaimed] = useState(false) //change to fetch query
+  const [claimable, setClaimable] = useState(true) //for testing
+  const [asMechanic, setAsMechanic] = useState(true) //for testing
+  const [claimVisibile, setClaimVisibile] = useState(false)
+  const [claimLoading, setClaimLoading] = useState(true)
+  const [editVisible, setEditVisible] = useState(false)
   const handleChoice = (flag: boolean, choice: string) => {
     if (flag) {
-=======
-  const [query, setQuery] = useState('');
-  const [visible, setVisible] = useState(false);
-  const [Verified, setVerified] = useState(false);
-  const [choice, setChoice] = useState("");
-  const [isClaimed, setClaimed] = useState(false); //change to fetch query
-  const [claimable, setClaimable] = useState(true); //for testing
-  const [asMechanic,setAsMechanic] = useState(true);//for testing
-  const [claimVisibile, setClaimVisibile] = useState(false);
-  const [claimLoading, setClaimLoading]= useState(true);
-  const [editVisible, setEditVisible] = useState(false);
-  const handleChoice = (flag:boolean, choice:string)=>{
-    if (flag){
->>>>>>> origin/main
       setChoice(choice)
     } else {
       setChoice('')
@@ -188,9 +136,9 @@ const Details = () => {
         )
 
         console.log(
-          "Raw backendReviews from Lambda:",
+          'Raw backendReviews from Lambda:',
           JSON.stringify(backendReviews, null, 2)
-        );
+        )
 
         setReviews(
           backendReviews.map((r: any) => ({
@@ -228,29 +176,21 @@ const Details = () => {
       }
     }
 
-<<<<<<< HEAD
     fetchData()
   }, [id])
 
-  if (loading) {
-    return (
-      <View className="items-center justify-center flex-1">
-=======
-    fetchData();
-  }, [id]); 
-
   //temporary for testing
-  const claim = async() =>{
-    setTimeout(()=>{
+  const claim = async () => {
+    setTimeout(() => {
       let temp = Math.random()
-      setClaimed(temp<0.5)
-      setClaimLoading(false)}, 5000)
+      setClaimed(temp < 0.5)
+      setClaimLoading(false)
+    }, 5000)
   }
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center">
->>>>>>> origin/main
+      <View className="items-center justify-center flex-1">
         <ActivityIndicator size="large" />
       </View>
     )
@@ -259,25 +199,16 @@ const Details = () => {
       <View className="items-center justify-center flex-1">
         <Text>{id} could not be found</Text>
       </View>
-<<<<<<< HEAD
     )
   } else {
-    const servicesData = mechanic.Services.split(',').map((item: string) =>
-      item.trim()
-    )
-=======
-    );
-    } else {
-      const rawServices = mechanic?.Services;
-    
-      const servicesData =
-        Array.isArray(rawServices)
-          ? rawServices.map((item: string) => item.trim())
-          : typeof rawServices === 'string'
-            ? rawServices.split(',').map((item: string) => item.trim())
-            : [];
-  
->>>>>>> origin/main
+    const rawServices = mechanic?.Services
+
+    const servicesData = Array.isArray(rawServices)
+      ? rawServices.map((item: string) => item.trim())
+      : typeof rawServices === 'string'
+        ? rawServices.split(',').map((item: string) => item.trim())
+        : []
+
     const condition =
       (mechanic.Hours?.length ?? 0) > 0 ||
       mechanic.address !== '' ||
@@ -296,7 +227,6 @@ const Details = () => {
     )
 
     const sortedTemp = Object.keys(temp)
-<<<<<<< HEAD
       .sort((a, b) => Number(b) - Number(a))
       .reduce(
         (acc, key) => {
@@ -307,96 +237,23 @@ const Details = () => {
       )
 
     // Search filter
-    const filterReviews =
-      query !== ''
+    const searchReviews =
+      query != ''
         ? reviews.filter((x) =>
             x.Review.toLowerCase().includes(query.toLowerCase())
           )
         : reviews
-=======
-      .sort((a, b) => Number(b) - Number(a)) 
-      .reduce((acc, key) => {
-        acc[key] = temp[key];
-        return acc;
-      }, {} as Record<string, number>);
-
-    // Search filter
-    const searchReviews = query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews;
-    const applyFilter = () =>{
-      const temp =searchReviews
-      if (choice ==''){
+    const applyFilter = () => {
+      const temp = searchReviews
+      if (choice == '') {
         return temp
-      }
-      else if (choice =='5')
-        return temp.filter(x=> x.Rating == Number(choice))
-      else{
+      } else if (choice == '5')
+        return temp.filter((x) => x.Rating == Number(choice))
+      else {
         const bound = Number(choice)
-        return temp.filter(x=> bound<=x.Rating && x.Rating<bound + 1)
+        return temp.filter((x) => bound <= x.Rating && x.Rating < bound + 1)
       }
     }
-
-    return(
-      <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
-        <KeyboardAvoidingView className='flex-1' behavior='padding' keyboardVerticalOffset={100}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 10, gap:10 }} showsVerticalScrollIndicator={false}>
-              <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
-                  {!mechanic.Image?(<images.defaultImage width={120} height={120} />):
-                              <Image source={{uri:String(mechanic.Image)}} className='w-[120] h-[120]'/>
-                              }
-                  <View className='ml-[5%] justify-center'>
-                      <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
-                      <View className='flex-row'>
-                        <Text className='buttonTextBlack'>Ratings: </Text>
-                        <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
-                      </View>
-                      <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
-                      {isAuthenticated && asMechanic && claimable && <ToggleButton flag={isClaimed} 
-                      text={isClaimed?'Claimed':'Claim Business'} 
-                      onPress={async ()=>{
-                                      /**
-                                       * 
-                                       * PsuedoCode
-                                       * if Claimed
-                                       *    prompt for confirmation modal
-                                       *    return
-                                       * 
-                                       * call modal
-                                       * call async func for claiming
-                                       *    
-                                       *  
-                                       * 
-                                       *  */
-                                      // just for simulation
-                                       if(!isClaimed) {
-                                        setClaimVisibile(true)  
-                                        await claim()
-                                       }
-                                                                                                                   
-                                    }}/>}
-                  </View>
-                  <View style={{marginTop:30, marginLeft:15, gap:10}}>
-                    {mechanic.Certified && <images.badge width={30} height={30}/>}            
-                  </View>
-                  {/*TODO modify to only allow claiming mechanic*/}
-                  {isClaimed &&<TouchableOpacity onPress={() => setEditVisible(true)}>
-                    <icons.editIcon style={{height:50, width:50, marginTop:10}}/>                 
-                  </TouchableOpacity>}
-                
-              </View>
-
-              <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
-                  <Text className='text-2xl buttonTextBlack mb-[5%] '> Services</Text>
-                  <FlatList
-                    className='mx-[5%] mb-[5%]'
-                    data={more?servicesData:servicesData.slice(0,8)}
-                    renderItem={({item})=> <Text className='flex-1 smallTextBlue'>{'\u2B24'} {item}</Text>}
-                    numColumns={2}
-                    initialNumToRender={2}
-                    scrollEnabled={false}
-                    columnWrapperClassName='gap-20 '
-                    contentContainerClassName='gap-2'
-                    showsVerticalScrollIndicator={false}
->>>>>>> origin/main
 
     return (
       <SafeAreaView
@@ -429,19 +286,53 @@ const Details = () => {
                   <Text className="buttonTextBlack">Ratings: </Text>
                   <StarRatingDisplay
                     color={'black'}
-                    starSize={16}
-                    starStyle={{ width: 4 }}
-                    style={{ alignItems: 'center' }}
+                    starSize={20}
+                    StarIconComponent={Star}
                     rating={reviewAVG}
+                    starStyle={{ marginHorizontal: -1 }}
                   />
                 </View>
-                <Text className="buttonTextBlack">
+                <Text className="buttonTextBlack mb-[10]">
                   Reviews: {reviews.length}
                 </Text>
+                {isAuthenticated && asMechanic && claimable && (
+                  <ToggleButton
+                    flag={isClaimed}
+                    text={isClaimed ? 'Claimed' : 'Claim Business'}
+                    onPress={async () => {
+                      /**
+                       *
+                       * PsuedoCode
+                       * if Claimed
+                       *    prompt for confirmation modal
+                       *    return
+                       *
+                       * call modal
+                       * call async func for claiming
+                       *
+                       *
+                       *
+                       *  */
+                      // just for simulation
+                      if (!isClaimed) {
+                        setClaimVisibile(true)
+                        await claim()
+                      }
+                    }}
+                  />
+                )}
               </View>
               <View style={{ marginTop: 30, marginLeft: 15, gap: 10 }}>
                 {mechanic.Certified && <images.badge width={30} height={30} />}
               </View>
+              {/*TODO modify to only allow claiming mechanic*/}
+              {isClaimed && (
+                <TouchableOpacity onPress={() => setEditVisible(true)}>
+                  <icons.editIcon
+                    style={{ height: 50, width: 50, marginTop: 10 }}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
 
             <View className="w-[95%] bg-white rounded-xl self-center py-[5%] ">
@@ -514,15 +405,17 @@ const Details = () => {
                           </Text>
                         </Text>
                       </View>
-                      <Pressable
-                        onPress={() =>
-                          Linking.openURL(
-                            `https://google.com/maps/search/?api=1&query=${mechanic.lat},${mechanic.lon}&force_browser=true`
-                          )
-                        }
-                      >
-                        <icons.start width={20} height={20} />
-                      </Pressable>
+                      {mechanic.Location && (
+                        <Pressable
+                          onPress={() =>
+                            Linking.openURL(
+                              `https://google.com/maps/search/?api=1&query=${mechanic.Location[0]},${mechanic.Location[1]}&force_browser=true`
+                            )
+                          }
+                        >
+                          <icons.start width={20} height={20} />
+                        </Pressable>
+                      )}
                     </View>
                   )}
                   {mechanic.Hours.length > 0 && (
@@ -586,7 +479,12 @@ const Details = () => {
                     ? `${displayName || 'no_name'}`
                     : 'Want to add a review?'}
                 </Text>
-                <StarRatingDisplay rating={0} color="black" starSize={20} />
+                <StarRatingDisplay
+                  rating={0}
+                  StarIconComponent={Star}
+                  color="black"
+                  starSize={20}
+                />
               </View>
               <View className="justify-center flex-1">
                 <NormalButton
@@ -606,21 +504,21 @@ const Details = () => {
               </View>
             </View>
 
-            <View className="w-[95%] bg-white rounded-xl self-center flex-row py-[5%] gap-2">
-              <View className="items-center justify-center gap-[5]">
-                <Text className="buttonTextBlack">
+            <View className="w-[95%] bg-white rounded-xl self-center flex-row py-[5%]">
+              <View className="items-center justify-center gap-[5] mx-[10]">
+                <Text className="text-2xl buttonTextBlack">
                   {reviewAVG ? reviewAVG.toFixed(1) : 0}
                 </Text>
                 <StarRatingDisplay
                   rating={reviewAVG}
                   color="black"
-                  starSize={15}
+                  StarIconComponent={Star}
+                  starSize={18}
                 />
-                <Text className="buttonTextBlack">
+                <Text className="buttonTextBlack text-l">
                   {reviews.length} reviews
                 </Text>
               </View>
-<<<<<<< HEAD
               <View className="items-center justify-center flex-1 mr-[2%]">
                 {Object.keys(sortedTemp)
                   .reverse()
@@ -660,12 +558,14 @@ const Details = () => {
                   }}
                 />
               </View>
-              <NormalButton text="Filter" onClick={() => {}} />
+              <NormalButton
+                text="Filter"
+                onClick={() => {
+                  setVisible(true)
+                }}
+              />
             </View>
             <View className="w-[95%] bg-white rounded-xl self-center py-[5%] ">
-=======
-              <View className='w-[95%] bg-white rounded-xl self-center py-[5%] '>
->>>>>>> origin/main
               <FlatList
                 data={applyFilter()}
                 renderItem={({ item }) => (
@@ -677,7 +577,7 @@ const Details = () => {
                           id: String(id),
                           reviewId: item.ReviewId,
                           mechanicId: item.MechanicId,
-                          userId: item.UserId, 
+                          userId: item.UserId,
                         },
                       })
                     }
@@ -696,64 +596,127 @@ const Details = () => {
                 keyExtractor={(item) => item.ReviewId}
                 extraData={query}
               />
-<<<<<<< HEAD
             </View>
-          </ScrollView>
-=======
+
+            {/*Filter reviews*/}
+            <Modal
+              isVisible={visible}
+              animationIn="slideInRight"
+              animationOut="slideOutRight"
+              onBackdropPress={() => setVisible(false)}
+              backdropOpacity={0.3}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                margin: 0,
+              }}
+            >
+              <View className="w-[40%] h-[70%] flex-row items-center">
+                <Pressable
+                  className="w-[20px] h-[40px] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black"
+                  onPress={() => setVisible(false)}
+                >
+                  <Text className="text-2xl text-bold buttonTextBlack">
+                    {'>'}
+                  </Text>
+                </Pressable>
+                <View className="items-center justify-around flex-1 h-full bg-white border border-black rounded-l-xl">
+                  <View className="w-full border-b border-stroke">
+                    <Text className="self-center text-2xl buttonTextBlack">
+                      Filters
+                    </Text>
+                  </View>
+
+                  <ToggleButton
+                    flag={Verified}
+                    onPress={(newf) => {
+                      setVerified(newf)
+                    }}
+                    text="Verified"
+                  />
+
+                  <View className="w-full items-center border-t pt-[10%] border-stroke">
+                    <ToggleButton
+                      flag={choice == '5'}
+                      onPress={(newf) => {
+                        handleChoice(newf, '5')
+                      }}
+                      text="5 stars"
+                    />
+                  </View>
+                  <ToggleButton
+                    flag={choice == '4'}
+                    onPress={(newf) => {
+                      handleChoice(newf, '4')
+                    }}
+                    text="4 stars"
+                  />
+                  <ToggleButton
+                    flag={choice == '3'}
+                    onPress={(newf) => {
+                      handleChoice(newf, '3')
+                    }}
+                    text="3 stars"
+                  />
+                  <ToggleButton
+                    flag={choice == '2'}
+                    onPress={(newf) => {
+                      handleChoice(newf, '2')
+                    }}
+                    text="2 stars"
+                  />
+                  <ToggleButton
+                    flag={choice == '1'}
+                    onPress={(newf) => {
+                      handleChoice(newf, '1')
+                    }}
+                    text="1 star"
+                  />
+                </View>
               </View>
-              
-              {/*Filter reviews*/}
-              <Modal isVisible={visible} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => setVisible(false)}
-              backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'flex-end', margin:0}}>
-                <View className='w-[40%] h-[70%] flex-row items-center'>
-                    <Pressable className="w-[20px] h-[40px] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black" onPress={()=>setVisible(false)}>
-                      <Text className='text-2xl text-bold buttonTextBlack'>
-                        {">"}
-                      </Text>
-                    </Pressable>
-                    <View className='bg-white flex-1 h-full rounded-l-xl justify-around items-center border border-black'>
-                      <View className='w-full border-b border-stroke'>
-                        <Text className='buttonTextBlack self-center text-2xl'>
-                          Filters
-                        </Text>
-                      </View>
-                      
-                        <ToggleButton flag={Verified}  onPress={(newf)=>{setVerified(newf)}} text="Verified"/>
+            </Modal>
 
-                      <View className='w-full items-center border-t pt-[10%] border-stroke'>
-                        <ToggleButton flag={choice == '5'}   onPress={(newf)=>{handleChoice(newf, '5')}} text="5 stars"/>
-                      </View>                      
-                      <ToggleButton flag={choice == '4'}   onPress={(newf)=>{handleChoice(newf, '4')}} text="4 stars"/> 
-                      <ToggleButton flag={choice == '3'}   onPress={(newf)=>{handleChoice(newf, '3')}} text="3 stars"/>   
-                      <ToggleButton flag={choice == '2'}  onPress={(newf)=>{handleChoice(newf, '2')}} text="2 stars"/> 
-                      <ToggleButton flag={choice == '1'}  onPress={(newf)=>{handleChoice(newf, '1')}} text="1 star"/>     
-                    </View>
-                  </View>            
-                </Modal> 
+            {/*Claim modal*/}
+            <Modal
+              isVisible={claimVisibile}
+              animationIn="slideInRight"
+              animationOut="slideOutRight"
+              onBackdropPress={() => {
+                setClaimVisibile(false)
+                setClaimLoading(true)
+              }}
+              backdropOpacity={0.3}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                margin: 0,
+              }}
+            >
+              <View className="w-[40%] h-[20%] bg-white border border-black rounded-xl items-center justify-center">
+                {/*Add loading*/}
+                {claimLoading ? (
+                  <View className="items-center justify-center flex-1">
+                    <ActivityIndicator size="large" />
+                  </View>
+                ) : isClaimed ? (
+                  <Text className="buttonTextBlack">Claim Succesful</Text>
+                ) : (
+                  //Add ways to ask for help
+                  <Text className="text-dangerDarkRed buttonTextBlack">
+                    Failed to Claim
+                  </Text>
+                )}
+              </View>
+            </Modal>
 
-                {/*Claim modal*/}
-                <Modal isVisible={claimVisibile} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => {setClaimVisibile(false); setClaimLoading(true)}}
-                backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'center', margin:0}}>
-                  <View className='w-[40%] h-[20%] bg-white border border-black rounded-xl items-center justify-center'>
-                      {/*Add loading*/}
-                      {(claimLoading)? 
-                      (<View className='flex-1 items-center justify-center'>
-                        <ActivityIndicator size="large" />  
-                      </View>):
-                        (isClaimed)?<Text className='buttonTextBlack'>
-                          Claim Succesful
-                        </Text>:
-                        //Add ways to ask for help
-                        <Text className='text-dangerDarkRed buttonTextBlack'>
-                          Failed to Claim 
-                          </Text>}
-                  </View> 
-                </Modal>   
-
-                {/*edit modal*/}  
-                <AddShop mode='edit' visible={editVisible} onClose={()=>setEditVisible(false)} data={{... mechanic}}/>
-        </ScrollView>
->>>>>>> origin/main
+            {/*edit modal*/}
+            <AddShop
+              mode="edit"
+              visible={editVisible}
+              onClose={() => setEditVisible(false)}
+              data={{ ...mechanic }}
+            />
+          </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
     )
