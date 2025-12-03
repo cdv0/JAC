@@ -425,6 +425,7 @@ export default function Index() {
   const [locReady, setLocReady] = useState(false);
   //#endregion
   
+  //Retrieving data
   useEffect(() => {
           const data = async () => {
               try {
