@@ -13,10 +13,20 @@ export type Review = {
 
 
 export type Mechanic = {
-  mechanicId: string;
+  Phone: string;
+  Hours: string[];
+  Review: number;      
+  Website: string;
+  ImageId: string;
+  mechanicID: string;
+  address: string;
+  lat: number | null;
+  lon: number | null;
+  Services: string;
   name: string;
-  address?: string;
-  imageUri?: string;
+  Certified: boolean;
+  imageKey?: string | null;
+  Image?: string | null;  
 };
 
 export type UpdatedReview = {
@@ -27,6 +37,15 @@ export type UpdatedReview = {
   review: string;
   createdAt: string;
   updatedAt?: string;
+};
+
+export type PublicUser = {
+  userId: string;
+  firstName?: string;
+  lastName?: string;
+  createdAt?: string;
+  totalReviews?: number;
+  averageRating?: number; // optional, in case you add it later
 };
 
 async function handleJsonResponse(res: Response) {
@@ -117,26 +136,6 @@ export async function getSingleReview(
   };
 }
 
-
-export async function getSingleMechanic(
-  mechanicId: string
-): Promise<Mechanic> {
-  const url = `${BASE_URL}/reviews/getSingleMechanic?mechanicId=${encodeURIComponent(
-    mechanicId
-  )}`;
-
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await handleJsonResponse(res);
-
-  return data.mechanic;
-}
-
 export async function updateReview(
   reviewId: string,
   userId: string,
@@ -171,22 +170,171 @@ export async function updateReview(
   };
 }
 
-export async function deleteReview(userId: string, ReviewId: string) {
+export async function deleteReview(userId: string, reviewId: string) {
+  console.log("[deleteReview] called with", { userId, reviewId });
+
   const res = await fetch(`${BASE_URL}/reviews/deleteReview`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      ReviewId: ReviewId,  // PK
-      userId: userId       // SK (lowercase, matches lambda)
-    })
+      ReviewId: reviewId, 
+      userId: userId,     
+    }),
   });
 
+  const text = await res.text();
+  console.log("[deleteReview] status:", res.status, "body:", text);
+
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error("Failed to delete review: " + err);
+    throw new Error("Failed to delete review: " + text);
   }
 
   return true;
+}
+
+
+export async function getAllMechanics(): Promise<Mechanic[]> {
+  const res = await fetch(`${BASE_URL}/mechanics/getMechanics`, {
+    method: "GET",
+  });
+
+  const raw = await handleJsonResponse(res);
+
+  // Case 1: API Gateway already unwrapped the Lambda body:
+  //   raw = { message, count, data: [...] }
+  if (raw && Array.isArray(raw.data)) {
+    return raw.data as Mechanic[];
+  }
+
+  // Case 2: You somehow get { statusCode, body: "<json string>" }
+  if (raw && typeof raw.body === "string") {
+    try {
+      const inner = JSON.parse(raw.body);
+      return (inner.data ?? []) as Mechanic[];
+    } catch (e) {
+      console.warn("Failed to parse inner body from Lambda:", e, raw.body);
+    }
+  }
+
+  return [];
+}
+
+export async function getMechanicById(
+  mechanicId: string
+): Promise<Mechanic | null> {
+  const mechanics = await getAllMechanics();
+  const found = mechanics.find(
+    (m: any) => m.mechanicID === mechanicId || m.mechanicId === mechanicId
+  );
+  return (found as Mechanic) ?? null;
+}
+
+
+export async function getReviewsByMechanic(mechanicId: string): Promise<{
+  length: number;
+  average: number;
+  reviews: any[];
+}> {
+  const res = await fetch(
+    `${BASE_URL}/reviews/getReviewsByMechanic?mechanicId=${encodeURIComponent(
+      mechanicId
+    )}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  const text = await res.text();
+  let data: any = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (e) {
+    console.warn("Failed to parse JSON response (reviews):", e, text);
+  }
+
+  if (!res.ok) {
+    const msg =
+      data?.message ||
+      `Request failed with status ${res.status} ${res.statusText}`;
+    throw new Error(msg);
+  }
+
+  // Handle both shapes: { length, average, reviews } OR { body: "<string>" }
+  if (data && typeof data.body === "string" && data.reviews === undefined) {
+    try {
+      const inner = JSON.parse(data.body);
+      return {
+        length: inner.length ?? 0,
+        average: inner.average ?? 0,
+        reviews: inner.reviews ?? [],
+      };
+    } catch (e) {
+      console.warn("Failed to parse inner reviews body:", e, data.body);
+    }
+  }
+
+  return {
+    length: data.length ?? 0,
+    average: data.average ?? 0,
+    reviews: data.reviews ?? [],
+  };
+}
+
+export async function getSingleMechanic(
+  mechanicId: string
+): Promise<Mechanic | null> {
+  return getMechanicById(mechanicId);
+}
+
+export async function getUserById(userId: string): Promise<PublicUser> {
+  const url = `${BASE_URL}/reviews/getUserById?userId=${encodeURIComponent(
+    userId
+  )}`;
+
+  // Lambda is GET, no body
+  const res = await fetch(url);
+
+  const text = await res.text();
+
+  if (!res.ok) {
+    let message = text;
+    try {
+      const parsed = text ? JSON.parse(text) : {};
+      message = parsed.message || message;
+    } catch {
+      // ignore parse errors
+    }
+    throw new Error(message || `Request failed with status ${res.status}`);
+  }
+
+  // Lambda returns result.Items (array)
+  let items: any[] = [];
+  try {
+    items = text ? JSON.parse(text) : [];
+  } catch (e) {
+    throw new Error("Invalid JSON returned from getUserById");
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error("User not found");
+  }
+
+  const item = items[0];
+
+  const publicUser: PublicUser = {
+    userId: item.userId ?? item.UserId,
+    firstName: item.firstName ?? item.FirstName ?? "",
+    lastName: item.lastName ?? item.LastName ?? "",
+    createdAt: item.createdAt ?? item.CreatedAt ?? undefined,
+    totalReviews: item.totalReviews ?? item.TotalReviews ?? 0,
+    averageRating: item.averageRating ?? item.AverageRating ?? undefined,
+  };
+
+  return publicUser;
 }

@@ -10,29 +10,54 @@ export const handler = async (event) => {
   const email = event.request.userAttributes.email
   const sub = event.request.userAttributes.sub
   const name = event.request.userAttributes.name
-  const firstName = name.split(' ')[0]
-  const lastName = name.split(' ')[1]
+  const firstName = name.split(' ')[0] || ''
+  const lastName = name.split(' ')[1] || ''
   const currentDate = new Date().toISOString()
+  const locale = event.request.userAttributes.locale
 
-  try {
-    const command = new PutCommand({
-      TableName: process.env.TABLE_NAME,
-      Item: {
-        userId: sub.toString(),
-        email: email.toString(),
-        firstName: firstName.toString(),
-        lastName: lastName.toString(),
-        createdAt: currentDate,
-      },
-    })
+  if (locale === 'Mechanic') {
+    try {
+      const command = new PutCommand({
+        TableName: process.env.MECHANIC_TABLE_NAME,
+        Item: {
+          userId: sub.toString(),
+          email: email.toString(),
+          firstName: firstName.toString(),
+          lastName: lastName.toString(),
+          createdAt: currentDate,
+        },
+      })
 
-    const result = await docClient.send(command)
-    console.log('Item Insert Result:', result)
-  } catch (error) {
-    console.error('Error inserting item:', error)
-    return {
-      statusCode: 500,
-      body: JSON.stringify('Error inserting item'),
+      const result = await docClient.send(command)
+      console.log('Item Insert Result:', result)
+    } catch (error) {
+      console.error('Error inserting item:', error)
+      return {
+        statusCode: 500,
+        body: JSON.stringify('Error inserting item'),
+      }
+    }
+  } else {
+    try {
+      const command = new PutCommand({
+        TableName: process.env.USER_TABLE_NAME,
+        Item: {
+          userId: sub.toString(),
+          email: email.toString(),
+          firstName: firstName.toString(),
+          lastName: lastName.toString(),
+          createdAt: currentDate,
+        },
+      })
+
+      const result = await docClient.send(command)
+      console.log('Item Insert Result:', result)
+    } catch (error) {
+      console.error('Error inserting item:', error)
+      return {
+        statusCode: 500,
+        body: JSON.stringify('Error inserting item'),
+      }
     }
   }
 

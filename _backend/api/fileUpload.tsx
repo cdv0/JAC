@@ -7,18 +7,20 @@ export type File = {
     name: string;
     size: number;
     mimeType: string | null;
+    userId?: string;
+    email?: string;
 }
 
-// VEHICLE IMAGE CONDITIONS
+// IMAGE CONDITIONS
 export const MAX_IMAGE_SIZE = 256 * 1024; // 256 KB
-export const ALLOWED_MIME_TYPES_VEHICLE = ["image/jpeg", "image/jpg"];
+export const ALLOWED_MIME_TYPES_IMAGE = ["image/jpeg", "image/jpg"];
 
-// VEHICLE IMAGE CONDITIONS
+// IMAGE CONDITIONS
 export const MAX_RECORD_SIZE = 1000 * 1024; // 1 MB
 export const ALLOWED_MIME_TYPES_RECORD = ["application/pdf", "pdf"];
 
 // POST /vehicle/uploadVehicleImage
-export default async function uploadVehicleImage(payload: File, type: "vehicle" | "record") {
+export async function uploadVehicleImage(payload: File, type: "vehicle" | "record") {
   const base64 = Base64.encode(payload.uri);
 
   const response = await fetch(BASE_URL+"/vehicle/uploadVehicleImage", {
@@ -41,27 +43,27 @@ export default async function uploadVehicleImage(payload: File, type: "vehicle" 
   return data.key as string;
 }
 
-// GET /vehicle/getVehicleImage
-export async function getVehicleImage(userId: string, vehicleId: string) {
-    const url = `${BASE_URL}/vehicle/getVehicleImage` +
-              `?userId=${encodeURIComponent(userId)}` +
-              `&vehicleId=${encodeURIComponent(vehicleId)}`;
-    const response = await fetch(url, {
-        method: "GET",
-        cache: "no-store"
-    });
+// POST /profile/uploadProfilePicture
+export async function uploadProfilePicture(payload: File) {
+  const base64 = Base64.encode(payload.uri);
 
-    const text = await response.text()
-    if (!response.ok) {
-        throw new Error(text || `HTTP ${response.status}`);
-    }
+  const response = await fetch(BASE_URL+"/profile/uploadProfilePicture", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fileName: payload.name,
+      fileContent: base64,
+      contentType: payload.mimeType,
+      userId: payload.userId,
+      email: payload.email,
+    }),
+  });
 
-    const data = await JSON.parse(text);
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
 
-    const base64wrapped = data.body as string;
-    const base64string = JSON.parse(base64wrapped);
-
-    const dataUrl = `data:image/jpeg;base64,${base64string}`;
-
-    return dataUrl;
+  const data = await JSON.parse(text);
+  return data.key as string;
 }

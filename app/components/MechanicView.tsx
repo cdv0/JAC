@@ -9,7 +9,6 @@ type MechanicViewProps = {
     mechanicID: string,
     name: string,
     Image: string,
-    Services: string,
     Certified:boolean,
     Distance?: number,
 }

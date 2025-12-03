@@ -1,77 +1,115 @@
-
-import {
-  handleGoogleSignIn,
-  loginHandler,
-  registerHandler,
-  verifyAccountHandler,
-} from '@/_backend/auth'
-import { Controller } from 'react-hook-form';
-import {JSX, useCallback, useEffect, useState} from "react";
-import {Pressable, Text, TextInput, View} from "react-native";
-import {useFocusEffect, useRouter} from "expo-router";
-import { useForm } from "react-hook-form";
-import { getCurrentUser } from 'aws-amplify/auth'
+import { registerHandler, verifyAccountHandler } from '@/_backend/auth'
+import NormalButton from '@/app/components/NormalButton'
 import AppLogo from '@/public/assets/images/group-name.svg'
-import NormalButton from '@/app/components/NormalButton';
-import { Hub } from 'aws-amplify';
+import { getCurrentUser } from 'aws-amplify/auth'
+import { Hub } from 'aws-amplify/utils'
+import { useFocusEffect, useRouter } from 'expo-router'
+import { JSX, useCallback, useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { Pressable, Text, TextInput, View } from 'react-native'
 
-
-export interface FormData{
-    name: string,
-    email: string,
-    password: string,
-    userType?: string,
-
-
+export interface FormData {
+  name: string
+  email: string
+  password: string
 }
 
-
 const profile = () => {
-    const [verifyCode, setVerifyCode] = useState<string>("");
-    const [profileStatus, setProfileStatus] = useState<string>("");
-    const {
-        control,
-        handleSubmit,
-        formState: {errors, isSubmitting},
-        getValues,
-        setError,
-        clearErrors,
-        reset
-    } = useForm<FormData>({
-        defaultValues: {
-            name: "",
-            email: "",
-            password: ""} });
+  const [verifyCode, setVerifyCode] = useState<string>('')
+  const [profileStatus, setProfileStatus] = useState<string>('')
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    getValues,
+    setError,
+    clearErrors,
+    reset,
+  } = useForm<FormData>({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  })
 
-            const signupOnClick = async (data: FormData) => {
-                const {nextStep, userId} = await registerHandler(
-                    data.name,
-                    data.email,
-                    data.password,
-                    data.userType = "Mechanic"
-                )
-        if (nextStep === "CONFIRM_SIGNUP") {
-            setProfileStatus("VerifyAccount");
-        }
+  const signupOnClick = async (data: FormData) => {
+    const { nextStep, userId } = await registerHandler(
+      data.name,
+      data.email,
+      data.password,
+      'Mechanic'
+    )
+    if (nextStep === 'CONFIRM_SIGNUP') {
+      setProfileStatus('VerifyAccount')
     }
-    const verifyAccountClick = async () =>{
-        const email: string = getValues("email");
-        const result = await verifyAccountHandler(verifyAccountHandler, email)
+  }
+  const verifyAccountClick = async () => {
+    const email: string = getValues('email')
+    const result = await verifyAccountHandler(email)
 
-        if(result === "success") {
-            setVerifyCode("");
-            reset()
-            setProfileStatus("SignIn")
-        }
+    if (result === 'success') {
+      setVerifyCode('')
+      reset()
+      setProfileStatus('SignIn')
     }
-    const router = useRouter();
+  }
 
-    let content: JSX.Element = <View />
-    switch (profileStatus){
-        case "SignUp":
-            content = (
-            <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
-            <AppLogo width={300} height={75} className="self-center mb-10" />
+  const signinOnClick = async (data: FormData) => {
+    if (data.email.trim() === '' || data.password.trim() === '') return
+
+    clearErrors('root')
+
+    const result = await loginHandler(data.email, data.password)
+
+    if (result?.user) {
+      if (result.user?.nextStep.signInStep === 'DONE') {
+        //handle signing in change
+        reset()
+        router.push('/profile/logged')
+      }
+    }
+
+    if (result?.code) {
+      switch (result.code) {
+        case 'UserNotFoundException':
+          setError('email', {
+            type: 'Cognito',
+            message: 'Email is not registered!',
+          })
+          break
+        case 'UserNotConfirmedException':
+          setError('email', {
+            type: 'validate',
+            message: 'User Email Not Verified',
+          })
+          break
+        case 'NotAuthorizedException':
+          setError('email', {})
+          setError('password', {})
+          setError('root', {
+            type: 'validate',
+            message: 'Incorrect email or password',
+          })
+          break
+        default:
+          setError('root', {
+            type: 'server',
+            message: 'Please try again later',
+          })
+      }
+    }
+    reset()
+  }
+
+  const router = useRouter()
+
+  let content: JSX.Element = <View />
+  switch (profileStatus) {
+    case 'SignUp':
+      content = (
+        <View className="flex flex-col gap-4 mt-10 ml-10 mr-10 text-left">
+          <AppLogo width={300} height={75} className="self-center mb-10" />
 
           {/* SIGN UP: NAME INPUT */}
           <View className="gap-2">
@@ -185,7 +223,7 @@ const profile = () => {
           <View className="w-full h-px my-6 bg-stroke" />
 
           <Pressable
-            onPress={() => router.push('/profile/index')}
+            onPress={() => router.push('/profile')}
             className="flex items-center"
           >
             <Text className="underline text-primaryBlue">
@@ -308,12 +346,10 @@ const profile = () => {
           <View className="w-full h-px my-6 bg-stroke" />
 
           <Pressable
-            onPress={() => router.push('/profile/index')}
+            onPress={() => router.push('/profile')}
             className="flex items-center"
           >
-            <Text className="underline text-primaryBlue">
-              Are you a user?
-            </Text>
+            <Text className="underline text-primaryBlue">Are you a user?</Text>
           </Pressable>
 
           {/* SIGN IN: Sign up navigation */}
@@ -333,11 +369,11 @@ const profile = () => {
           </View>
         </View>
       )
-      break;
-      default:
-        content = (<View></View>)
-        break
-    }
+      break
+    default:
+      content = <View></View>
+      break
+  }
   useFocusEffect(
     useCallback(() => {
       const checkUser = async () => {
@@ -371,8 +407,4 @@ const profile = () => {
 
     return () => listener()
   }, [])
-
-
-
-
 }

@@ -1,9 +1,13 @@
-import { icons } from '@/constants/icons'
-import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth'
-import { Hub } from 'aws-amplify/utils'
-import { Tabs } from 'expo-router'
-import { useEffect, useState } from 'react'
-import { Text, View } from 'react-native'
+import { icons } from '@/constants/icons';
+import { Tabs } from 'expo-router';
+import { View, Text, Image } from 'react-native';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
+import { Hub } from 'aws-amplify/utils';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri';
+const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`;
 
 const TabIcon = ({ Icon }: any) => {
   return (
@@ -14,40 +18,66 @@ const TabIcon = ({ Icon }: any) => {
 }
 
 const _layout = () => {
-  const [firstName, setFirstName] = useState<string>('')
+  const [firstName, setFirstName] = useState<string>('');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   async function fetchNames() {
     try {
-      await getCurrentUser()
-      const attrs = await fetchUserAttributes()
-      const given = (attrs.name || '').trim()
-      setFirstName(given)
+      await getCurrentUser();
+      const attrs = await fetchUserAttributes();
+      const given = (attrs.name || '').trim();
+      setFirstName(given);
     } catch {
-      setFirstName('')
+      setFirstName('');
+    }
+  }
+
+  async function fetchProfileImage() {
+    try {
+      const user = await getCurrentUser();
+      const cacheKey = getProfileImageKey(user.userId);
+      const uri = await AsyncStorage.getItem(cacheKey);
+      setProfileImage(uri);
+    } catch {
+      setProfileImage(null);
     }
   }
 
   useEffect(() => {
-    fetchNames()
-    const unsubscribe = Hub.listen('auth', ({ payload }) => {
-      const event = payload?.event
+    fetchNames();
+    fetchProfileImage();
+
+    const authUnsub = Hub.listen('auth', ({ payload }) => {
+      const event = payload?.event;
       switch (event) {
         case 'signedIn':
-          fetchNames()
-          break
+          fetchNames();
+          fetchProfileImage();
+          break;
         case 'signedOut':
-          setFirstName('')
-          break
+          setFirstName('');
+          setProfileImage(null);
+          break;
       }
-    })
-    return () => unsubscribe()
-  }, [])
+    });
 
-  const firstInitial = (firstName?.[0] ?? '').toUpperCase()
+    const profileUnsub = Hub.listen('profile', ({ payload }) => {
+      const event = payload?.event;
+      if (event === 'profileImageUpdated') {
+        fetchProfileImage();
+      }
+    });
+
+    return () => {
+      authUnsub();
+      profileUnsub();
+    };
+  }, []);
+
+  const firstInitial = (firstName?.[0] ?? '').toUpperCase();
 
   return (
     <Tabs
-      detachInactiveScreens={false}
       screenOptions={{
         tabBarShowLabel: false,
         tabBarStyle: {
@@ -91,20 +121,34 @@ const _layout = () => {
           title: 'Profile',
           headerShown: false,
           tabBarIcon: ({ focused }) =>
-            firstInitial ? (
+            profileImage ? (
               focused ? (
                 <View className="items-center justify-center">
-                  <View className="items-center justify-center w-16 rounded-full h-7 bg-primaryBlue">
-                    <View className="items-center justify-center w-6 h-6 rounded-full bg-accountOrange">
-                      <Text className="font-bold text-white">
-                        {firstInitial}
-                      </Text>
+                  <View className="h-7 w-16 rounded-full bg-primaryBlue items-center justify-center">
+                    <Image
+                      source={{ uri: profileImage }}
+                      className="h-6 w-6 rounded-full"
+                    />
+                  </View>
+                </View>
+              ) : (
+                <Image
+                  source={{ uri: profileImage }}
+                  className="h-6 w-6 rounded-full"
+                />
+              )
+            ) : firstInitial ? (
+              focused ? (
+                <View className="items-center justify-center">
+                  <View className="h-7 w-16 rounded-full bg-primaryBlue items-center justify-center">
+                    <View className="h-6 w-6 rounded-full items-center justify-center bg-accountOrange">
+                      <Text className="text-white font-bold">{firstInitial}</Text>
                     </View>
                   </View>
                 </View>
               ) : (
-                <View className="items-center justify-center w-6 h-6 rounded-full bg-accountOrange">
-                  <Text className="font-bold text-white">{firstInitial}</Text>
+                <View className="h-6 w-6 rounded-full items-center justify-center bg-accountOrange">
+                  <Text className="text-white font-bold">{firstInitial}</Text>
                 </View>
               )
             ) : (
@@ -113,7 +157,7 @@ const _layout = () => {
         }}
       />
     </Tabs>
-  )
-}
+  );
+};
 
-export default _layout
+export default _layout;
