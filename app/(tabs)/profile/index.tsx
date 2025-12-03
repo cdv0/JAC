@@ -236,7 +236,9 @@ const profile = () => {
           <View className="w-full h-px my-6 bg-stroke" />
 
           <Pressable
-            onPress={() => router.push('/profile/mechanic/mechanicSignUp')}
+            onPress={() =>
+              router.push('/(tabs)/profile/mechanic/mechanicSignUp')
+            }
             className="flex items-center"
           >
             <Text className="underline text-primaryBlue">
@@ -359,7 +361,9 @@ const profile = () => {
           <View className="w-full h-px my-6 bg-stroke" />
 
           <Pressable
-            onPress={() => router.push('/profile/mechanic/mechanicSignIn')}
+            onPress={() =>
+              router.push('/(tabs)/profile/mechanic/mechanicSignIn')
+            }
             className="flex items-center"
           >
             <Text className="underline text-primaryBlue">

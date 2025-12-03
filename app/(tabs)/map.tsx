@@ -124,14 +124,6 @@ const map = () => {
     }, [])
   )
 
-  if (loading) {
-    return (
-      <View className="flex flex-col items-center justify-center h-full">
-        <ActivityIndicator size="large" />
-      </View>
-    )
-  }
-
   const hasValidLocation = (m: any) => {
     const L = m?.Location
     if (!Array.isArray(L)) return false
@@ -180,6 +172,14 @@ const map = () => {
     }
     data()
   }, [validMechanics])
+
+  if (loading) {
+    return (
+      <View className="flex flex-col items-center justify-center h-full">
+        <ActivityIndicator size="large" />
+      </View>
+    )
+  }
 
   return (
     <View className="flex-1 bg-white">
