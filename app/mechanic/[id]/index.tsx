@@ -1,5 +1,6 @@
 import { readUserProfile } from '@/_backend/api/profile';
 import { getMechanicById, getReviewsByMechanic } from '@/_backend/api/review';
+import AddShop from '@/app/components/AddShop';
 import NormalButton from '@/app/components/NormalButton';
 import Star from '@/app/components/Star';
 import TimeConverter from '@/app/components/TimeConverter';
@@ -94,6 +95,7 @@ const Details = () => {
   const [asMechanic,setAsMechanic] = useState(true);
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading]= useState(true);
+  const [editVisible, setEditVisible] = useState(false);
   const handleChoice = (flag:boolean, choice:string)=>{
     if (flag){
       setChoice(choice)
@@ -254,6 +256,7 @@ const Details = () => {
                                       // setClaimVisibile(true)  
                                       // await claim()                                                                            
                                     }}/>}
+                      <NormalButton onClick={() => setEditVisible(true)} text='edit'/>
                   </View>
                   <View style={{marginTop:30, marginLeft:15, gap:10}}>
                     {mechanic.Certified && <images.badge width={30} height={30}/>}            
@@ -477,7 +480,10 @@ const Details = () => {
                           Failed to Claim 
                           </Text>}
                   </View> 
-                </Modal>     
+                </Modal>   
+
+                {/*edit modal*/}  
+                <AddShop mode='edit' visible={editVisible} onClose={()=>setEditVisible(false)} data={{... mechanic}}/>
         </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
