@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+// app/mechanic/[id]/deleteReview.tsx
+
+import React, { useState } from "react";
 import { View, Text, Pressable, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { getCurrentUser } from "aws-amplify/auth";
-import { icons } from "@/constants/icons";
 
 import { deleteReview } from "@/_backend/api/review";
 
@@ -13,6 +14,7 @@ const DeleteReview = () => {
     reviewId: string | string[];
     userId: string | string[];
   }>();
+
   const router = useRouter();
 
   const mechanicId =
@@ -21,21 +23,42 @@ const DeleteReview = () => {
     typeof params.reviewId === "string"
       ? params.reviewId
       : params.reviewId?.[0];
+  const paramUserId =
+    typeof params.userId === "string"
+      ? params.userId
+      : params.userId?.[0];
 
   const [modalVisible, setModalVisible] = useState(true);
   const [loading, setLoading] = useState(false);
 
   async function handleConfirmDelete() {
     try {
+      if (!reviewId) {
+        console.log("DeleteReview: missing reviewId, aborting.");
+        setModalVisible(false);
+        router.back();
+        return;
+      }
+
       setLoading(true);
-      const { userId } = await getCurrentUser();
-        console.log("user", userId, "reviewId", reviewId)
-      await deleteReview(userId, reviewId);
+
+      let userIdToUse = paramUserId;
+      if (!userIdToUse) {
+        const { userId } = await getCurrentUser();
+        userIdToUse = userId;
+      }
+
+      console.log("DeleteReview: deleting", {
+        userId: userIdToUse,
+        reviewId,
+        mechanicId,
+      });
+
+      await deleteReview(userIdToUse, reviewId);
 
       setModalVisible(false);
 
-      // Go back to previous screen  
-      router.back();
+      router.replace("/profile/logged");
     } catch (err) {
       console.error("DeleteReview: error deleting review", err);
     } finally {
@@ -61,12 +84,12 @@ const DeleteReview = () => {
             <Text className="xsTitle mb-3">Delete confirmation</Text>
 
             <Text className="smallTextGray mb-6">
-              Are you sure you want to delete this review? This action cannot be undone.
+              Are you sure you want to delete this review? This action cannot be
+              undone.
             </Text>
 
             {/* Buttons */}
             <View className="flex-row justify-end gap-4">
-
               {/* Cancel */}
               <Pressable
                 onPress={handleCancel}
