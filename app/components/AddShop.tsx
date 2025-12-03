@@ -7,7 +7,6 @@ import PhoneInput from "react-native-phone-number-input";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
-
 interface props{
     visible:boolean,
     mode?: 'add' | 'edit',
@@ -97,9 +96,21 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
       });
     }
     else if( mode== 'edit' && data){
+
+      const convert = (time:string)=>{
+        const temp = time.trim()
+        const sub = Number(temp.slice(0,2))
+          if(sub> 12){
+              return String(sub % 12) +`:${temp.slice(2)} pm`
+          }
+          return String(sub)+`:${temp.slice(2)} am`
+      }
+
       const getTime =(i:number):day=>{
         const time =  data.Hours[i].split('-');
-        return {start:time[0], end:time[1]}
+        if(time.length == 2)
+          return {start:convert(time[0]), end:convert(time[1])}
+        return {start:'', end:''}
       }
       setDays({
       'Monday': getTime(0),
@@ -313,7 +324,7 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
           </KeyboardAvoidingView>
           <View className='flex-row self-center gap-20'>
               <NormalButton text='Cancel' variant='cancel' onClick={()=>{onClose();}} />
-              <NormalButton text='Add' variant='lightBlue' onClick={()=>{
+              <NormalButton text={mode=='add'?'add':'save'} variant='lightBlue' onClick={()=>{
                                                                         //call some add shop function here
                                                                         onClose();}} />
           </View>        
