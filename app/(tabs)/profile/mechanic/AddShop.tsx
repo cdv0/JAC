@@ -5,9 +5,29 @@ import { FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, 
 import { ReactNativeModal as Modal } from 'react-native-modal';
 import PhoneInput from "react-native-phone-number-input";
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+
+
 interface props{
-    visible:boolean
+    visible:boolean,
+    mode?: 'add' | 'edit',
+    data?:MechanicViewProps,
     onClose:()=> void
+}
+
+interface MechanicViewProps {
+  mechanicID: string;
+  name: string;
+  Certified: boolean;
+  Review: number;
+  Image: string;
+  Services: string[];
+  Hours: string[];
+  address: string;
+  Website: string;
+  Phone: string;
+  lat: number;
+  lon: number;
 }
 
 interface shop{
@@ -28,7 +48,7 @@ type day ={
 };
 type schedule = Record<string, day>;
 
-const AddShop = ({visible, onClose}:props) => { 
+const AddShop = ({visible, onClose, mode='add',data}:props) => { 
   const phoneInput = useRef<PhoneInput>(null);
   const [shop, setShop] =useState<shop>({
           name:'',
@@ -54,26 +74,55 @@ const AddShop = ({visible, onClose}:props) => {
     })
 
   useEffect(()=>{
-    setDays({
-    'Monday':{ start:'', end:''},
-    'Tuesday':{ start:'', end:''},
-    'Wednesday':{ start:'', end:''},
-    'Thursday':{ start:'', end:''},
-    'Friday':{ start:'', end:''},
-    'Saturday':{ start:'', end:''},
-    'Sunday':{ start:'', end:''},
-    })
-    setShop({
-      name:'',
-      address:'',
-      hours:['', '', '', '' , '', '', ''],
-      ImageId: null,
-      Location: null,
-      shopPhone:'',
-      Services:[],
-      Website:'',
-      license: null
-    });
+    if(mode == 'add'){
+      setDays({
+      'Monday':{ start:'', end:''},
+      'Tuesday':{ start:'', end:''},
+      'Wednesday':{ start:'', end:''},
+      'Thursday':{ start:'', end:''},
+      'Friday':{ start:'', end:''},
+      'Saturday':{ start:'', end:''},
+      'Sunday':{ start:'', end:''},
+      })
+      setShop({
+        name:'',
+        address:'',
+        hours:['', '', '', '' , '', '', ''],
+        ImageId: null,
+        Location: null,
+        shopPhone:'',
+        Services:[],
+        Website:'',
+        license: null
+      });
+    }
+    else if( mode== 'edit' && data){
+      const getTime =(i:number):day=>{
+        const time =  data.Hours[i].split('-');
+        return {start:time[0], end:time[1]}
+      }
+      setDays({
+      'Monday': getTime(0),
+      'Tuesday':getTime(1),
+      'Wednesday': getTime(2),
+      'Thursday': getTime(3),
+      'Friday': getTime(4),
+      'Saturday': getTime(5),
+      'Sunday': getTime(6),
+      })
+      setShop({
+        name: data.name,
+        address:data.address,
+        hours: data.Hours,
+        ImageId: null,
+        Location: null,
+        shopPhone:data.Phone,
+        Services:data.Services,
+        Website:data.Website,
+        license: null
+      });
+    }
+    
     setQuery('')
     }, [visible])
 
@@ -170,7 +219,9 @@ const AddShop = ({visible, onClose}:props) => {
         <SafeAreaView className='w-full h-full bg-white' style={{alignSelf:'center'}}>
           <KeyboardAvoidingView className='flex-1' behavior='padding' keyboardVerticalOffset={100}>
             <ScrollView contentContainerStyle={{ paddingBottom: 10, gap:10 }} showsVerticalScrollIndicator={false}>
-              <Text className='buttonTextBlack  font-bold text-2xl self-center'>Add a shop</Text>
+              {mode == 'add'?(<Text className='buttonTextBlack  font-bold text-2xl self-center'>Add a shop</Text>)
+              :(<Text className='buttonTextBlack  font-bold text-2xl self-center'>Edit shop</Text>)}
+              
               <View className='w-[80%] ml-[10%] mt-[10%]'>
                 {/*Add business Name*/}
                 <Text className='buttonTextBlack   text-xl'>Business Name</Text>
@@ -263,8 +314,7 @@ const AddShop = ({visible, onClose}:props) => {
           <View className='flex-row self-center gap-20'>
               <NormalButton text='Cancel' variant='cancel' onClick={()=>{onClose();}} />
               <NormalButton text='Add' variant='lightBlue' onClick={()=>{
-                                                                        //add ADD query here
-               
+                                                                        //call some add shop function here
                                                                         onClose();}} />
           </View>        
         </SafeAreaView>
