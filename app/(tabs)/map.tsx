@@ -2,7 +2,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import * as Loc from 'expo-location'
 import { useRouter } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-/*import {
+import {
   ActivityIndicator,
   Button,
   Platform,
@@ -15,7 +15,7 @@ import MapView, {
   Camera,
   Marker,
   PROVIDER_GOOGLE,
-} from 'react-native-maps'*/
+} from 'react-native-maps'
 
 type Mechanic = {
   name?: string
