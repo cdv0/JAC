@@ -8,12 +8,11 @@ import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingVie
 import { ReactNativeModal as Modal } from 'react-native-modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import NormalButton from '@/app/components/NormalButton';
+import NormalButton from '../components/NormalButton';
 import Star from '../components/Star';
-import TimeConverter from '@/app/components/TimeConverter';
+import TimeConverter from '../components/TimeConverter';
 import ToggleButton from '../components/ToggleButton';
-import ViewReviews from '@/app/components/ViewReviews';
-import { router } from 'expo-router'
+import ViewReviews from '../components/ViewReviews';
 
 
 
@@ -94,6 +93,7 @@ const Details = () => {
     }
   }
 
+  
   useEffect(() => {
             const data = async () => {
                 try {

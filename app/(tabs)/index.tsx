@@ -131,7 +131,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
       
   const [mQuery, setMQuery] = useState('');
-  const [lQuery, setLQuery] = useState('');
+  const [lQuery, setLQuery] = useState('');user
   const [isFiltersModal, setisFiltersModal] = useState(false);
 
   const [isFiltersActive, setisFiltersActive] = useState(false);
@@ -413,18 +413,17 @@ export default function Index() {
   useEffect(() => {
           const data = async () => {
               try {
-                  // const file = await fetch(process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string);
-                  const file = await fetch("/local/dummy/mechanics2.json")
+                  const file = await fetch((process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string));
+                  //const file = await fetch("/local/dummy/mechanics2.json")
                   const mechanicsData = await file.json();  
                   const temp =  mechanicsData.data
-                  temp.forEach((x:Mechanics)=>{
+                  temp.forEach(async (x:Mechanics)=>{
                      x.Services = x.Services.toLowerCase()
+                     const data = await fetch((process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) + `?mechanicId=${x.mechanicID}`)
+                     const response = await data.json();
+                     x.Rating = response?.average ?? 0;
+                     x.Review = response?.length ?? 0;
                   })     
-                  if (temp){
-                      const file2 = await fetch("/local/dummy/review2.json");
-                      const reviewData = await file2.json();
-                      setReviews(reviewData || [])     
-                  }
                   setMechanics(temp);
           
               } catch (error) {
