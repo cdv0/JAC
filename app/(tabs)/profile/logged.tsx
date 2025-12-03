@@ -7,10 +7,11 @@ import { Pressable, ScrollView, Text, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { icons } from '@/constants/icons';
-
-const PROFILE_IMAGE_URI_KEY = 'profileImageUri'
 import { getReviewsByUser } from '@/_backend/api/review'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
+
+const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
+const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
 
 type SortOption =
   | 'dateNewest'
@@ -31,12 +32,13 @@ export const account = () => {
   useEffect(() => {
     (async () => {
       try {
-        const cachedUri = await AsyncStorage.getItem(PROFILE_IMAGE_URI_KEY)
+        const { userId } = await getCurrentUser()
+        const cacheKey = getProfileImageKey(userId)
+        const cachedUri = await AsyncStorage.getItem(cacheKey)
         if (cachedUri) {
           setProfileImage(cachedUri)
         }
 
-        const { userId } = await getCurrentUser()
         const attrs = await fetchUserAttributes()
         const email = attrs.email
         if (!email) {
@@ -44,16 +46,14 @@ export const account = () => {
             'No email on the Cognito profile (check pool/app-client readable attributes).'
           )
         }
-        console.log('userid:', userId, 'email:', email)
+
         const userData = await readUserProfile(userId, email)
         setFirstName(userData.firstName ?? '')
         setLastName(userData.lastName ?? '')
         setCreatedAt(userData.createdAt ?? '')
 
         const reviewData = await getReviewsByUser(userId)
-        console.log("Reviews:", reviewData)
         setReviews(reviewData ?? [])
-
       } catch (e: any) {
         console.log('Account: Error loading user data:', e)
         console.log('Account: Error message:', e.message)
@@ -79,13 +79,12 @@ export const account = () => {
     const copy = [...reviews];
 
     const getDate = (rev: any) => {
-    const raw = rev.createdAt ?? rev.CreatedAt;
-    return raw ? new Date(raw).getTime() : 0;
+      const raw = rev.createdAt ?? rev.CreatedAt;
+      return raw ? new Date(raw).getTime() : 0;
     };
 
     const getRating = (rev: any) =>
       Number(rev.rating ?? rev.Rating ?? 0);
-
 
     switch (sortOption) {
       case 'dateNewest':
@@ -105,9 +104,7 @@ export const account = () => {
     <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
       <ScrollView>
         <View className="flex-1 mt-5 gap-5 mb-5">
-          {/* ACCOUNT BANNER */}
           <View className="flex-row items-center justify-center bg-white pb-12 gap-10 border-b border-secondary">
-            {/* PROFILE IMAGE OR INITIALS */}
             {profileImage ? (
               <Image
                 source={{ uri: profileImage }}
@@ -121,7 +118,6 @@ export const account = () => {
               </View>
             )}
 
-            {/* ACCOUNT METADATA */}
             <View>
               <Text className="xsTitle">{firstName} {lastName}</Text>
               <Text className="xsTextGray">{reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}</Text>
@@ -129,9 +125,7 @@ export const account = () => {
             </View>
           </View>
 
-          {/* REVIEW SECTION */}
           <View className="flex-1 mx-5 gap-6">
-            {/* TITLE AND FILTER BUTTON */}
             <View className="flex-row justify-between">
               <Text className="mediumTitle">Reviews</Text>
               <NormalButton
@@ -145,7 +139,6 @@ export const account = () => {
               />
             </View>
 
-            {/* FILTER OPEN */}
             {filterOpen && (
               <View className="mx-3 pt-4 pb-6 border-y border-stroke">
                 <View className="flex-1 flex-row justify-between">
@@ -189,7 +182,6 @@ export const account = () => {
               </View>
             )}
 
-            {/* REVIEWS */}
             <View className="gap-4 pb-10">
               {sortedReviews.length === 0 ? (
                 <Text className="smallTextGray text-center">No reviews yet.</Text>
@@ -208,17 +200,14 @@ export const account = () => {
                     }
                     className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm"
                   >
-                    {/* Mechanic name or id */}
                     <Text className="smallTitle">
                       {rev.mechanicName ?? rev.mechanicId ?? rev.MechanicId}
                     </Text>
 
-                    {/* Description */}
                     <Text className="smallTextGray">
                       {rev.review ?? rev.Review}
                     </Text>
 
-                    {/* Rating */}
                     <View className="flex-row items-center mt-2">
                       <Text className="mr-1">Rating</Text>
                       <StarRatingDisplay

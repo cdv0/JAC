@@ -6,7 +6,8 @@ import { Hub } from 'aws-amplify/utils';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const PROFILE_IMAGE_URI_KEY = 'profileImageUri';
+const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri';
+const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`;
 
 const TabIcon = ({ Icon }: any) => {
   return (
@@ -22,10 +23,10 @@ const _layout = () => {
 
   async function fetchNames() {
     try {
-      await getCurrentUser()
-      const attrs = await fetchUserAttributes()
-      const given = (attrs.name || '').trim()
-      setFirstName(given)
+      await getCurrentUser();
+      const attrs = await fetchUserAttributes();
+      const given = (attrs.name || '').trim();
+      setFirstName(given);
     } catch {
       setFirstName('');
     }
@@ -33,7 +34,9 @@ const _layout = () => {
 
   async function fetchProfileImage() {
     try {
-      const uri = await AsyncStorage.getItem(PROFILE_IMAGE_URI_KEY);
+      const user = await getCurrentUser();
+      const cacheKey = getProfileImageKey(user.userId);
+      const uri = await AsyncStorage.getItem(cacheKey);
       setProfileImage(uri);
     } catch {
       setProfileImage(null);
@@ -44,7 +47,7 @@ const _layout = () => {
     fetchNames();
     fetchProfileImage();
 
-    const unsubscribe = Hub.listen('auth', ({ payload }) => {
+    const authUnsub = Hub.listen('auth', ({ payload }) => {
       const event = payload?.event;
       switch (event) {
         case 'signedIn':
@@ -58,7 +61,17 @@ const _layout = () => {
       }
     });
 
-    return () => unsubscribe();
+    const profileUnsub = Hub.listen('profile', ({ payload }) => {
+      const event = payload?.event;
+      if (event === 'profileImageUpdated') {
+        fetchProfileImage();
+      }
+    });
+
+    return () => {
+      authUnsub();
+      profileUnsub();
+    };
   }, []);
 
   const firstInitial = (firstName?.[0] ?? '').toUpperCase();
