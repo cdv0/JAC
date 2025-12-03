@@ -1,4 +1,5 @@
 import NormalButton from '@/app/components/NormalButton';
+import { validSet } from '@/constants/validServices';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -223,7 +224,7 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
     
   }
   const [query, setQuery] = useState('')
-  const validServices = ['Smog Check', 'Transmission Repair', 'Oil Check', 'Exhaust']
+  const validServices = validSet;
 
   return (
     <Modal isVisible={visible} style={{flex:1, margin:0}} >
