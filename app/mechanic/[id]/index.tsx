@@ -374,6 +374,7 @@ const Details = () => {
                           id: String(id),
                           reviewId: item.ReviewId,
                           mechanicId: item.MechanicId,
+                          userId: item.UserId, 
                         },
                       })
                     }
