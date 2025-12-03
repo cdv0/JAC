@@ -16,11 +16,18 @@ import MapView, {
   Marker,
   PROVIDER_GOOGLE,
 } from 'react-native-maps'
+import { StarRatingDisplay } from 'react-native-star-rating-widget'
+import Star from '../components/Star'
 
 type Mechanic = {
   name?: string
   address?: string
   Location?: []
+}
+
+type ReviewProps = {
+  mechanicId: string
+  rating: number
 }
 
 const map = () => {
@@ -30,6 +37,9 @@ const map = () => {
   const [locationPermission, setLocationPermission] = useState<boolean>(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const [mechanicRatings, setMechanicRatings] = useState<
+    Record<string, number>
+  >({})
 
   const zoomBy = async (delta: number) => {
     if (!mapRef.current) return
@@ -114,14 +124,6 @@ const map = () => {
     }, [])
   )
 
-  if (loading) {
-    return (
-      <View className="flex flex-col items-center justify-center h-full">
-        <ActivityIndicator size="large" />
-      </View>
-    )
-  }
-
   const hasValidLocation = (m: any) => {
     const L = m?.Location
     if (!Array.isArray(L)) return false
@@ -138,6 +140,45 @@ const map = () => {
       pathname: '/mechanic/[id]',
       params: { id: String(m.mechanicID) },
     })
+  }
+
+  useEffect(() => {
+    const data = async () => {
+      try {
+        const file = await fetch('/local/dummy/review2.json')
+        const reviewData = await file.json()
+
+        const ratings: Record<string, number> = {}
+        validMechanics.forEach((mechanic) => {
+          const reviews = reviewData.filter(
+            (x: ReviewProps) => x.mechanicId === mechanic.mechanicID
+          ) as ReviewProps[]
+
+          let sum = 0
+          reviews.forEach((x) => {
+            sum += x.rating
+          })
+
+          const avg = reviews.length > 0 ? sum / reviews.length : 0
+
+          ratings[mechanic.mechanicID] = avg
+        })
+
+        setMechanicRatings(ratings)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error loading mechanics data:', error)
+      }
+    }
+    data()
+  }, [validMechanics])
+
+  if (loading) {
+    return (
+      <View className="flex flex-col items-center justify-center h-full">
+        <ActivityIndicator size="large" />
+      </View>
+    )
   }
 
   return (
@@ -184,9 +225,19 @@ const map = () => {
               >
                 <Callout onPress={() => mechanicNavigate(m)}>
                   <View>
-                    <Text className="text-lg font-bold">
-                      {m.name ?? 'Mechanic'}
-                    </Text>
+                    <View className="flex flex-row w-full gap-4">
+                      <Text className="text-lg font-bold">
+                        {m.name ?? 'Mechanic'}
+                      </Text>
+                      <StarRatingDisplay
+                        color={'black'}
+                        starSize={18}
+                        starStyle={{ marginHorizontal: -1 }}
+                        StarIconComponent={Star}
+                        style={{ alignItems: 'center' }}
+                        rating={mechanicRatings[m.mechanicID] ?? 0}
+                      />
+                    </View>
                     {!!m.address && (
                       <Text className="mt-2" numberOfLines={2}>
                         {m.address}

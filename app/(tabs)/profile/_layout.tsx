@@ -43,8 +43,6 @@ export default function ProfileLayout() {
           headerShown: false,
         }}
       />
-
-      {/* Forget Password */}
       <Stack.Screen
         name="forgetPassword"
         options={{
@@ -67,51 +65,8 @@ export default function ProfileLayout() {
         }}
       />
 
-      {/* Mechanic Login */}
-      <Stack.Screen
-        name="mechanic/mechanicSignIn"
-        options={{
-          headerTitle: () => (
-            <Text className="buttonTextBlack">Mechanic Login</Text>
-          ),
-          headerBackVisible: false,
-          headerLeft: () => (
-            <Pressable
-              onPress={() => router.push('/(tabs)/profile')}
-              className="flex-row items-center px-2"
-              hitSlop={2}
-            >
-              <icons.chevBack width={24} height={24} fill="#1B263B" />
-              <Text className="ml-1 text-primaryBlue text-[15px] font-medium">
-                Back
-              </Text>
-            </Pressable>
-          ),
-        }}
-      />
-
-      {/* Mechanic Sign Up */}
-      <Stack.Screen
-        name="mechanic/mechanicSignUp"
-        options={{
-          headerTitle: () => (
-            <Text className="buttonTextBlack">Mechanic Sign Up</Text>
-          ),
-          headerBackVisible: false,
-          headerLeft: () => (
-            <Pressable
-              onPress={() => router.push('/(tabs)/profile')}
-              className="flex-row items-center px-2"
-              hitSlop={2}
-            >
-              <icons.chevBack width={24} height={24} fill="#1B263B" />
-              <Text className="ml-1 text-primaryBlue text-[15px] font-medium">
-                Back
-              </Text>
-            </Pressable>
-          ),
-        }}
-      />
+      {/* Mechanic */}
+      <Stack.Screen name="mechanic" options={{ headerShown: false }} />
     </Stack>
   )
 }

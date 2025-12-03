@@ -1,6 +1,7 @@
 import {
   CognitoIdentityProvider,
   ConfirmSignUpCommand,
+  GetUserCommand,
   GlobalSignOutCommand,
   InitiateAuthCommand,
   SignUpCommand,
@@ -79,4 +80,18 @@ export async function mechanicSignOut() {
   }
 
   mechanicSession = {}
+}
+
+export async function getCurrentUser() {
+  // No current mechanic user
+  if (!mechanicSession.accessToken) return null
+
+  const response = await cognitoClient.send(
+    new GetUserCommand({
+      AccessToken: mechanicSession.accessToken,
+    })
+  )
+
+  // returns email and user attributes such as sub
+  return response
 }
