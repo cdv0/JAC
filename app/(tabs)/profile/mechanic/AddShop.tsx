@@ -42,19 +42,7 @@ const AddShop = ({visible, onClose}:props) => {
           license:null,
         })
 
-  const reset = ()=>{
-    setShop({
-          name:'',
-          address:'',
-          hours:['', '', '', '' , '', '', ''],
-          ImageId: null,
-          Location: null,
-          shopPhone:'',
-          Services:[],
-          Website:'',
-          license: null
-        })
-  }
+
   const [days, setDays]= useState<schedule>({
       'Monday':{ start:'', end:''},
       'Tuesday':{ start:'', end:''},
@@ -64,7 +52,7 @@ const AddShop = ({visible, onClose}:props) => {
       'Saturday':{ start:'', end:''},
       'Sunday':{ start:'', end:''},
     })
-    
+
   useEffect(()=>{
     setDays({
     'Monday':{ start:'', end:''},
@@ -75,6 +63,18 @@ const AddShop = ({visible, onClose}:props) => {
     'Saturday':{ start:'', end:''},
     'Sunday':{ start:'', end:''},
     })
+    setShop({
+      name:'',
+      address:'',
+      hours:['', '', '', '' , '', '', ''],
+      ImageId: null,
+      Location: null,
+      shopPhone:'',
+      Services:[],
+      Website:'',
+      license: null
+    });
+    setQuery('')
     }, [visible])
 
   const setHours = () =>{
@@ -212,8 +212,11 @@ const AddShop = ({visible, onClose}:props) => {
                     placeholder='Add Services' placeholderTextColor= "#9E9E9E"
                     className=" buttonTextBlack  border border-stroke w-[65%]"  />
                   <NormalButton onClick={()=>{
-                                              if(!shop.Services.includes(query) && validServices.find(x=> x.toLocaleLowerCase().localeCompare(query.toLocaleLowerCase())))
-                                                setShop(prev=>({...prev, Services:[...prev.Services, query]}))
+                                              if(!shop.Services.includes(query) && 
+                                              validServices.find(x=> x.toLocaleLowerCase().localeCompare(query.toLocaleLowerCase()))){
+                                                setShop(prev=>({...prev, Services:[...prev.Services, query]}));
+                                                setQuery('');
+                                              }                                            
                                               }} text='Enter'/>
                 </View>
               {/*Suggestion*/}
@@ -221,7 +224,7 @@ const AddShop = ({visible, onClose}:props) => {
                 data={validServices.filter(x=> x.includes(query))}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={()=>{setQuery(item)}} className='ml-[5%] border border-stroke w-[59%]'>
+                  <TouchableOpacity onPress={()=>{setQuery(item)}} className='ml-[5%] border border-stroke w-[58.5%]'>
                     <Text className='buttonTextBlack'>
                       {item}
                     </Text>
@@ -258,10 +261,10 @@ const AddShop = ({visible, onClose}:props) => {
             </ScrollView>
           </KeyboardAvoidingView>
           <View className='flex-row self-center gap-20'>
-              <NormalButton text='Cancel' variant='cancel' onClick={()=>{reset();onClose();}} />
+              <NormalButton text='Cancel' variant='cancel' onClick={()=>{onClose();}} />
               <NormalButton text='Add' variant='lightBlue' onClick={()=>{
                                                                         //add ADD query here
-                                                                        reset();
+               
                                                                         onClose();}} />
           </View>        
         </SafeAreaView>
