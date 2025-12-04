@@ -739,6 +739,7 @@ export default function Index() {
   useEffect(() => {
     //Ensure everything is ready before displaying thingsd
     setLoading(!(dataReady && locReady))
+    console.log(userLoc)
     if (mechanics && mechanics.every((x) => !x.Distance)) {
       mechanics.forEach((x) => {
         x.Distance = distanceScore(x)
