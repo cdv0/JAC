@@ -151,10 +151,6 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
     };
 
      const onChange = (event: DateTimePickerEvent, selectedDate: Date | undefined) => {
-        if (Platform.OS === 'android') {
-            setShowPicker(false);
-        }
-
         if (event.type === 'set' && selectedDate && pickerTarget) {
             setDate(selectedDate);
             
@@ -176,6 +172,7 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
         }
             // Reset the target once selection is done/dismissed
         setPickerTarget(null); 
+        setShowPicker(false);
     }; 
 
     const render = (day:string) =>{
