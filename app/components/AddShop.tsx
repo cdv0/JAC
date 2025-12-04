@@ -155,7 +155,7 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
             setShowPicker(false);
         }
 
-        if (selectedDate && pickerTarget) {
+        if (event.type === 'set' && selectedDate && pickerTarget) {
             setDate(selectedDate);
             
             const formattedTime = selectedDate.toLocaleTimeString('en-US', {
@@ -180,24 +180,26 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
 
     const render = (day:string) =>{
       return(
-      <View className='flex-row ml-5 items-center'>
-            <Text className='buttonTextBlack   text-l font-bold'>{day}: </Text>
-            <Text className='buttonTextBlack   text-l '> From  </Text>
-            <View className='flex-row border border-black rounded-xl'>
-              <Pressable onPress={() => showTimePicker(`${day}-start`)}>
-                <Text className='buttonTextBlack   text-l py-2 px-2'>
-                  {days[day].start==""?"Enter Time":days[day].start}
-                </Text>
-              </Pressable>
-            </View>
-            <Text className='buttonTextBlack   text-l '> To  </Text>
-            <View className='flex-row border border-black rounded-xl'>
-              <Pressable onPress={() => showTimePicker(`${day}-end`)}>
-                <Text className='buttonTextBlack   text-l py-2 px-2'>
-                  {days[day].end==""?"Enter Time":days[day].end}
-                </Text>
-              </Pressable>
-            </View>
+        <View className='ml-5'>
+            <Text className='buttonTextBlack text-xl font-bold mb-2'>{day}</Text>
+            <View className='flex-row ml-5 items-center'>
+              <Text className='buttonTextBlack   text-l '>From  </Text>
+                <View className='border border-black rounded-xl'>
+                  <Pressable onPress={() => showTimePicker(`${day}-start`)}>
+                    <Text className='buttonTextBlack   text-l py-2 px-2'>
+                      {days[day].start==""?"Enter Time":days[day].start}
+                    </Text>
+                  </Pressable>
+                </View>
+                <Text className='buttonTextBlack   text-l '> To  </Text>
+                <View className='border border-black rounded-xl'>
+                  <Pressable onPress={() => showTimePicker(`${day}-end`)}>
+                    <Text className='buttonTextBlack   text-l py-2 px-2'>
+                      {days[day].end==""?"Enter Time":days[day].end}
+                    </Text>
+                  </Pressable>
+                </View>
+            </View>       
         </View>
       )
     }
@@ -210,6 +212,7 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
         </View>})}
 
         {showPicker && (
+              <Modal isVisible={showPicker} backdropOpacity={0.2} onBackdropPress={()=> setShowPicker(false)} style={{alignItems:'center', justifyContent:'center'}}>
                 <DateTimePicker
                     testID="dateTimePicker"
                     value={date} // Use the internal Date state
@@ -218,6 +221,8 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={onChange}
                 />
+              </Modal>
+                
             )}
     </View>
     )
@@ -275,16 +280,16 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
                     placeholder='Add Services' placeholderTextColor= "#9E9E9E"
                     className=" buttonTextBlack  border border-stroke w-[65%]"  />
                   <NormalButton onClick={()=>{
-                                              if(!shop.Services.includes(query) && 
-                                              validServices.find(x=> x.toLocaleLowerCase().localeCompare(query.toLocaleLowerCase()))){
-                                                setShop(prev=>({...prev, Services:[...prev.Services, query]}));
+                                              let temp = validServices.find(x=> x.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
+                                              if(!shop.Services.map(x=>x.toLocaleLowerCase()).includes(query.toLocaleLowerCase()) && temp){
+                                                setShop(prev=>({...prev, Services:[...prev.Services, temp]}));
                                                 setQuery('');
                                               }                                            
                                               }} text='Enter'/>
                 </View>
               {/*Suggestion*/}
               {query.length>0 && <FlatList
-                data={validServices.filter(x=> x.includes(query))}
+                data={validServices.filter(x=> x.toLowerCase().includes(query.toLocaleLowerCase()))}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <TouchableOpacity onPress={()=>{setQuery(item)}} className='ml-[5%] border border-stroke w-[58.5%]'>
@@ -293,41 +298,44 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
                     </Text>
                   </TouchableOpacity>
                 )}
+              
                 scrollEnabled={false}
                 ListEmptyComponent={<Text className='buttonTextBlack'>
                   No Result for {query}
                 </Text>}
               /> }
 
-              <View className='mt-[10]'>
-                <FlatList
-                  data={shop.Services}
-                  keyExtractor={(item) => item}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity className='bg-lightBlueText rounded-xl' activeOpacity={0.5}>
-                      <Text className='buttonTextWhite px-2'>
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                  numColumns={3}
-                  contentContainerClassName='border border-stroke w-full items-center py-5'
-                  columnWrapperStyle={{gap:2, marginVertical:4}}
-                  scrollEnabled={false}
-                  ListEmptyComponent={<Text className='buttonTextBlack self-center'>
-                    No Services Added
-                  </Text>}
-                />
-              </View>
+              
               
             </View>
+              <View className='mt-[10] w-[95%] self-center'>
+                  <FlatList
+                    data={shop.Services}
+                    keyExtractor={(item) => item}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity className='bg-lightBlueText rounded-xl items-center justify-center flex-1' activeOpacity={0.5}>
+                        <Text className='buttonTextWhite p-1 text-sm text-center'>
+                          {item.includes('/')?item.split('/').join(' '):item}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                    numColumns={3}
+                    contentContainerClassName='border border-stroke w-full items-center py-5 mx-0'
+                    columnWrapperStyle={{marginVertical:4, marginHorizontal:2, gap:4, width:'100%'}}
+                    scrollEnabled={false}
+                    ListEmptyComponent={<Text className='buttonTextBlack self-center'>
+                      No Services Added
+                    </Text>}
+                  />
+                </View>
         
             </ScrollView>
           </KeyboardAvoidingView>
           <View className='flex-row self-center gap-20'>
               <NormalButton text='Cancel' variant='cancel' onClick={()=>{onClose();}} />
-              <NormalButton text={mode=='add'?'add':'save'} variant='lightBlue' onClick={()=>{
-                                                                        //call some add shop function here
+              <NormalButton text={mode=='add'?'add':'Save'} variant='lightBlue' onClick={()=>{
+                                                                        //call some add/edit shop function here
+                                                                        
                                                                         onClose();}} />
           </View>        
         </SafeAreaView>
