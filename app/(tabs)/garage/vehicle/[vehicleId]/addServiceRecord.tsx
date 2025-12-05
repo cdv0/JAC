@@ -9,7 +9,6 @@ import { createServiceRecord } from "@/_backend/api/serviceRecord";
 import { type File, MAX_RECORD_SIZE, ALLOWED_MIME_TYPES_RECORD } from "@/_backend/api/fileUpload";
 import * as DocumentPicker from "expo-document-picker";
 import { uploadVehicleImage } from "@/_backend/api/fileUpload";
-import MlkitOcr from "react-native-mlkit-ocr";
 
 export const ServiceRecord = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -119,81 +118,20 @@ export const ServiceRecord = () => {
         }
       }
 
-      let parsedText: string | undefined = undefined;
-
-      if (files.length > 0) {
-        const firstFile = files[0];
-        const isImage =
-          firstFile.mimeType && firstFile.mimeType.startsWith("image/");
-
-        const hasMlkit =
-          MlkitOcr && typeof (MlkitOcr as any).detectFromUri === "function";
-
-        console.log(
-          "OCR check:",
-          "mimeType=",
-          firstFile.mimeType,
-          "isImage=",
-          isImage,
-          "hasMlkit=",
-          hasMlkit
-        );
-
-        if (isImage && hasMlkit) {
-          try {
-            const blocks = await (MlkitOcr as any).detectFromUri(firstFile.uri);
-            if (Array.isArray(blocks)) {
-              parsedText = blocks.map((b: any) => b.text ?? "").join("\n");
-            } else {
-              parsedText = "";
-            }
-            console.log(
-              "MLKit parsedText length:",
-              parsedText?.length ?? 0,
-              "sample:",
-              parsedText ? parsedText.slice(0, 200) : null
-            );
-          } catch (e: any) {
-            console.log("MLKit OCR error:", e?.message || e);
-          }
-        } else if (!isImage) {
-          console.log(
-            "Skipping OCR because file is not an image:",
-            firstFile.mimeType
-          );
-        } else if (!hasMlkit) {
-          console.log("Skipping OCR because MlkitOcr is not available");
-        }
-      }
-
-      const payload = {
-        vehicleId: vehicleId,
-        title,
+      // Create the service record in your backend
+      await createServiceRecord({
+        vehicleId,
+        title: title.trim(),
         serviceDate: date.toISOString(),
-        mileage,
-        note,
+        mileage: mileage.trim(),
+        note: note.trim(),
         files: fileKeys,
-        parsedText,
-      };
-
-      console.log("createServiceRecord payload:", {
-        ...payload,
-        parsedTextPreview: parsedText ? parsedText.slice(0, 100) : null,
       });
 
-      const data = await createServiceRecord(payload);
-      console.log("Add service record: success:", data);
-
-      setTitle("");
-      setDate(new Date());
-      setMileage("");
-      setNote("");
-      setFiles([]);
-
-      router.replace(`/garage/vehicle/${params.vehicleId}`);
-    } catch (err: any) {
-      console.log("Add service record: Error adding service record:", err);
-      console.log("Add service record: Error message:", err?.message);
+      console.log("Add service record: Service record created successfully");
+      router.back();
+    } catch (e: any) {
+      console.log("Add service record: Error saving service record:", e);
     }
   };
 
@@ -374,7 +312,7 @@ export const ServiceRecord = () => {
                 onPress={() => setModalVisible(false)}
               ></Pressable>
 
-              <View className="w-full mb-3 gap-2 mx-3 self-center">
+            <View className="w-full mb-3 gap-2 mx-3 self-center">
                 <View className="bg-white px-4 py-3 rounded-lg">
                   <Text className="smallTextGray">Choose source</Text>
                   <Pressable className="py-3 border-stroke">
