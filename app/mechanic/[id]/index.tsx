@@ -18,31 +18,6 @@ import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 
 
-
-
-interface MechanicViewProps {
-  mechanicID: string;
-  name: string;
-  Certified: boolean;
-  Review: number;
-  Image: string;
-  Services: string[];
-  Hours: string[];
-  address: string;
-  Website: string;
-  Phone: string;
-  lat: number;
-  lon: number;
-}
-
-type ReviewProps = {
-  ReviewId: string;
-  MechanicId: string;
-  Rating: number;
-  Review: string;
-  UserId: string;
-};
-
 const Details = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
  
