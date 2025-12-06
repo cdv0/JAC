@@ -422,7 +422,7 @@ const Details = () => {
                 contentContainerStyle={{ gap: 10 }}
                 ListEmptyComponent={
                   <Text className="self-center buttonTextBlack">
-                    No Reviews Available
+                    No Reviews Found
                   </Text>
                 }
                 scrollEnabled={false}
@@ -440,7 +440,7 @@ const Details = () => {
                         {">"}
                       </Text>
                     </Pressable>
-                    <View className='bg-white flex-1 h-full rounded-l-xl justify-around items-center border border-black'>
+                    <View className='bg-white w-full h-full pr-[8%] rounded-l-xl justify-around items-center border border-black'>
                       <View className='w-full border-b border-stroke'>
                         <Text className='buttonTextBlack self-center text-2xl'>
                           Filters
