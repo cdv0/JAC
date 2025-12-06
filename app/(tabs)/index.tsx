@@ -883,9 +883,10 @@ export default function Index() {
                 <View className="mt-[25%] items-center self-center ">
                   <ActivityIndicator size="large" />
                 </View>
-              ) : (
+              ) : 
+              (
                 <Text className="buttonTextBlack mt-[25%] ">
-                  No Mechanics found
+                  No Mechanics found {userLoc?"within " + sliderValue + ' mi' :''}
                 </Text>
               )
             }
