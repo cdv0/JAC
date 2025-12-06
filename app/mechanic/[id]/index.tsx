@@ -31,7 +31,7 @@ const Details = () => {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const displayName = firstName || lastName ? `${firstName} ${lastName}`.trim() : null;
-
+  const [hours, setHours] = useState<Record<string, string>>();
   
 
   useEffect(() => {
@@ -96,6 +96,18 @@ const Details = () => {
         console.log("id", id)
         const mech = await getMechanicById(String(id));
         setMechanic(mech as any);
+
+        if(mech){
+          setHours({
+            "Mon": mech.Hours[0],
+            "Tues": mech.Hours[1],
+            "Weds": mech.Hours[2],
+            "Thurs":mech.Hours[3],
+            "Fri":mech.Hours[4],
+            "Sat":mech.Hours[5],
+            "Sun" :mech.Hours[6],
+          })
+        }
 
         // 2. Reviews for this mechanic
         const { reviews: backendReviews, average } = await getReviewsByMechanic(
@@ -307,35 +319,12 @@ const Details = () => {
                       <>
                         <Text className='smallTextBlue mb-[2%]'>{'\u2B24'} Hours</Text>
                         <View className='mx-[5%] w-[75%]'>
-                          <View className='flex-row justify-between mb-[2%]'>
-                            <Text className='buttonTextBlue'>Mon</Text>
-                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[0])}</Text>
-                          </View>
-                          <View className='flex-row justify-between mb-[2%]'>
-                            <Text className='buttonTextBlue'>Tues</Text>
-                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[1])}</Text>
-                          </View>
-                          <View className='flex-row justify-between mb-[2%]'>
-                            <Text className='buttonTextBlue'>Weds</Text>
-                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[2])}</Text>
-                          </View>
-                          <View className='flex-row justify-between mb-[2%]'>
-                            <Text className='buttonTextBlue'>Thurs</Text>
-                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[3])}</Text>
-                          </View>
-                          <View className='flex-row justify-between mb-[2%]'>
-                            <Text className='buttonTextBlue'>Fri</Text>
-                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[4])}</Text>
-                          </View>
-                          <View className='flex-row justify-between mb-[2%]'>
-                            <Text className='buttonTextBlue'>Sat</Text>
-                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[5])}</Text>
-                          </View>
-                          <View className='flex-row justify-between mb-[2%]'>
-                            <Text className='buttonTextBlue'>Sun</Text>
-                            <Text className='buttonTextBlue'>{TimeConverter(mechanic.Hours[6])}</Text>
-                          </View>
-                          
+                          {hours && Object.keys(hours).map(x=> (
+                            <View key={x} className='flex-row justify-between mb-[2%]'>
+                              <Text className='buttonTextBlue'>{x}</Text>
+                              <Text className='buttonTextBlue'>{TimeConverter(hours[x])}</Text>
+                            </View>
+                          ))}
                         </View>
                       </>)}
                   </View>
