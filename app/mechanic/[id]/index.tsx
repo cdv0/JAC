@@ -1,7 +1,7 @@
 import { readUserProfile } from '@/_backend/api/profile';
 import { getMechanicById, getReviewsByMechanic } from '@/_backend/api/review';
-import AddShop from '@/app/components/AddShop';
 import NormalButton from '@/app/components/NormalButton';
+import ShopManager from '@/app/components/ShopManager';
 import Star from '@/app/components/Star';
 import TimeConverter from '@/app/components/TimeConverter';
 import ToggleButton from '@/app/components/ToggleButton';
@@ -487,7 +487,7 @@ const Details = () => {
                 </Modal>   
 
                 {/*edit modal*/}  
-                <AddShop mode='edit' visible={editVisible} onClose={()=>setEditVisible(false)} data={{... mechanic}}/>
+                <ShopManager mode='edit' visible={editVisible} onClose={()=>setEditVisible(false)} data={{... mechanic}}/>
         </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
