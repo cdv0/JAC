@@ -10,7 +10,7 @@ import { icons } from '@/constants/icons';
 import { images } from '@/constants/images';
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, DimensionValue, FlatList, Image, KeyboardAvoidingView, Linking, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ReactNativeModal as Modal } from 'react-native-modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -65,18 +65,19 @@ const Details = () => {
   const [visible, setVisible] = useState(false);
   const [Verified, setVerified] = useState(false);
   const [choice, setChoice] = useState("");
+  const [choice2, setChoice2] =useState("");
   const [isClaimed, setClaimed] = useState(false); //change to fetch query
   const [claimable, setClaimable] = useState(true); //for testing
   const [asMechanic,setAsMechanic] = useState(true);//for testing
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading]= useState(true);
   const [editVisible, setEditVisible] = useState(false);
-  const handleChoice = (flag:boolean, choice:string)=>{
+  const handleChoice = (flag:boolean, choice:string, setter:React.Dispatch<React.SetStateAction<string>>)=>{
     if (flag){
-      setChoice(choice)
+      setter(choice)
     }
     else{
-      setChoice('')
+      setter('')
     }
   }
 
@@ -215,7 +216,13 @@ const Details = () => {
     // Search filter
     const searchReviews = query!=''?reviews.filter(x=> x.Review.toLowerCase().includes(query.toLowerCase())):reviews;
     const applyFilter = () =>{
-      const temp =searchReviews
+      let temp =searchReviews
+      if (choice2 != ''){
+        const today = new Date()
+        const cat = new Date(today.setDate(today.getDate() - ((choice2=='1')?30:(choice2=="2")?14:7)))
+        temp = temp.filter(x=>x.CreatedAt && new Date(x.CreatedAt) >= cat)
+      }
+
       if (choice ==''){
         return temp
       }
@@ -427,8 +434,8 @@ const Details = () => {
               {/*Filter reviews*/}
               <Modal isVisible={visible} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => setVisible(false)}
               backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'flex-end', margin:0}}>
-                <View className='w-[40%] h-[70%] flex-row items-center'>
-                    <Pressable className="w-[20px] h-[40px] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black" onPress={()=>setVisible(false)}>
+                <View className='w-[50%] h-full flex-row items-center'>
+                    <Pressable className="w-[20] h-[40] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black" onPress={()=>setVisible(false)}>
                       <Text className='text-2xl text-bold buttonTextBlack'>
                         {">"}
                       </Text>
@@ -441,15 +448,22 @@ const Details = () => {
                       </View>
                       
                         <ToggleButton flag={Verified}  onPress={(newf)=>{setVerified(newf)}} text="Verified"/>
-
-                      <View className='w-full items-center border-t pt-[10%] border-stroke'>
-                        <ToggleButton flag={choice == '5'}   onPress={(newf)=>{handleChoice(newf, '5')}} text="5 stars"/>
-                      </View>                      
-                      <ToggleButton flag={choice == '4'}   onPress={(newf)=>{handleChoice(newf, '4')}} text="4 stars"/> 
-                      <ToggleButton flag={choice == '3'}   onPress={(newf)=>{handleChoice(newf, '3')}} text="3 stars"/>   
-                      <ToggleButton flag={choice == '2'}  onPress={(newf)=>{handleChoice(newf, '2')}} text="2 stars"/> 
-                      <ToggleButton flag={choice == '1'}  onPress={(newf)=>{handleChoice(newf, '1')}} text="1 star"/>     
-                    </View>
+                      <View className='flex-row w-full items-center'>
+                        <Text className='buttonTextBlack text-xl ml-1 mr-5'>Ratings</Text>
+                        <View className='w-full  border-t border-stroke'/>
+                      </View>
+                      <ToggleButton flag={choice == '5'} width={'80%'}  onPress={(newf)=>{handleChoice(newf, '5',setChoice)}} text="5 stars"/>                     
+                      <ToggleButton flag={choice == '3'} width={'80%'}  onPress={(newf)=>{handleChoice(newf, '3',setChoice)}} text="3 stars"/>   
+                      <ToggleButton flag={choice == '2'} width={'80%'} onPress={(newf)=>{handleChoice(newf, '2',setChoice)}} text="2 stars"/> 
+                      <ToggleButton flag={choice == '1'} width={'80%'} onPress={(newf)=>{handleChoice(newf, '1',setChoice)}} text="1 star"/> 
+                      <View className='flex-row w-full items-center mb-[-5]'>
+                        <Text className='buttonTextBlack text-xl ml-1 mr-5'>Date</Text>
+                        <View className='w-full  border-t border-stroke'/>
+                      </View>  
+                      <ToggleButton flag={choice2 == '1'}  width={'80%'} onPress={(newf)=>{handleChoice(newf, '1',setChoice2)}} text="Last 30 days"/>                     
+                      <ToggleButton flag={choice2 == '2'}  width={'80%'} onPress={(newf)=>{handleChoice(newf, '2',setChoice2)}} text="Last 14 days"/>   
+                      <ToggleButton flag={choice2 == '3'}  width={'80%'} onPress={(newf)=>{handleChoice(newf, '3',setChoice2)}} text="Last week"/>
+                    </View>       
                   </View>            
                 </Modal> 
 
