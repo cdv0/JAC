@@ -48,7 +48,7 @@ type day ={
 };
 type schedule = Record<string, day>;
 
-const AddShop = ({visible, onClose, mode='add',data}:props) => { 
+const ShopManager = ({visible, onClose, mode='add',data}:props) => { 
   const phoneInput = useRef<PhoneInput>(null);
   const [shop, setShop] =useState<shop>({
           name:'',
@@ -340,4 +340,4 @@ const AddShop = ({visible, onClose, mode='add',data}:props) => {
   )
 }
 
-export default AddShop
+export default ShopManager
