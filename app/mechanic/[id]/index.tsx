@@ -67,7 +67,6 @@ const Details = () => {
   const [choice, setChoice] = useState("");
   const [choice2, setChoice2] =useState("");
   const [isClaimed, setClaimed] = useState(false); //change to fetch query
-  const [claimable, setClaimable] = useState(true); //for testing
   const [asMechanic,setAsMechanic] = useState(true);//for testing
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading]= useState(true);
@@ -249,7 +248,7 @@ const Details = () => {
                         <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
                       <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
-                      {isAuthenticated && asMechanic && claimable && <ToggleButton flag={isClaimed} 
+                      {isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
                       text={isClaimed?'Claimed':'Claim Business'} 
                       onPress={async ()=>{
                                       /**
