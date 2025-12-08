@@ -189,7 +189,7 @@ const map = () => {
         <MapView
           ref={mapRef}
           style={{ flex: 1 }}
-          provider={PROVIDER_GOOGLE}
+          // provider={PROVIDER_GOOGLE}
           initialCamera={{
             center: { latitude: 33.783, longitude: -118.1129 },
             pitch: 0,

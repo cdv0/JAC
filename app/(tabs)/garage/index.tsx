@@ -8,7 +8,7 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable, ScrollView, Text, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import decodeBase64Image from "@/app/components/ImageDecode";
+// import decodeBase64Image from "@/app/components/ImageDecode";
 
 export const garage = () => {
   const router = useRouter();
