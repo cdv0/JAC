@@ -25,20 +25,20 @@ const ViewReviews = ({Rating, Review, UserId, CreatedAt}:ReviewProps) => {
     <View className=' border-b-2 border-stroke px-5 py-3'>
       <View className='flex-row ml-5'>
         <View className='w-[50] h-[50] border border-black rounded-full justify-center items-center'>
+          {/*Update to retrieve the user profile*/}
           <Text className='buttonTextBlack'>
             T
           </Text>
         </View>
         <View className='w-full'>
           <View className='ml-5'>
+            {/*Update to retrieve user name instead of id*/}
             <Text className='ml-2 buttonTextBlack'>
               User {UserId}
             </Text>
             <Text className='ml-2 buttonTextBlack'>
               {formattedDate}
             </Text>
-            {/*todo: Fix inconsisent star sizes */}
-
             <StarRatingDisplay color={'black'} starSize={18} StarIconComponent={Star} starStyle={{marginHorizontal:-1}} style={{ alignItems:'center'}} rating={Rating}/>
           </View>
         </View>

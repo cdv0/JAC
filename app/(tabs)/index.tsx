@@ -37,6 +37,92 @@ interface Mechanics {
 }
 
 export default function Index() {
+
+  const [dataReady, setDataReady] = useState(false)
+  const [locReady, setLocReady] = useState(false)
+
+  //fetching data
+  useEffect(() => {
+    const data = async () => {
+      try {
+        const file = await fetch(
+          process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string
+        )
+        //const file = await fetch("/local/dummy/mechanics2.json")
+        const mechanicsData = await file.json()
+        const temp = mechanicsData.data
+        temp.forEach(async (x: Mechanics) => {
+          x.Services = x.Services.map((serv) => serv.toLocaleLowerCase())
+          try {
+            const data = await fetch(
+              (process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) +
+                `?mechanicId=${x.mechanicID}`
+            )
+            const response = await data.json()
+            x.Rating = response?.average ?? 0
+            x.Review = response?.length ?? 0
+          } catch {
+            x.Rating = 0
+            x.Review = 0
+          }
+        })
+        setMechanics(temp)
+      } catch (error) {
+        console.error('Error loading mechanics data:', error)
+      } finally {
+        setDataReady(true)
+      }
+    }
+    const loc = async () => {
+      const services = await Location.hasServicesEnabledAsync()
+      //prompt user for location permision
+      const { status: curStat } =
+        await Location.requestForegroundPermissionsAsync()
+      let perm = curStat
+      const flag = services && perm === 'granted'
+
+      if (!flag) {
+        setLocReady(true)
+        return
+      }
+
+      let location: Location.LocationObject | undefined
+
+      try {
+        location = (await Location.getLastKnownPositionAsync({})) || undefined
+        setUserLoc(location?.coords || undefined)
+        setLocReady(true)
+        try {
+          const temp = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+            mayShowUserSettingsDialog: true,
+          })
+          if (temp) setUserLoc(temp.coords)
+        } catch (error) {
+          console.warn('getCurrentPositionAsync failed')
+        }
+      } catch (fallbackError) {
+        console.error('Unable to getLastKnownPositionAsync', fallbackError)
+      }
+    }
+    const t = async () => {
+      await Promise.all([data(), loc()])
+    }
+
+    t()
+  }, [])
+
+  useEffect(() => {
+    //Ensure everything is ready before displaying thingsd
+    setLoading(!(dataReady && locReady))
+    console.log(userLoc)
+    if (mechanics && mechanics.every((x) => !x.Distance)) {
+      mechanics.forEach((x) => {
+        x.Distance = distanceScore(x)
+      })
+    }
+  }, [dataReady, locReady])
+
   const [categories, setCategories] = useState<string[]>([])
   //#region helper functions
   const insertCategory = (newCategory: string) => {
@@ -662,91 +748,8 @@ export default function Index() {
   const [userLoc, setUserLoc] = useState<
     Location.LocationObjectCoords | undefined
   >(undefined)
-  const [dataReady, setDataReady] = useState(false)
-  const [locReady, setLocReady] = useState(false)
   //#endregion
   
-  //Retrieving data
-  useEffect(() => {
-    const data = async () => {
-      try {
-        const file = await fetch(
-          process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string
-        )
-        //const file = await fetch("/local/dummy/mechanics2.json")
-        const mechanicsData = await file.json()
-        const temp = mechanicsData.data
-        temp.forEach(async (x: Mechanics) => {
-          x.Services = x.Services.map((serv) => serv.toLocaleLowerCase())
-          try {
-            const data = await fetch(
-              (process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) +
-                `?mechanicId=${x.mechanicID}`
-            )
-            const response = await data.json()
-            x.Rating = response?.average ?? 0
-            x.Review = response?.length ?? 0
-          } catch {
-            x.Rating = 0
-            x.Review = 0
-          }
-        })
-        setMechanics(temp)
-      } catch (error) {
-        console.error('Error loading mechanics data:', error)
-      } finally {
-        setDataReady(true)
-      }
-    }
-    const loc = async () => {
-      const services = await Location.hasServicesEnabledAsync()
-      //prompt user for location permision
-      const { status: curStat } =
-        await Location.requestForegroundPermissionsAsync()
-      let perm = curStat
-      const flag = services && perm === 'granted'
-
-      if (!flag) {
-        setLocReady(true)
-        return
-      }
-
-      let location: Location.LocationObject | undefined
-
-      try {
-        location = (await Location.getLastKnownPositionAsync({})) || undefined
-        setUserLoc(location?.coords || undefined)
-        setLocReady(true)
-        try {
-          const temp = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-            mayShowUserSettingsDialog: true,
-          })
-          if (temp) setUserLoc(temp.coords)
-        } catch (error) {
-          console.warn('getCurrentPositionAsync failed')
-        }
-      } catch (fallbackError) {
-        console.error('Unable to getLastKnownPositionAsync', fallbackError)
-      }
-    }
-    const t = async () => {
-      await Promise.all([data(), loc()])
-    }
-
-    t()
-  }, [])
-
-  useEffect(() => {
-    //Ensure everything is ready before displaying thingsd
-    setLoading(!(dataReady && locReady))
-    if (mechanics && mechanics.every((x) => !x.Distance)) {
-      mechanics.forEach((x) => {
-        x.Distance = distanceScore(x)
-      })
-    }
-  }, [dataReady, locReady])
-
   //#endregion
   const finalData =
     userLoc && maxD == sliderValue
@@ -895,9 +898,10 @@ export default function Index() {
                 <View className="mt-[25%] items-center self-center ">
                   <ActivityIndicator size="large" />
                 </View>
-              ) : (
+              ) : 
+              (
                 <Text className="buttonTextBlack mt-[25%] ">
-                  No Mechanics found
+                  No Mechanics found {userLoc?"within " + sliderValue + ' mi' :''}
                 </Text>
               )
             }
