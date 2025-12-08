@@ -47,7 +47,7 @@ const Details = () => {
         }
 
         const userData = await readUserProfile(userId, email);
-
+        setIsAuthenticated(attrs.userType == "Mechanic");
         setFirstName(userData.firstName ?? '');
         setLastName(userData.lastName ?? '');
         setIsAuthenticated(true);
