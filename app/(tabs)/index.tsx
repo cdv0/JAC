@@ -47,7 +47,6 @@ export default function Index() {
         const file = await fetch(
           process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string
         )
-        //const file = await fetch("/local/dummy/mechanics2.json")
         const mechanicsData = await file.json()
         const temp = mechanicsData.data
         temp.forEach(async (x: Mechanics) => {
