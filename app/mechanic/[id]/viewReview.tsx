@@ -114,7 +114,7 @@ const ViewReview = () => {
           const mechDetail = await getMechanicById(mechanicId);
           console.log(
             "ViewReview: mechDetail from getMechanicById",
-            mechDetail
+            mechDetail, 
           );
 
           if (!mechDetail) {

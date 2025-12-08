@@ -7,12 +7,13 @@ import { Pressable, ScrollView, Text, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { icons } from '@/constants/icons';
-import { getReviewsByUser } from '@/_backend/api/review'
+import { getReviewsByUser, getMechanicById } from '@/_backend/api/review'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import { useFocusEffect } from '@react-navigation/native' 
 
 const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
 const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
+
 
 type SortOption = 'dateNewest' | 'dateOldest' | 'ratingHigh' | 'ratingLow'
 
@@ -25,6 +26,7 @@ export const account = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [reviews, setReviews] = useState<any[]>([])
   const [sortOption, setSortOption] = useState<SortOption>('dateNewest')
+  const [mechanicsById, setMechanicsById] = useState<Record<string, any>>({})
 
   const loadAccountData = useCallback(async () => {
     try {
@@ -36,21 +38,49 @@ export const account = () => {
           'No email on the Cognito profile (check pool/app-client readable attributes).'
         )
       }
-
-      console.log('userid:', userId, 'email:', email)
+  
       const userData = await readUserProfile(userId, email)
       setFirstName(userData.firstName ?? '')
       setLastName(userData.lastName ?? '')
       setCreatedAt(userData.createdAt ?? '')
-
+  
       const reviewData = await getReviewsByUser(userId)
-      console.log('Reviews:', reviewData)
-      setReviews(reviewData ?? [])
+      const safeReviews = reviewData ?? []
+      setReviews(safeReviews)
+  
+      // 🔹 NEW: fetch mechanic info (including Image) for each unique mechanicId
+      const mechanicIds = [
+        ...new Set(
+          safeReviews
+            .map((rev: any) => rev.mechanicId ?? rev.MechanicId)
+            .filter(Boolean)
+        ),
+      ]
+  
+      if (mechanicIds.length === 0) {
+        setMechanicsById({})
+        return
+      }
+  
+      const entries = await Promise.all(
+        mechanicIds.map(async (id) => {
+          try {
+            const mech = await getMechanicById(String(id))
+            return [String(id), mech] as const
+          } catch (e) {
+            console.log('Account: failed to load mechanic', id, e)
+            return [String(id), null] as const
+          }
+        })
+      )
+  
+      setMechanicsById(Object.fromEntries(entries))
     } catch (e: any) {
       console.log('Account: Error loading user data:', e)
       console.log('Account: Error message:', e.message)
     }
   }, [])
+  
 
   useEffect(() => {
     (async () => {
@@ -240,44 +270,69 @@ export const account = () => {
                   No reviews yet.
                 </Text>
               ) : (
-                sortedReviews.map((rev) => (
-                  <Pressable
-                    key={rev.reviewId ?? rev.ReviewId}
-                    onPress={() =>
-                      router.push({
-                        pathname: '/mechanic/[id]/viewReview',
-                        params: {
-                          id: rev.mechanicId ?? rev.MechanicId,
-                          reviewId: rev.reviewId ?? rev.ReviewId,
-                        },
-                      })
-                    }
-                    className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm"
-                  >
-                    <Text className="smallTitle">
-                      {rev.mechanicName ??
-                        rev.mechanicId ??
-                        rev.MechanicId}
-                    </Text>
-
-                    <Text className="smallTextGray">
-                      {rev.review ?? rev.Review}
-                    </Text>
-
-                    <View className="flex-row items-center mt-2">
-                      <Text className="mr-1">Rating</Text>
-                      <StarRatingDisplay
-                        color="black"
-                        starSize={16}
-                        starStyle={{ width: 4 }}
-                        rating={Number(rev.rating ?? rev.Rating ?? 0)}
-                      />
-                      <Text className="ml-2">
-                        ({rev.rating ?? rev.Rating}/5)
-                      </Text>
-                    </View>
-                  </Pressable>
-                ))
+                sortedReviews.map((rev) => {
+                  const mechId = rev.mechanicId ?? rev.MechanicId
+                  const mechanic = mechId ? mechanicsById[String(mechId)] : null
+                  const imageUri = mechanic?.Image ?? null
+                  const mechanicName =
+                    rev.mechanicName ?? mechanic?.name ?? mechId
+                
+                  return (
+                    <Pressable
+                      key={rev.reviewId ?? rev.ReviewId}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/mechanic/[id]/viewReview',
+                          params: {
+                            id: mechId,
+                            reviewId: rev.reviewId ?? rev.ReviewId,
+                          },
+                        })
+                      }
+                      className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm"
+                    >
+                      <View className="flex-row gap-3">
+                        {/* 🔹 Left: mechanic image */}
+                        {imageUri ? (
+                          <Image
+                            source={{ uri: imageUri }}
+                            className="w-14 h-14 rounded-lg"
+                          />
+                        ) : (
+                          <View className="w-14 h-14 rounded-lg bg-accountOrange items-center justify-center">
+                            <Text className="text-white font-bold">
+                              {String(mechanicName ?? '?')[0]?.toUpperCase()}
+                            </Text>
+                          </View>
+                        )}
+                
+                        {/* 🔹 Right: existing text & rating */}
+                        <View className="flex-1">
+                          <Text className="smallTitle" numberOfLines={1}>
+                            {mechanicName}
+                          </Text>
+                
+                          <Text className="smallTextGray" numberOfLines={2}>
+                            {rev.review ?? rev.Review}
+                          </Text>
+                
+                          <View className="flex-row items-center mt-2">
+                            <Text className="mr-1">Rating</Text>
+                            <StarRatingDisplay
+                              color="black"
+                              starSize={16}
+                              starStyle={{ width: 4 }}
+                              rating={Number(rev.rating ?? rev.Rating ?? 0)}
+                            />
+                            <Text className="ml-2">
+                              ({rev.rating ?? rev.Rating}/5)
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </Pressable>
+                  )
+                })                
               )}
             </View>
           </View>
