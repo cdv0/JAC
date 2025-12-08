@@ -1,6 +1,6 @@
 // app/mechanic/[id]/viewReview.tsx
 
-import React, { useEffect, useState, useLayoutEffect } from "react";
+import React, { useEffect, useState, useLayoutEffect, useCallback } from "react";
 import {
   Image,
   ScrollView,
@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { getCurrentUser } from "aws-amplify/auth";
 
 import {
   getSingleReview,
@@ -20,6 +19,19 @@ import {
   type Mechanic,
 } from "@/_backend/api/review";
 import { icons } from "@/constants/icons";
+
+import { fetchUserAttributes, getCurrentUser } from "aws-amplify/auth"
+import { readUserProfile } from "@/_backend/api/profile";
+
+const loadData = useCallback(async () =>{
+  const {userId} = await getCurrentUser();
+  const attributes = await fetchUserAttributes();
+  const email = attributes.email;
+  if(!email){
+    throw new Error("User email not found");
+  }
+  const userData = await readUserProfile(userId, email);
+}, [])
 
 // 🔹 Helper: turn imageKey into a full image URL
 // Update this to match how you usually build S3 URLs in your app.

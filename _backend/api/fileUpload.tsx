@@ -1,6 +1,4 @@
 import { Base64 } from "js-base64";
-import * from "expo-file-system";
-
 
 export const BASE_URL = "https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev";
 
@@ -47,8 +45,7 @@ export async function uploadVehicleImage(payload: File, type: "vehicle" | "recor
 
 // POST /profile/uploadProfilePicture
 export async function uploadProfilePicture(payload: File) {
-  const base64 = await FileSystem.readAsStringAsync(payload.uri, {encoding: FileSystem.EncodingType.Base64})
-
+  const base64 = Base64.encode(payload.uri);
 
   const response = await fetch(BASE_URL+"/profile/uploadProfilePicture", {
     method: "POST",
