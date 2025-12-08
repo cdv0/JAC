@@ -6,9 +6,9 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { type File, MAX_IMAGE_SIZE, ALLOWED_MIME_TYPES_VEHICLE } from "@/_backend/api/fileUpload";
+import { type File, MAX_IMAGE_SIZE, ALLOWED_MIME_TYPES_IMAGE } from "@/_backend/api/fileUpload";
 import * as DocumentPicker from "expo-document-picker";
-import uploadVehicleImage from "@/_backend/api/fileUpload";
+import {uploadVehicleImage} from "@/_backend/api/fileUpload";
 
 export const addVehicle = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -29,12 +29,12 @@ export const addVehicle = () => {
   const isYearInvalid = submitted && !year.trim();
   
   const isFileInvalid = submitted && file !== null && (
-    file.size > MAX_IMAGE_SIZE || !ALLOWED_MIME_TYPES_VEHICLE.includes(file.mimeType ?? "")
+    file.size > MAX_IMAGE_SIZE || !ALLOWED_MIME_TYPES_IMAGE.includes(file.mimeType ?? "")
   )
 
   const handleChooseFile = async () => {
     const res = await DocumentPicker.getDocumentAsync({
-      type: ALLOWED_MIME_TYPES_VEHICLE,
+      type: ALLOWED_MIME_TYPES_IMAGE,
       multiple: false,
       copyToCacheDirectory: true,
     });
@@ -76,7 +76,7 @@ export const addVehicle = () => {
     }
 
     // If a file exists, make sure it's valid
-    if ( file && (file.size > MAX_IMAGE_SIZE || !ALLOWED_MIME_TYPES_VEHICLE.includes(file.mimeType ?? ""))) {
+    if ( file && (file.size > MAX_IMAGE_SIZE || !ALLOWED_MIME_TYPES_IMAGE.includes(file.mimeType ?? ""))) {
       console.log("Add vehicle: Invalid file selected");
       return;
     }
@@ -126,8 +126,8 @@ export const addVehicle = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <ScrollView>
+    // <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <ScrollView className="flex-1 bg-white">
         <View className="flex-1 mx-5 mt-3 gap-3 mb-5">
 
           {/* VIN INPUT */}
@@ -318,7 +318,7 @@ export const addVehicle = () => {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   )
 }
 

@@ -20,6 +20,7 @@ import MechanicView from '../components/MechanicView'
 import NormalButton from '../components/NormalButton'
 import SearchBar from '../components/SearchBar'
 import ToggleButton from '../components/ToggleButton'
+import { icons } from '@/constants/icons'
 
 interface Mechanics {
   mechanicID: string
@@ -795,18 +796,32 @@ export default function Index() {
             showsHorizontalScrollIndicator={false}
           >
             <NormalButton
-              variant={`${isFiltersActive ? `primary` : `outline`}`}
+              variant={isFiltersActive ? 'primary' : 'outline'}
               onClick={() => {
                 setisFiltersModal(!isFiltersModal)
               }}
               text="Filters"
+              icon={
+                isFiltersActive ? (
+                  <icons.filter height={24} width={24} />
+                ) : (
+                  <icons.tune height={24} width={24} />
+                )
+              }
             />
             <NormalButton
-              variant={`${isServicesActive ? `primary` : `outline`}`}
+              variant={isServicesActive ? 'primary' : 'outline'}
               onClick={() => {
                 setIsServicesModal(!isServicesModal)
               }}
               text="Services"
+              icon={
+                isServicesActive ? (
+                  <icons.filter height={24} width={24} />
+                ) : (
+                  <icons.tune height={24} width={24} />
+                )
+              }
             />
             <ToggleButton
               flag={isCertified}
@@ -895,8 +910,8 @@ export default function Index() {
         {/*Expand filters */}
         <Modal visible={isFiltersModal} className="flex-1">
           <View className={`flex-1 ${Platform.OS == 'ios' ? 'mt-[10%]' : ''}`}>
-            <View className="flex-row justify-between ml-[2%] mr-[2%] mt-[5%] mb-[5%]">
-              <Text className="justify-start text-2xl buttonTextBlack">
+            <View className="flex-row justify-between m-5">
+              <Text className="justify-start mediumTitle">
                 Filters
               </Text>
 
@@ -912,64 +927,72 @@ export default function Index() {
                 }}
               >
                 <View className="w-[35] items-center justify-center ">
-                  <Text className="text-2xl buttonTextBlack">X</Text>
+                  <icons.x height={24} width={24}/>
                 </View>
               </Pressable>
             </View>
 
-            <View className="flex-1 border border-stroke gap-[5%] ">
-              <Text className="text-[20px] buttonTextBlack ml-[5%] mt-[5%]">
+            <View className="flex-1 border border-stroke gap-6">
+
+              <Text className="smallTitle mx-5 mt-5">
                 Sort by
               </Text>
 
-              <View className="flex-row justify-between ml-[5%] mr-[5%]">
-                <ToggleButton
-                  width={width}
+            <View className="flex-row flex-wrap mx-5">
+              <View className="w-1/2 px-1 mb-2">
+                <NormalButton
                   text="Name"
-                  flag={sortOpt == '1'}
-                  onPress={(newf) => {
-                    newf ? setSortOpt('1') : setSortOpt('0')
+                  variant={sortOpt === '1' ? 'primary' : 'outline'}
+                  grow
+                  onClick={() => {
+                    setSortOpt(sortOpt === '1' ? '0' : '1')
                   }}
                 />
-                <View style={{ opacity: userLoc ? 1 : 0.5, width: width }}>
-                  <ToggleButton
-                    width={'100%'}
-                    text="Distance"
-                    flag={sortOpt == '2'}
-                    onPress={(newf) => {
-                      if (userLoc) newf ? setSortOpt('2') : setSortOpt('0')
-                    }}
-                  />
-                </View>
               </View>
 
-              <View className="flex-row justify-between ml-[5%] mr-[5%] mt-[-2%]">
-                <ToggleButton
-                  width={width}
+              <View className="w-1/2 px-1 mb-2">
+                <NormalButton
+                  text="Distance"
+                  variant={sortOpt === '2' ? 'primary' : 'outline'}
+                  grow
+                  onClick={() => {
+                    if (!userLoc) return
+                    setSortOpt(sortOpt === '2' ? '0' : '2')
+                  }}
+                />
+              </View>
+
+              <View className="w-1/2 px-1">
+                <NormalButton
                   text="Review Count"
-                  flag={sortOpt == '3'}
-                  onPress={(newf) => {
-                    newf ? setSortOpt('3') : setSortOpt('0')
-                  }}
-                />
-                <ToggleButton
-                  width={width}
-                  text="Rating"
-                  flag={sortOpt == '4'}
-                  onPress={(newf) => {
-                    newf ? setSortOpt('4') : setSortOpt('0')
+                  variant={sortOpt === '3' ? 'primary' : 'outline'}
+                  grow
+                  onClick={() => {
+                    setSortOpt(sortOpt === '3' ? '0' : '3')
                   }}
                 />
               </View>
 
-              <Text className="text-[20px] buttonTextBlack ml-[5%] ">
+              <View className="w-1/2 px-1">
+                <NormalButton
+                  text="Rating"
+                  variant={sortOpt === '4' ? 'primary' : 'outline'}
+                  grow
+                  onClick={() => {
+                    setSortOpt(sortOpt === '4' ? '0' : '4')
+                  }}
+                />
+              </View>
+            </View>
+
+              <Text className="smallTitle mx-5 ">
                 Price
               </Text>
               <View className="flex-row ml-[5%] mr-[5%] gap-[2%] items-center">
-                <Text className="buttonTextBlack ">Minimum:</Text>
+                <Text className="smallTextBold ">Minimum:</Text>
 
                 <View
-                  className={`border ${warning ? 'border-dangerBrightRed' : 'border-textBlack'} w-[30%] rounded-xl`}
+                  className={`border ${warning ? 'border-dangerBrightRed' : 'border-subheaderGray'} w-[30%] h-8 rounded-lg`}
                 >
                   <TextInput
                     value={tempMinP}
@@ -985,7 +1008,7 @@ export default function Index() {
                 <Text className="buttonTextBlack">Maximum:</Text>
 
                 <View
-                  className={`border ${warning ? 'border-dangerBrightRed' : 'border-textBlack'} w-[30%] rounded-xl`}
+                  className={`border ${warning ? 'boasdsaq1123rder-dangerBrightRed' : 'border-subheaderGray'} w-[30%] h-8 rounded-lg`}
                 >
                   <TextInput
                     value={tempMaxP}
@@ -1005,16 +1028,15 @@ export default function Index() {
                 </Text>
               )}
 
-              <Text className="text-[20px] buttonTextBlack ml-[5%] mt-[2%] ">
+              <Text className="smallTitle mx-5 ">
                 Distance
               </Text>
 
               <View className="h-[10%] ml-[5%] mr-[5%] ">
-                <Text className="self-center">
-                  {tempSliderValue == maxD
-                    ? `${tempSliderValue}+`
-                    : tempSliderValue}{' '}
-                  mi
+                <Text className="">
+                  {`Set distance: ${
+                    tempSliderValue == maxD ? `${tempSliderValue}+` : tempSliderValue
+                  } mi`}
                 </Text>
 
                 <Slider
@@ -1045,8 +1067,30 @@ export default function Index() {
             </View>
           </View>
 
-          {/*Apply these filters only when apply button is pressed*/}
-          <View className="items-end mt-[2%] mb-[2%] mr-[2%]">
+          {/*Apply / Clear filters */}
+          <View className="flex-row justify-end m-6 pb-8 gap-3">
+            <NormalButton
+              text="Clear"
+              variant="cancel"
+              onClick={() => {
+                // reset everything to defaults
+                setSortOpt('0')
+                setSortOptApplied('0')
+
+                setTempMinP('')
+                setTempMaxP('')
+                setminP('')
+                setmaxP('')
+
+                setTempSliderValue(maxD / 2)
+                setSliderValue(maxD / 2)
+
+                setWarning(false)
+                setisFiltersActive(false)
+                // keep modal open so user can see the cleared state
+              }}
+            />
+
             <NormalButton
               text="Apply"
               onClick={() => {
@@ -1072,8 +1116,6 @@ export default function Index() {
                     setisFiltersActive(false)
                   }
 
-                  //filter logic goes here
-
                   setSortOptApplied(sortOpt)
                   setminP(tempMinP.replace('$', ''))
                   setmaxP(tempMaxP.replace('$', ''))
@@ -1083,13 +1125,14 @@ export default function Index() {
               }}
             />
           </View>
+
         </Modal>
 
         {/*Expand Services*/}
         <Modal visible={isServicesModal} className="flex-1">
           <View className={`flex-1 ${Platform.OS == 'ios' ? 'mt-[10%]' : ''}`}>
-            <View className="flex-row justify-between ml-[2%] mr-[2%] mt-[5%] mb-[5%]">
-              <Text className="justify-start text-2xl buttonTextBlack">
+            <View className="flex-row justify-between m-5">
+              <Text className="justify-start mediumTitle">
                 Services
               </Text>
 
@@ -1110,7 +1153,7 @@ export default function Index() {
                 }}
               >
                 <View className="w-[35] items-center justify-center ">
-                  <Text className="text-2xl buttonTextBlack">X</Text>
+                  <icons.x height={24} width={24} />
                 </View>
               </Pressable>
             </View>

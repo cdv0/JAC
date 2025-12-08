@@ -137,8 +137,8 @@ export const account = () => {
   }, [reviews, sortOption])
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
-      <ScrollView>
+    // <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
+      <ScrollView className="flex-1 bg-white">
         <View className="flex-1 mt-5 gap-5 mb-5">
           <View className="flex-row items-center justify-center bg-white pb-12 gap-10 border-b border-secondary">
             {profileImage ? (
@@ -197,7 +197,7 @@ export const account = () => {
                       variant={
                         sortOption === 'dateNewest' ? 'primary' : 'outline'
                       }
-                      text="Date: Newest - Oldest"
+                      text="Newest to Oldest"
                       grow={true}
                       onClick={() => setSortOption('dateNewest')}
                     />
@@ -205,7 +205,7 @@ export const account = () => {
                       variant={
                         sortOption === 'dateOldest' ? 'primary' : 'outline'
                       }
-                      text="Date: Oldest - Newest"
+                      text="Oldest to Newest"
                       grow={true}
                       onClick={() => setSortOption('dateOldest')}
                     />
@@ -217,7 +217,7 @@ export const account = () => {
                       variant={
                         sortOption === 'ratingHigh' ? 'primary' : 'outline'
                       }
-                      text="Highest Rating First"
+                      text="Highest Rating"
                       grow={true}
                       onClick={() => setSortOption('ratingHigh')}
                     />
@@ -225,7 +225,7 @@ export const account = () => {
                       variant={
                         sortOption === 'ratingLow' ? 'primary' : 'outline'
                       }
-                      text="Lowest Rating First"
+                      text="Lowest Rating"
                       grow={true}
                       onClick={() => setSortOption('ratingLow')}
                     />
@@ -283,7 +283,7 @@ export const account = () => {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   )
 }
 
