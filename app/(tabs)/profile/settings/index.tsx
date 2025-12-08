@@ -8,9 +8,9 @@ export default function Settings() {
   const router = useRouter()
 
   return (
-    <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
-      <View className="justify-start flex-1">
-        <View className="h-full px-2 pt-3">
+    // <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
+      <View className="flex-1 justify-start">
+        <View className="h-full px-4 pt-3">
           {/* First container */}
           <View className="bg-white rounded-xl">
             {/* Account */}
@@ -53,6 +53,6 @@ export default function Settings() {
           </Pressable>
         </View>
       </View>
-    </SafeAreaView>
+    // </SafeAreaView>
   )
 }

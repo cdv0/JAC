@@ -22,6 +22,7 @@ import settings from "@/public/assets/icons/settings.svg"
 import trash from "@/public/assets/icons/trash.svg"
 import upload from "@/public/assets/icons/upload.svg"
 import x from "@/public/assets/icons/x.svg"
+import tune from "@/public/assets/icons/tune.svg"
 export const icons = {
     garage,
     garageH,
@@ -46,5 +47,6 @@ export const icons = {
     add,
     filter,
     x,
-    editIcon
+    editIcon,
+    tune
 };
