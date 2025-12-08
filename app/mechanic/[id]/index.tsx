@@ -53,6 +53,7 @@ type ReviewProps = {
   UserId: string
 }
 
+
 const Details = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
 
@@ -82,16 +83,20 @@ const Details = () => {
         }
 
         const userData = await readUserProfile(userId, email);
-
+        if(attrs.userType == "mechanic"){
+          setIsAuthenticated(true);
+        }else{
+          setIsAuthenticated(false);
+        }
         setFirstName(userData.firstName ?? '');
         setLastName(userData.lastName ?? '');
-        setIsAuthenticated(true);
+        //setIsAuthenticated(true);
       } catch (e: any) {
         console.log('Details: Error loading user data:', e);
         console.log('Details: Error message:', e?.message);
         setFirstName('');
         setLastName('');
-        setIsAuthenticated(false);
+        //setIsAuthenticated(false);
       }
     })()
   }, [])
