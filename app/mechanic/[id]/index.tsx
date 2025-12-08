@@ -83,11 +83,8 @@ const Details = () => {
         }
 
         const userData = await readUserProfile(userId, email);
-        if(attrs.userType == "mechanic"){
-          setIsAuthenticated(true);
-        }else{
-          setIsAuthenticated(false);
-        }
+        
+        setIsAuthenticated(attrs.userType == "Mechanic");
         setFirstName(userData.firstName ?? '');
         setLastName(userData.lastName ?? '');
         //setIsAuthenticated(true);
