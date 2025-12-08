@@ -23,7 +23,7 @@ export const ALLOWED_MIME_TYPES_RECORD = ["image/png", "image/jpeg", "image/jpg"
 
 // POST /vehicle/uploadVehicleImage
 export async function uploadVehicleImage(payload: File, type: "vehicle" | "record") {
-  const base64 = Base64.encode(payload.uri);
+  const base64 = await FileSystem.readAsStringAsync(payload.uri, {encoding: FileSystem.EncodingType.Base64})
 
   const response = await fetch(BASE_URL+"/vehicle/uploadVehicleImage", {
     method: "POST",
