@@ -26,19 +26,19 @@ import { icons } from "@/constants/icons";
 function getMechanicImageUri(mechanic: Mechanic | null): string | undefined {
   if (!mechanic) return undefined;
 
-  // If you already store a full URL somewhere, use that directly:
-  // if ((mechanic as any).imageUrl) return (mechanic as any).imageUrl;
+  // This matches what you're already using in Details.tsx
+  const img =
+    (mechanic as any).Image ??
+    (mechanic as any).image ??
+    (mechanic as any).imageUrl;
 
-  // Otherwise, build from imageKey + your base URL:
-  if ((mechanic as any).imageKey) {
-    const imageKey = (mechanic as any).imageKey as string;
-    // TODO: replace with your real public S3 URL / CloudFront domain
-    const BASE_IMAGE_URL = "https://YOUR-S3-PUBLIC-URL-HERE"; // <-- change this
-    return `${BASE_IMAGE_URL}/${imageKey}`;
+  if (typeof img === "string" && img.length > 0) {
+    return img;
   }
 
   return undefined;
 }
+
 
 const ViewReview = () => {
   const params = useLocalSearchParams<{
