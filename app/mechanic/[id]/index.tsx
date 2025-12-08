@@ -482,11 +482,11 @@ const Details = () => {
                         <ActivityIndicator size="large" />  
                       </View>):
                         (isClaimed)?<Text className='buttonTextBlack'>
-                          Claim Succesful
+                          Claim Request Sent
                         </Text>:
                         //Add ways to ask for help
                         <Text className='text-dangerDarkRed buttonTextBlack'>
-                          Failed to Claim 
+                          Failed to Send Claim Request
                           </Text>}
                   </View> 
                 </Modal>   
