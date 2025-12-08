@@ -1,4 +1,5 @@
 import { Base64 } from "js-base64";
+import * as FileSystem from 'expo-file-system';
 
 export const BASE_URL = "https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev";
 
