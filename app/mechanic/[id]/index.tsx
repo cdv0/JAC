@@ -19,6 +19,8 @@ import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 
 
 const Details = () => {
+
+  //#region Constant
   const { id } = useLocalSearchParams<{ id: string }>();
  
   const [mechanic, setMechanic] = useState<any>(null);
@@ -32,8 +34,19 @@ const Details = () => {
   const [lastName, setLastName] = useState<string>('');
   const displayName = firstName || lastName ? `${firstName} ${lastName}`.trim() : null;
   const [hours, setHours] = useState<Record<string, string>>();
-  
+  const [query, setQuery] = useState('');
+  const [visible, setVisible] = useState(false);
+  const [Verified, setVerified] = useState(false);
+  const [choice, setChoice] = useState("");
+  const [choice2, setChoice2] =useState("");
+  const [isClaimed, setClaimed] = useState(false); //change to fetch query
+  const [asMechanic,setAsMechanic] = useState(false);//for testing
+  const [claimVisibile, setClaimVisibile] = useState(false);
+  const [claimLoading, setClaimLoading]= useState(true);
+  const [editVisible, setEditVisible] = useState(false);
+//#endregion
 
+//#region useEffect
   useEffect(() => {
     (async () => {
       try {
@@ -51,6 +64,8 @@ const Details = () => {
         setFirstName(userData.firstName ?? '');
         setLastName(userData.lastName ?? '');
         setIsAuthenticated(true);
+        setAsMechanic(attrs.userType=="Mechanic")
+
       } catch (e: any) {
         console.log('Details: Error loading user data:', e);
         console.log('Details: Error message:', e?.message);
@@ -60,25 +75,6 @@ const Details = () => {
       }
     })();
   }, []);
-
-  const [query, setQuery] = useState('');
-  const [visible, setVisible] = useState(false);
-  const [Verified, setVerified] = useState(false);
-  const [choice, setChoice] = useState("");
-  const [choice2, setChoice2] =useState("");
-  const [isClaimed, setClaimed] = useState(false); //change to fetch query
-  const [asMechanic,setAsMechanic] = useState(true);//for testing
-  const [claimVisibile, setClaimVisibile] = useState(false);
-  const [claimLoading, setClaimLoading]= useState(true);
-  const [editVisible, setEditVisible] = useState(false);
-  const handleChoice = (flag:boolean, choice:string, setter:React.Dispatch<React.SetStateAction<string>>)=>{
-    if (flag){
-      setter(choice)
-    }
-    else{
-      setter('')
-    }
-  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -157,6 +153,16 @@ const Details = () => {
 
     fetchData();
   }, [id]); 
+//#endregion
+
+  const handleChoice = (flag:boolean, choice:string, setter:React.Dispatch<React.SetStateAction<string>>)=>{
+    if (flag){
+      setter(choice)
+    }
+    else{
+      setter('')
+    }
+  }
 
   //temporary for testing
   const claim = async() =>{
@@ -248,7 +254,7 @@ const Details = () => {
                         <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
                       <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
-                      {isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
+                      {!mechanic.Certified && isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
                       text={isClaimed?'Claimed':'Claim Business'} 
                       onPress={async ()=>{
                                       /**
