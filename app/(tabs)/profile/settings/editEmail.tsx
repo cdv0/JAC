@@ -103,7 +103,7 @@ export default function Contact() {
     }
   };
     return (
-    <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
+    // <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
         <View className="flex-1 bg-white rounded-xl px-4 py-5">
                 <View>
                   {!isVerifying ? (
@@ -157,6 +157,6 @@ export default function Contact() {
                   )}
                 </View>
                 </View>
-              </SafeAreaView>
+              // </SafeAreaView>
     )
 }

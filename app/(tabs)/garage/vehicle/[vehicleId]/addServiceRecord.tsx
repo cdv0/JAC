@@ -136,8 +136,8 @@ export const ServiceRecord = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <ScrollView>
+    // <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <ScrollView className="flex-1 bg-white">
         <View className="mx-5 mt-3 gap-3 mb-5">
           <View className="gap-2">
             <View className="flex-1 flex-row">
@@ -339,7 +339,7 @@ export const ServiceRecord = () => {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 };
 

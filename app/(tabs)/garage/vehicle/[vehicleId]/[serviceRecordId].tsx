@@ -585,11 +585,11 @@ const ServiceRecord = () => {
     );
   }
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView>
+    // <SafeAreaView className="flex-1 bg-white">
+      <ScrollView className="flex-1 bg-white">
         <View className="flex-1">{content}</View>
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 };
 
