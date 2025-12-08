@@ -448,10 +448,10 @@ export default function VehicleDetail() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-secondary" edges={["top", "bottom"]}>
-      <ScrollView>
+    // <SafeAreaView className="flex-1 bg-secondary" edges={["top", "bottom"]}>
+      <ScrollView className="flex-1 bg-secondary">
         <View className="flex-1">{content}</View>
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 }

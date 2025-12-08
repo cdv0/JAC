@@ -145,10 +145,10 @@ export default function Account() {
   }
 
   return (
-    <SafeAreaView className="flex-col" edges={['top', 'bottom']}>
+    // <SafeAreaView className="flex-col" edges={['top', 'bottom']}>
       <View className="flex flex-col justify-start">
-        <View className="h-full px-2 pt-3">
-          <View className="items-center mb-4">
+        <View className="h-full px-2 pt-5">
+          <View className="items-center mb-5">
             {profileImage ? (
               <Image
                 source={{ uri: profileImage }}
@@ -254,6 +254,6 @@ export default function Account() {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    // </SafeAreaView>
   )
 }
