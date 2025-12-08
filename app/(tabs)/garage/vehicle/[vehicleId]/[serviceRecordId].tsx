@@ -10,7 +10,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import DeleteModal from "@/app/components/DeleteModal";
 import { type File, MAX_RECORD_SIZE, ALLOWED_MIME_TYPES_RECORD } from "@/_backend/api/fileUpload";
 import * as DocumentPicker from "expo-document-picker";
-import uploadVehicleImage from "@/_backend/api/fileUpload";
+import {uploadVehicleImage} from "@/_backend/api/fileUpload";
 
 const ServiceRecord = () => {
   const navigation = useNavigation();
@@ -585,11 +585,11 @@ const ServiceRecord = () => {
     );
   }
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView>
+    // <SafeAreaView className="flex-1 bg-white">
+      <ScrollView className="flex-1 bg-white">
         <View className="flex-1">{content}</View>
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 };
 

@@ -92,10 +92,10 @@ const editPassword = () => {
   }
 
   return (
-    <View className="flex flex-col gap-4 mt-6 ml-10 mr-10 text-left">
+    <View className="flex-1 bg-white rounded-xl px-4 py-5">
       {index === 1 && (
-        <View className="flex gap-4">
-          <Text className="text-xl font-bold">Enter old password</Text>
+        <View className="gap-2.5">
+          <Text className="font-semibold text-textBlack">Enter old password</Text>
           <Controller
             control={control}
             name="oldPassword"
@@ -109,12 +109,12 @@ const editPassword = () => {
                 id="oldPassword"
                 placeholder="Type here"
                 secureTextEntry={showPass}
-                className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
+                className="mb-2 border rounded-full px-4 py-2 smallTextGray border-stroke"
               />
             )}
           />
 
-          <View className="items-center">
+          <View className="mt-3">
             <NormalButton
               onClick={handleSubmit((data) => validateOldPassword(data))}
               text="Save"
@@ -123,8 +123,8 @@ const editPassword = () => {
         </View>
       )}
       {index === 2 && (
-        <View className="flex gap-4">
-          <Text className="text-xl font-bold">Enter new password</Text>
+        <View className="gap-2.5">
+          <Text className="font-semibold text-textBlack">Enter new password</Text>
           <Controller
             control={control}
             name="newPassword"
@@ -148,12 +148,12 @@ const editPassword = () => {
                 id="newPassword"
                 placeholder="Type here"
                 secureTextEntry={showPass}
-                className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
+                className="mb-2 border rounded-full px-4 py-2 smallTextGray border-stroke"
               />
             )}
           />
 
-          <View className="items-center">
+          <View className="mt-3">
             <NormalButton
               onClick={handleSubmit((data) => {
                 sendCode(data)
@@ -164,13 +164,13 @@ const editPassword = () => {
         </View>
       )}
       {index === 3 && (
-        <View className="flex gap-4">
-          <Text className="text-xl font-bold">Enter Code From Email</Text>
+        <View className="gap-2.5">
+          <Text className="font-semibold text-textBlack">Enter code from email</Text>
           <Controller
             control={control}
             name="verifyCode"
             rules={{
-              required: 'Verify Code is required',
+              required: 'Verify code is required',
             }}
             render={({ field: { onChange, value } }) => (
               <TextInput
@@ -178,12 +178,12 @@ const editPassword = () => {
                 value={value}
                 id="verifyCode"
                 placeholder="Type here"
-                className="px-4 py-3 bg-white border rounded-full smallTextGray border-stroke h-fit"
+                className="mb-2 border rounded-full px-4 py-2 smallTextGray border-stroke"
               />
             )}
           />
 
-          <View className="items-center">
+          <View className="mt-3">
             <NormalButton
               onClick={handleSubmit((data) => {
                 verifyCode(data)
@@ -195,7 +195,7 @@ const editPassword = () => {
       )}
       {index === 4 && (
         <View>
-          <Text className="text-xl font-bold">New password set</Text>
+          <Text className="font-semibold text-textBlack">New password set</Text>
         </View>
       )}
     </View>

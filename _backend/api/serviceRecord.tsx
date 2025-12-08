@@ -18,20 +18,27 @@ export async function createServiceRecord(payload: {
   serviceDate: string;
   mileage: string;
   note: string;
-  files: string[];  // store list of file keys
+  files: string[];
+  parsedText?: string;
 }) {
-  const response = await fetch(BASE_URL+"/vehicle/serviceRecord/createServiceRecord", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    BASE_URL + "/vehicle/serviceRecord/createServiceRecord",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
 
   const text = await response.text();
   if (!response.ok) {
     throw new Error(text || `HTTP ${response.status}`);
   }
 
-  return (text ? JSON.parse(text) : {}) as { message: string; serviceRecordId: string };
+  return (text ? JSON.parse(text) : {}) as {
+    message: string;
+    serviceRecordId: string;
+  };
 }
 
 // GET ALL SERVICE RECORDS /vehicle/serviceRecord/listServiceRecords

@@ -1,3 +1,5 @@
+import {Buffer} from "buffer";
+
 export const BASE_URL = "https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev";
 
 export type Vehicle = {
@@ -99,22 +101,24 @@ export async function getVehicleImage(userId: string, vehicleId: string) {
     const url = `${BASE_URL}/vehicle/getVehicleImage` +
               `?userId=${encodeURIComponent(userId)}` +
               `&vehicleId=${encodeURIComponent(vehicleId)}`;
+    
     const response = await fetch(url, {
         method: "GET",
         cache: "no-store"
     });
 
-    const text = await response.text()
     if (!response.ok) {
-        throw new Error(text || `HTTP ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(errorText || `HTTP ${response.status}`);
     }
 
-    const data = await JSON.parse(text);
-
+    const data = await response.json();
+    
     const base64string = data.body as string;
+    
 
     const dataUrl = `data:image/jpeg;base64,${base64string}`;
-
+    
     return dataUrl;
 }
 

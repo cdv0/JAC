@@ -1,7 +1,7 @@
 import { readUserProfile } from '@/_backend/api/profile'
 import { getMechanicById, getReviewsByMechanic } from '@/_backend/api/review'
-import AddShop from '@/app/components/AddShop'
 import NormalButton from '@/app/components/NormalButton'
+import ShopManager from '@/app/components/ShopManager'
 import Star from '@/app/components/Star'
 import TimeConverter from '@/app/components/TimeConverter'
 import ToggleButton from '@/app/components/ToggleButton'
@@ -10,7 +10,7 @@ import { icons } from '@/constants/icons'
 import { images } from '@/constants/images'
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   DimensionValue,
@@ -30,29 +30,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace'
 
-interface MechanicViewProps {
-  mechanicID: string
-  name: string
-  Certified: boolean
-  Review: number
-  Image: string
-  Services: string[]
-  Hours: string[]
-  address: string
-  Website: string
-  Phone: string
-  lat: number
-  lon: number
-}
-
-type ReviewProps = {
-  ReviewId: string
-  MechanicId: string
-  Rating: number
-  Review: string
-  UserId: string
-}
-
 const Details = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
 
@@ -67,6 +44,7 @@ const Details = () => {
   const [lastName, setLastName] = useState<string>('')
   const displayName =
     firstName || lastName ? `${firstName} ${lastName}`.trim() : null
+  const [hours, setHours] = useState<Record<string, string>>()
 
   useEffect(() => {
     ;(async () => {
@@ -99,17 +77,21 @@ const Details = () => {
   const [visible, setVisible] = useState(false)
   const [Verified, setVerified] = useState(false)
   const [choice, setChoice] = useState('')
+  const [choice2, setChoice2] = useState('')
   const [isClaimed, setClaimed] = useState(false) //change to fetch query
-  const [claimable, setClaimable] = useState(true) //for testing
   const [asMechanic, setAsMechanic] = useState(true) //for testing
   const [claimVisibile, setClaimVisibile] = useState(false)
   const [claimLoading, setClaimLoading] = useState(true)
   const [editVisible, setEditVisible] = useState(false)
-  const handleChoice = (flag: boolean, choice: string) => {
+  const handleChoice = (
+    flag: boolean,
+    choice: string,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
     if (flag) {
-      setChoice(choice)
+      setter(choice)
     } else {
-      setChoice('')
+      setter('')
     }
   }
 
@@ -129,6 +111,18 @@ const Details = () => {
         console.log('id', id)
         const mech = await getMechanicById(String(id))
         setMechanic(mech as any)
+
+        if (mech) {
+          setHours({
+            Mon: mech.Hours[0],
+            Tues: mech.Hours[1],
+            Weds: mech.Hours[2],
+            Thurs: mech.Hours[3],
+            Fri: mech.Hours[4],
+            Sat: mech.Hours[5],
+            Sun: mech.Hours[6],
+          })
+        }
 
         // 2. Reviews for this mechanic
         const { reviews: backendReviews, average } = await getReviewsByMechanic(
@@ -190,13 +184,13 @@ const Details = () => {
 
   if (loading) {
     return (
-      <View className="items-center justify-center flex-1">
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
       </View>
     )
   } else if (!mechanic) {
     return (
-      <View className="items-center justify-center flex-1">
+      <View className="flex-1 items-center justify-center">
         <Text>{id} could not be found</Text>
       </View>
     )
@@ -244,7 +238,17 @@ const Details = () => {
           )
         : reviews
     const applyFilter = () => {
-      const temp = searchReviews
+      let temp = searchReviews
+      if (choice2 != '') {
+        const today = new Date()
+        const cat = new Date(
+          today.setDate(
+            today.getDate() - (choice2 == '1' ? 30 : choice2 == '2' ? 14 : 7)
+          )
+        )
+        temp = temp.filter((x) => x.CreatedAt && new Date(x.CreatedAt) >= cat)
+      }
+
       if (choice == '') {
         return temp
       } else if (choice == '5')
@@ -295,7 +299,7 @@ const Details = () => {
                 <Text className="buttonTextBlack mb-[10]">
                   Reviews: {reviews.length}
                 </Text>
-                {isAuthenticated && asMechanic && claimable && (
+                {isAuthenticated && asMechanic && (
                   <ToggleButton
                     flag={isClaimed}
                     text={isClaimed ? 'Claimed' : 'Claim Business'}
@@ -357,7 +361,7 @@ const Details = () => {
               />
               {!more && servicesData.length > 8 && (
                 <Text
-                  className="text-center text-lightBlueText bold"
+                  className="text-lightBlueText bold text-center"
                   onPress={() => {
                     setMore(true)
                   }}
@@ -367,7 +371,7 @@ const Details = () => {
               )}
               {more && servicesData.length > 8 && (
                 <Text
-                  className="text-center text-lightBlueText"
+                  className="text-lightBlueText text-center"
                   onPress={() => {
                     setMore(false)
                   }}
@@ -424,48 +428,18 @@ const Details = () => {
                         {'\u2B24'} Hours
                       </Text>
                       <View className="mx-[5%] w-[75%]">
-                        <View className="flex-row justify-between mb-[2%]">
-                          <Text className="buttonTextBlue">Mon</Text>
-                          <Text className="buttonTextBlue">
-                            {TimeConverter(mechanic.Hours[0])}
-                          </Text>
-                        </View>
-                        <View className="flex-row justify-between mb-[2%]">
-                          <Text className="buttonTextBlue">Tues</Text>
-                          <Text className="buttonTextBlue">
-                            {TimeConverter(mechanic.Hours[1])}
-                          </Text>
-                        </View>
-                        <View className="flex-row justify-between mb-[2%]">
-                          <Text className="buttonTextBlue">Weds</Text>
-                          <Text className="buttonTextBlue">
-                            {TimeConverter(mechanic.Hours[2])}
-                          </Text>
-                        </View>
-                        <View className="flex-row justify-between mb-[2%]">
-                          <Text className="buttonTextBlue">Thurs</Text>
-                          <Text className="buttonTextBlue">
-                            {TimeConverter(mechanic.Hours[3])}
-                          </Text>
-                        </View>
-                        <View className="flex-row justify-between mb-[2%]">
-                          <Text className="buttonTextBlue">Fri</Text>
-                          <Text className="buttonTextBlue">
-                            {TimeConverter(mechanic.Hours[4])}
-                          </Text>
-                        </View>
-                        <View className="flex-row justify-between mb-[2%]">
-                          <Text className="buttonTextBlue">Sat</Text>
-                          <Text className="buttonTextBlue">
-                            {TimeConverter(mechanic.Hours[5])}
-                          </Text>
-                        </View>
-                        <View className="flex-row justify-between mb-[2%]">
-                          <Text className="buttonTextBlue">Sun</Text>
-                          <Text className="buttonTextBlue">
-                            {TimeConverter(mechanic.Hours[6])}
-                          </Text>
-                        </View>
+                        {hours &&
+                          Object.keys(hours).map((x) => (
+                            <View
+                              key={x}
+                              className="flex-row justify-between mb-[2%]"
+                            >
+                              <Text className="buttonTextBlue">{x}</Text>
+                              <Text className="buttonTextBlue">
+                                {TimeConverter(hours[x])}
+                              </Text>
+                            </View>
+                          ))}
                       </View>
                     </>
                   )}
@@ -486,7 +460,7 @@ const Details = () => {
                   starSize={20}
                 />
               </View>
-              <View className="justify-center flex-1">
+              <View className="flex-1 justify-center">
                 <NormalButton
                   text={isAuthenticated ? 'Post a review' : 'Log in'}
                   onClick={() => {
@@ -506,7 +480,7 @@ const Details = () => {
 
             <View className="w-[95%] bg-white rounded-xl self-center flex-row py-[5%]">
               <View className="items-center justify-center gap-[5] mx-[10]">
-                <Text className="text-2xl buttonTextBlack">
+                <Text className="buttonTextBlack text-2xl">
                   {reviewAVG ? reviewAVG.toFixed(1) : 0}
                 </Text>
                 <StarRatingDisplay
@@ -533,9 +507,9 @@ const Details = () => {
                         className=" w-full mb-[2%] flex-row justify-center items-center gap-1"
                       >
                         <Text className="buttonTextBlack">{x}</Text>
-                        <View className="flex-row w-full rounded-full bg-stroke">
+                        <View className="bg-stroke rounded-full w-full  flex-row">
                           <Text
-                            className="rounded-full bg-primaryBlue"
+                            className="bg-primaryBlue rounded-full"
                             style={{ width: `${percent}%` as DimensionValue }}
                           >
                             {' '}
@@ -548,7 +522,7 @@ const Details = () => {
             </View>
 
             <View className="flex-row w-[95%] justify-between self-center ">
-              <View className="flex-row items-center bg-white border rounded-full border-stroke ">
+              <View className="flex-row border border-stroke rounded-full bg-white items-center ">
                 <icons.search />
                 <TextInput
                   className="w-[50%]"
@@ -589,7 +563,7 @@ const Details = () => {
                 contentContainerStyle={{ gap: 10 }}
                 ListEmptyComponent={
                   <Text className="self-center buttonTextBlack">
-                    No Reviews Available
+                    No Reviews Found
                   </Text>
                 }
                 scrollEnabled={false}
@@ -611,18 +585,18 @@ const Details = () => {
                 margin: 0,
               }}
             >
-              <View className="w-[40%] h-[70%] flex-row items-center">
+              <View className="w-[50%] h-full flex-row items-center">
                 <Pressable
-                  className="w-[20px] h-[40px] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black"
+                  className="w-[20] h-[40] bg-white rounded-l-[20px] justify-center items-end border-y border-l border-black"
                   onPress={() => setVisible(false)}
                 >
                   <Text className="text-2xl text-bold buttonTextBlack">
                     {'>'}
                   </Text>
                 </Pressable>
-                <View className="items-center justify-around flex-1 h-full bg-white border border-black rounded-l-xl">
+                <View className="bg-white w-full h-full pr-[8%] rounded-l-xl justify-around items-center border border-black">
                   <View className="w-full border-b border-stroke">
-                    <Text className="self-center text-2xl buttonTextBlack">
+                    <Text className="buttonTextBlack self-center text-2xl">
                       Filters
                     </Text>
                   </View>
@@ -634,43 +608,73 @@ const Details = () => {
                     }}
                     text="Verified"
                   />
-
-                  <View className="w-full items-center border-t pt-[10%] border-stroke">
-                    <ToggleButton
-                      flag={choice == '5'}
-                      onPress={(newf) => {
-                        handleChoice(newf, '5')
-                      }}
-                      text="5 stars"
-                    />
+                  <View className="flex-row w-full items-center">
+                    <Text className="buttonTextBlack text-xl ml-1 mr-5">
+                      Ratings
+                    </Text>
+                    <View className="w-full  border-t border-stroke" />
                   </View>
                   <ToggleButton
-                    flag={choice == '4'}
+                    flag={choice == '5'}
+                    width={'80%'}
                     onPress={(newf) => {
-                      handleChoice(newf, '4')
+                      handleChoice(newf, '5', setChoice)
                     }}
-                    text="4 stars"
+                    text="5 stars"
                   />
                   <ToggleButton
                     flag={choice == '3'}
+                    width={'80%'}
                     onPress={(newf) => {
-                      handleChoice(newf, '3')
+                      handleChoice(newf, '3', setChoice)
                     }}
                     text="3 stars"
                   />
                   <ToggleButton
                     flag={choice == '2'}
+                    width={'80%'}
                     onPress={(newf) => {
-                      handleChoice(newf, '2')
+                      handleChoice(newf, '2', setChoice)
                     }}
                     text="2 stars"
                   />
                   <ToggleButton
                     flag={choice == '1'}
+                    width={'80%'}
                     onPress={(newf) => {
-                      handleChoice(newf, '1')
+                      handleChoice(newf, '1', setChoice)
                     }}
                     text="1 star"
+                  />
+                  <View className="flex-row w-full items-center mb-[-5]">
+                    <Text className="buttonTextBlack text-xl ml-1 mr-5">
+                      Date
+                    </Text>
+                    <View className="w-full  border-t border-stroke" />
+                  </View>
+                  <ToggleButton
+                    flag={choice2 == '1'}
+                    width={'80%'}
+                    onPress={(newf) => {
+                      handleChoice(newf, '1', setChoice2)
+                    }}
+                    text="Last 30 days"
+                  />
+                  <ToggleButton
+                    flag={choice2 == '2'}
+                    width={'80%'}
+                    onPress={(newf) => {
+                      handleChoice(newf, '2', setChoice2)
+                    }}
+                    text="Last 14 days"
+                  />
+                  <ToggleButton
+                    flag={choice2 == '3'}
+                    width={'80%'}
+                    onPress={(newf) => {
+                      handleChoice(newf, '3', setChoice2)
+                    }}
+                    text="Last week"
                   />
                 </View>
               </View>
@@ -695,7 +699,7 @@ const Details = () => {
               <View className="w-[40%] h-[20%] bg-white border border-black rounded-xl items-center justify-center">
                 {/*Add loading*/}
                 {claimLoading ? (
-                  <View className="items-center justify-center flex-1">
+                  <View className="flex-1 items-center justify-center">
                     <ActivityIndicator size="large" />
                   </View>
                 ) : isClaimed ? (
@@ -710,7 +714,7 @@ const Details = () => {
             </Modal>
 
             {/*edit modal*/}
-            <AddShop
+            <ShopManager
               mode="edit"
               visible={editVisible}
               onClose={() => setEditVisible(false)}
