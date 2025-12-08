@@ -209,7 +209,6 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
         </View>})}
 
         {showPicker && (
-               <Modal isVisible={showPicker} backdropOpacity={0.2} onBackdropPress={()=> setShowPicker(false)} style={{alignItems:'center', justifyContent:'center'}}>
                 <DateTimePicker
                     testID="dateTimePicker"
                     value={date} // Use the internal Date state
@@ -218,7 +217,6 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={onChange}
                 />
-               </Modal> 
                 
             )}
     </View>
