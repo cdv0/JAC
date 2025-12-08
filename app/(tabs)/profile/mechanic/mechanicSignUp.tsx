@@ -48,16 +48,22 @@ const mechanicSignUp = () => {
 
   const verifyAccountClick = async () => {
     const email: string = getValues('email')
-    const result = await verifyAccountHandler(verifyCode, email)
+    try {
+      const result = await verifyAccountHandler(verifyCode, email)
+      console.log('Result: ', result)
 
-    // handle success account
-    if (result === 'success') {
-      setVerifyCode('')
-      reset()
+      // handle success account
+      if (result === 'success') {
+        setVerifyCode('')
+        reset()
+        router.push('/(tabs)/profile/mechanic/mechanicSignIn')
+      }
+
       router.push('/(tabs)/profile/mechanic/mechanicSignIn')
-    } else {
-      // notify user about wrong code or other error
+    } catch (error) {
+      console.log('Error: ', error)
     }
+    router.push('/(tabs)/profile/mechanic/mechanicSignIn')
   }
 
   switch (profileStatus) {
