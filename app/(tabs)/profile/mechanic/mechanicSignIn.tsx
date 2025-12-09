@@ -168,6 +168,22 @@ const mechanicSignIn = () => {
           />
         </View>
 
+        {/* SIGN IN: Sign up navigation */}
+        <View className="flex flex-row justify-center gap-1.5">
+          <Text className="font-semibold text-textBlack">
+            Don't have an account?
+          </Text>
+          <Text
+            onPress={() => {
+              reset()
+              router.push('/(tabs)/profile/mechanic/mechanicSignUp')
+            }}
+            className="font-bold text-lightBlueText"
+          >
+            Sign up
+          </Text>
+        </View>
+
         {/* hr */}
         <View className="w-full h-px my-6 bg-stroke" />
 
@@ -177,22 +193,6 @@ const mechanicSignIn = () => {
         >
           <Text className="underline text-primaryBlue">Are you a User?</Text>
         </Pressable>
-
-        {/* SIGN IN: Sign up navigation */}
-        <View className="flex flex-row justify-center gap-1.5">
-          <Text className="font-semibold text-textBlack">
-            Don't have an account?
-          </Text>
-          <Text
-            onPress={() => {
-              reset()
-              router.push('/')
-            }}
-            className="font-bold text-lightBlueText"
-          >
-            Sign up
-          </Text>
-        </View>
       </View>
     </SafeAreaView>
   )

@@ -1,6 +1,5 @@
 import { Base64 } from "js-base64";
-import * from "expo-file-system";
-
+import * as FileSystem from 'expo-file-system/legacy';
 
 export const BASE_URL = "https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev";
 
@@ -23,8 +22,8 @@ export const ALLOWED_MIME_TYPES_RECORD = ["image/png", "image/jpeg", "image/jpg"
 
 // POST /vehicle/uploadVehicleImage
 export async function uploadVehicleImage(payload: File, type: "vehicle" | "record") {
-  const base64 = await FileSystem.readAsStringAsync(payload.uri, {encoding: FileSystem.EncodingType.Base64})
-
+  console.log(payload.name, payload.uri);
+  const base64 = await FileSystem.readAsStringAsync(payload.uri, { encoding: FileSystem.EncodingType.Base64 });
   const response = await fetch(BASE_URL+"/vehicle/uploadVehicleImage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -47,8 +46,7 @@ export async function uploadVehicleImage(payload: File, type: "vehicle" | "recor
 
 // POST /profile/uploadProfilePicture
 export async function uploadProfilePicture(payload: File) {
-  const base64 = await FileSystem.readAsStringAsync(payload.uri, {encoding: FileSystem.EncodingType.Base64})
-
+  const base64 = Base64.encode(payload.uri);
 
   const response = await fetch(BASE_URL+"/profile/uploadProfilePicture", {
     method: "POST",
