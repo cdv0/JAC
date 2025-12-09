@@ -196,7 +196,18 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
                     </Text>
                   </Pressable>
                 </View>
-            </View>       
+            </View>  
+            {Platform.OS == "ios" && pickerTarget && pickerTarget.includes(day) && showPicker && (
+                <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date} // Use the internal Date state
+                    mode="time" // We only need the time picker UI
+                    is24Hour={false} 
+                    display={'spinner'}
+                    onChange={onChange}
+                />
+                
+            )}     
         </View>
       )
     }
@@ -208,17 +219,15 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
           {render(x)}
         </View>})}
 
-        {showPicker && (
-               <Modal isVisible={showPicker} backdropOpacity={0.2} onBackdropPress={()=> setShowPicker(false)} style={{alignItems:'center', justifyContent:'center'}}>
+        {Platform.OS == "android" && showPicker && (
                 <DateTimePicker
                     testID="dateTimePicker"
                     value={date} // Use the internal Date state
                     mode="time" // We only need the time picker UI
                     is24Hour={false} 
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    display={'default'}
                     onChange={onChange}
                 />
-               </Modal> 
                 
             )}
     </View>
