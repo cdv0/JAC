@@ -58,7 +58,7 @@ const Details = () => {
   const [editVisible, setEditVisible] = useState(false);
 //#endregion
 
-//#region useEffect
+  //#region useEffect
   useEffect(() => {
     ;(async () => {
       try {
@@ -167,6 +167,7 @@ const Details = () => {
   }, [id]); 
 //#endregion
 
+  //#region Helper Functions
   const handleChoice = (flag:boolean, choice:string, setter:React.Dispatch<React.SetStateAction<string>>)=>{
     if (flag){
       setter(choice)
@@ -184,6 +185,7 @@ const Details = () => {
       setClaimLoading(false)
     }, 5000)
   }
+  //#endregion
 
   if (loading) {
     return (
