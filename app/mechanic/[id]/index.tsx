@@ -85,8 +85,8 @@ const Details = () => {
         setLastName('')
         setIsAuthenticated(false)
       }
-    })();
-  }, []);
+    })()
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -161,6 +161,7 @@ const Details = () => {
       } finally {
         setLoading(false)
       }
+    }
     }
 
     fetchData();
@@ -444,9 +445,11 @@ const Details = () => {
                     router.push({
                       pathname: '/mechanic/[id]/createReview',
                       params: { id },
-                    })
-                  }}
-                />
+                  });
+                }}
+              />
+                </View>
+                
               </View>
             </View>
 
