@@ -42,6 +42,7 @@ const Details = () => {
   const [more, setMore] = useState(false);
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [userID, setUserID] = useState('');
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const displayName = firstName || lastName ? `${firstName} ${lastName}`.trim() : null;
@@ -69,6 +70,9 @@ const Details = () => {
           throw new Error(
             'No email on the Cognito profile (check pool/app-client readable attributes).'
           )
+        }
+        else if(userID){
+          setUserID(userID)
         }
 
         const userData = await readUserProfile(userId, email)
@@ -165,6 +169,10 @@ const Details = () => {
 
     fetchData();
   }, [id]); 
+
+useEffect(()=>{
+  setClaimed(mechanic.Certified && userID== mechanic.ownerid)
+},[mechanic, userID])
 //#endregion
 
   //#region Helper Functions
@@ -279,7 +287,7 @@ const Details = () => {
                         <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
                       <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
-                      {!mechanic.Certified && isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
+                      {isClaimed  || isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
                       text={isClaimed?'Claimed':'Claim Business'} 
                       onPress={async ()=>{
                                       /**
@@ -533,6 +541,7 @@ const Details = () => {
                     <ViewReviews {...item} />
                   </Pressable>
                 )}
+                initialNumToRender={4}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ gap: 10 }}
                 ListEmptyComponent={
