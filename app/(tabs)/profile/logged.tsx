@@ -1,18 +1,18 @@
 import { readUserProfile } from '@/_backend/api/profile'
+import { getReviewsByUser } from '@/_backend/api/review'
 import NormalButton from '@/app/components/NormalButton'
+import { icons } from '@/constants/icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native'
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth'
 import { useRouter } from 'expo-router'
-import { useEffect, useMemo, useState, useCallback } from 'react'
-import { Pressable, ScrollView, Text, View, Image } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { icons } from '@/constants/icons';
-import { getReviewsByUser } from '@/_backend/api/review'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Image, Pressable, ScrollView, Text, View } from 'react-native'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
-import { useFocusEffect } from '@react-navigation/native' 
 
 const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
-const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
+const getProfileImageKey = (userId: string) =>
+  `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
 
 type SortOption = 'dateNewest' | 'dateOldest' | 'ratingHigh' | 'ratingLow'
 
@@ -30,6 +30,7 @@ export const account = () => {
     try {
       const { userId } = await getCurrentUser()
       const attrs = await fetchUserAttributes()
+      console.log('Attributes: ', attrs)
       const email = attrs.email
       if (!email) {
         throw new Error(
@@ -38,6 +39,16 @@ export const account = () => {
       }
 
       console.log('userid:', userId, 'email:', email)
+
+      if (attrs.locale === 'Mechanic') {
+        const name = attrs.name?.split(' ')
+        console.log('name: ', name)
+        setFirstName(name?.[0] ?? '')
+        setLastName(name?.[1] ?? '')
+        setCreatedAt('')
+        return
+      }
+
       const userData = await readUserProfile(userId, email)
       setFirstName(userData.firstName ?? '')
       setLastName(userData.lastName ?? '')
@@ -53,7 +64,7 @@ export const account = () => {
   }, [])
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       try {
         const { userId } = await getCurrentUser()
         const cacheKey = getProfileImageKey(userId)
@@ -84,11 +95,9 @@ export const account = () => {
     })()
   }, [])
 
-  
   useEffect(() => {
     loadAccountData()
   }, [loadAccountData])
-
 
   useFocusEffect(
     useCallback(() => {
@@ -115,12 +124,11 @@ export const account = () => {
     const copy = [...reviews]
 
     const getDate = (rev: any) => {
-      const raw = rev.createdAt ?? rev.CreatedAt;
-      return raw ? new Date(raw).getTime() : 0;
-    };
+      const raw = rev.createdAt ?? rev.CreatedAt
+      return raw ? new Date(raw).getTime() : 0
+    }
 
-    const getRating = (rev: any) =>
-      Number(rev.rating ?? rev.Rating ?? 0);
+    const getRating = (rev: any) => Number(rev.rating ?? rev.Rating ?? 0)
 
     switch (sortOption) {
       case 'dateNewest':
@@ -138,151 +146,141 @@ export const account = () => {
 
   return (
     // <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
-      <ScrollView className="flex-1 bg-white">
-        <View className="flex-1 mt-5 gap-5 mb-5">
-          <View className="flex-row items-center justify-center bg-white pb-12 gap-10 border-b border-secondary">
-            {profileImage ? (
-              <Image
-                source={{ uri: profileImage }}
-                className="h-20 w-20 rounded-full"
-              />
-            ) : (
-              <View className="h-20 w-20 bg-accountOrange rounded-full items-center justify-center">
-                <Text className="text-4xl font-bold text-white">
-                  {fullInitials}
-                </Text>
-              </View>
-            )}
-
-            <View>
-              <Text className="xsTitle">
-                {firstName} {lastName}
-              </Text>
-              <Text className="xsTextGray">
-                {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
-              </Text>
-              <Text className="xsTextGray">
-                Member since {memberSince || '-'}
+    <ScrollView className="flex-1 bg-white">
+      <View className="flex-1 gap-5 mt-5 mb-5">
+        <View className="flex-row items-center justify-center gap-10 pb-12 bg-white border-b border-secondary">
+          {profileImage ? (
+            <Image
+              source={{ uri: profileImage }}
+              className="w-20 h-20 rounded-full"
+            />
+          ) : (
+            <View className="items-center justify-center w-20 h-20 rounded-full bg-accountOrange">
+              <Text className="text-4xl font-bold text-white">
+                {fullInitials}
               </Text>
             </View>
-          </View>
+          )}
 
-          <View className="flex-1 mx-5 gap-6">
-            <View className="flex-row justify-between">
-              <Text className="mediumTitle">Reviews</Text>
-              <NormalButton
-                variant="primary"
-                text="Filter"
-                icon={<icons.filter height={24} width={24} />}
-                paddingHorizontal={20}
-                onClick={() => {
-                  setFilterOpen((f) => !f)
-                }}
-              />
-            </View>
-
-            {filterOpen && (
-              <View className="mx-3 pt-4 pb-6 border-y border-stroke">
-                <View className="flex-1 flex-row justify-between">
-                  <Text className="xsTitle mb-3">Sort by</Text>
-                  <Pressable onPress={() => setFilterOpen(false)}>
-                    <icons.x height={24} width={24} />
-                  </Pressable>
-                </View>
-
-
-                <View className="gap-3">
-                  <View className="flex-1 flex-row gap-3">
-                    <NormalButton
-                      variant={
-                        sortOption === 'dateNewest' ? 'primary' : 'outline'
-                      }
-                      text="Newest to Oldest"
-                      grow={true}
-                      onClick={() => setSortOption('dateNewest')}
-                    />
-                    <NormalButton
-                      variant={
-                        sortOption === 'dateOldest' ? 'primary' : 'outline'
-                      }
-                      text="Oldest to Newest"
-                      grow={true}
-                      onClick={() => setSortOption('dateOldest')}
-                    />
-                  </View>
-
-
-                  <View className="flex-1 flex-row gap-3">
-                    <NormalButton
-                      variant={
-                        sortOption === 'ratingHigh' ? 'primary' : 'outline'
-                      }
-                      text="Highest Rating"
-                      grow={true}
-                      onClick={() => setSortOption('ratingHigh')}
-                    />
-                    <NormalButton
-                      variant={
-                        sortOption === 'ratingLow' ? 'primary' : 'outline'
-                      }
-                      text="Lowest Rating"
-                      grow={true}
-                      onClick={() => setSortOption('ratingLow')}
-                    />
-                  </View>
-                </View>
-              </View>
-            )}
-
-            <View className="gap-4 pb-10">
-              {sortedReviews.length === 0 ? (
-                <Text className="smallTextGray text-center">
-                  No reviews yet.
-                </Text>
-              ) : (
-                sortedReviews.map((rev) => (
-                  <Pressable
-                    key={rev.reviewId ?? rev.ReviewId}
-                    onPress={() =>
-                      router.push({
-                        pathname: '/mechanic/[id]/viewReview',
-                        params: {
-                          id: rev.mechanicId ?? rev.MechanicId,
-                          reviewId: rev.reviewId ?? rev.ReviewId,
-                        },
-                      })
-                    }
-                    className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm"
-                  >
-                    <Text className="smallTitle">
-                      {rev.mechanicName ??
-                        rev.mechanicId ??
-                        rev.MechanicId}
-                    </Text>
-
-                    <Text className="smallTextGray">
-                      {rev.review ?? rev.Review}
-                    </Text>
-
-                    <View className="flex-row items-center mt-2">
-                      <Text className="mr-1">Rating</Text>
-                      <StarRatingDisplay
-                        color="black"
-                        starSize={16}
-                        starStyle={{ width: 4 }}
-                        rating={Number(rev.rating ?? rev.Rating ?? 0)}
-                      />
-                      <Text className="ml-2">
-                        ({rev.rating ?? rev.Rating}/5)
-                      </Text>
-                    </View>
-                  </Pressable>
-                ))
-              )}
-            </View>
+          <View>
+            <Text className="xsTitle">
+              {firstName} {lastName}
+            </Text>
+            <Text className="xsTextGray">
+              {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
+            </Text>
+            <Text className="xsTextGray">
+              Member since {memberSince || '-'}
+            </Text>
           </View>
         </View>
-      </ScrollView>
+
+        <View className="flex-1 gap-6 mx-5">
+          <View className="flex-row justify-between">
+            <Text className="mediumTitle">Reviews</Text>
+            <NormalButton
+              variant="primary"
+              text="Filter"
+              icon={<icons.filter height={24} width={24} />}
+              paddingHorizontal={20}
+              onClick={() => {
+                setFilterOpen((f) => !f)
+              }}
+            />
+          </View>
+
+          {filterOpen && (
+            <View className="pt-4 pb-6 mx-3 border-y border-stroke">
+              <View className="flex-row justify-between flex-1">
+                <Text className="mb-3 xsTitle">Sort by</Text>
+                <Pressable onPress={() => setFilterOpen(false)}>
+                  <icons.x height={24} width={24} />
+                </Pressable>
+              </View>
+
+              <View className="gap-3">
+                <View className="flex-row flex-1 gap-3">
+                  <NormalButton
+                    variant={
+                      sortOption === 'dateNewest' ? 'primary' : 'outline'
+                    }
+                    text="Newest to Oldest"
+                    grow={true}
+                    onClick={() => setSortOption('dateNewest')}
+                  />
+                  <NormalButton
+                    variant={
+                      sortOption === 'dateOldest' ? 'primary' : 'outline'
+                    }
+                    text="Oldest to Newest"
+                    grow={true}
+                    onClick={() => setSortOption('dateOldest')}
+                  />
+                </View>
+
+                <View className="flex-row flex-1 gap-3">
+                  <NormalButton
+                    variant={
+                      sortOption === 'ratingHigh' ? 'primary' : 'outline'
+                    }
+                    text="Highest Rating"
+                    grow={true}
+                    onClick={() => setSortOption('ratingHigh')}
+                  />
+                  <NormalButton
+                    variant={sortOption === 'ratingLow' ? 'primary' : 'outline'}
+                    text="Lowest Rating"
+                    grow={true}
+                    onClick={() => setSortOption('ratingLow')}
+                  />
+                </View>
+              </View>
+            </View>
+          )}
+
+          <View className="gap-4 pb-10">
+            {sortedReviews.length === 0 ? (
+              <Text className="text-center smallTextGray">No reviews yet.</Text>
+            ) : (
+              sortedReviews.map((rev) => (
+                <Pressable
+                  key={rev.reviewId ?? rev.ReviewId}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/mechanic/[id]/viewReview',
+                      params: {
+                        id: rev.mechanicId ?? rev.MechanicId,
+                        reviewId: rev.reviewId ?? rev.ReviewId,
+                      },
+                    })
+                  }
+                  className="p-4 bg-white border border-gray-200 shadow-sm rounded-xl"
+                >
+                  <Text className="smallTitle">
+                    {rev.mechanicName ?? rev.mechanicId ?? rev.MechanicId}
+                  </Text>
+
+                  <Text className="smallTextGray">
+                    {rev.review ?? rev.Review}
+                  </Text>
+
+                  <View className="flex-row items-center mt-2">
+                    <Text className="mr-1">Rating</Text>
+                    <StarRatingDisplay
+                      color="black"
+                      starSize={16}
+                      starStyle={{ width: 4 }}
+                      rating={Number(rev.rating ?? rev.Rating ?? 0)}
+                    />
+                    <Text className="ml-2">({rev.rating ?? rev.Rating}/5)</Text>
+                  </View>
+                </Pressable>
+              ))
+            )}
+          </View>
+        </View>
+      </View>
+    </ScrollView>
     // </SafeAreaView>
   )
 }
