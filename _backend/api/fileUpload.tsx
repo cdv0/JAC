@@ -68,3 +68,32 @@ export async function uploadProfilePicture(payload: File) {
   const data = await JSON.parse(text);
   return data.key as string;
 }
+
+export async function updateVehicleImageRemote(params: {
+  userId: string;
+  vehicleId: string;
+  file: File;
+}) {
+  const base64 = await FileSystem.readAsStringAsync(params.file.uri, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+
+  const response = await fetch(BASE_URL + "/vehicle/updateVehicleImage2", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: params.userId,
+      vehicleId: params.vehicleId,
+      fileName: params.file.name,
+      fileContent: base64,
+      contentType: params.file.mimeType,
+    }),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
+
+  return text ? JSON.parse(text) : {};
+}

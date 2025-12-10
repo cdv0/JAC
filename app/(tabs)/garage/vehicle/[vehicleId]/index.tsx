@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList } from "react-native";
+import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList, Image, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
-import { readVehicle, updateVehicleDetails } from "@/_backend/api/vehicle";
+import { readVehicle, updateVehicleDetails, getVehicleImage } from "@/_backend/api/vehicle";
 import { getCurrentUser } from "aws-amplify/auth";
 import { icons } from "@/constants/icons";
 import NormalButton from "@/app/components/NormalButton";
 import { type ServiceRecord, listServiceRecords } from "@/_backend/api/serviceRecord";
+import { type File, MAX_IMAGE_SIZE, ALLOWED_MIME_TYPES_IMAGE, updateVehicleImageRemote } from "@/_backend/api/fileUpload";
+import * as DocumentPicker from "expo-document-picker";
 
 export default function VehicleDetail() {
   const params = useLocalSearchParams<{ vehicleId: string}>();
@@ -38,6 +40,9 @@ export default function VehicleDetail() {
   // Submission state & empty value check
   const [submittedEdit, setSubmittedEdit] = useState(false);
 
+  const [vehicleImage, setVehicleImage] = useState<string | null>(null);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+
   const isNewVINInvalid = submittedEdit && !(newVIN?.trim());
   const isNewPlateNumInvalid = submittedEdit && !(newPlateNum?.trim());
   const isNewMakeInvalid = submittedEdit && !(newMake?.trim());
@@ -54,6 +59,53 @@ export default function VehicleDetail() {
     });
   }
 
+  const handleChooseImage = async () => {
+    try {
+      const res = await DocumentPicker.getDocumentAsync({
+        type: ALLOWED_MIME_TYPES_IMAGE,
+        multiple: false,
+        copyToCacheDirectory: true,
+      });
+
+      if (res.canceled) return;
+
+      const doc = res.assets[0];
+
+      const pickedFile: File = {
+        uri: doc.uri,
+        name: doc.name,
+        size: doc.size ?? 0,
+        mimeType: doc.mimeType ?? null,
+      };
+
+      if (pickedFile.size > MAX_IMAGE_SIZE || !ALLOWED_MIME_TYPES_IMAGE.includes(pickedFile.mimeType ?? "")) {
+        console.log("Vehicle: Invalid image selected");
+        return;
+      }
+
+      const { userId } = await getCurrentUser();
+
+      const result = await updateVehicleImageRemote({
+        userId,
+        vehicleId: String(vehicleId),
+        file: pickedFile,
+      });
+
+      console.log("Vehicle: updateVehicleImageRemote result:", result);
+
+      try {
+        const img = await getVehicleImage(userId, String(vehicleId));
+        setVehicleImage(img || null);
+      } catch (e: any) {
+        console.log("Vehicle: Error reloading image after update:", e?.message);
+      }
+
+      setImageModalVisible(false);
+    } catch (e: any) {
+      console.log("Vehicle: Error updating image:", e?.message || e);
+    }
+  };
+
   // LOAD VEHICLE DETAILS
   useEffect(() => {(async () => {
       try {
@@ -68,6 +120,14 @@ export default function VehicleDetail() {
         setMake(data.make ?? "");
         setModel(data.model ?? "");
         setYear(String(data.year ?? ""));
+
+        try {
+          const img = await getVehicleImage(userId, String(vehicleId));
+          setVehicleImage(img || null);
+        } catch (e: any) {
+          console.log("Vehicle: Error loading image:", e?.message);
+          setVehicleImage(null);
+        }
 
         setVehicle(true);
       } catch (e: any) {
@@ -164,8 +224,22 @@ export default function VehicleDetail() {
       <View className="flex-1">
         {/* Vehicle banner */}
         <View className="flex-row items-center gap-4 bg-white w-full p-2 px-8">
-          <View className="items-center justify-center h-24 w-24">
-            <icons.noImage height={50} width={70} />
+          <View className="items-center justify-center h-24 w-24 relative">
+            {vehicleImage ? (
+              <Image
+                source={{ uri: vehicleImage }}
+                className="h-full w-full rounded-lg"
+              />
+            ) : (
+              <icons.noImage height={50} width={70} />
+            )}
+            <Pressable
+              onPress={() => setImageModalVisible(true)}
+              className="absolute bottom-1 right-1 bg-white rounded-full p-1"
+              hitSlop={8}
+            >
+              <icons.pencil height={16} width={16} />
+            </Pressable>
           </View>
           <View>
             <Text className="buttonTextBlue">{model}</Text>
@@ -443,6 +517,37 @@ export default function VehicleDetail() {
             )}
           </View>
         </View>
+
+        <Modal
+          transparent={true}
+          visible={imageModalVisible}
+          onRequestClose={() => setImageModalVisible(false)}
+        >
+          <View className="flex-1 justify-end px-2">
+            <Pressable 
+              className="absolute inset-0 bg-black/40"
+              onPress={() => setImageModalVisible(false)}>
+            </Pressable>
+
+            <View className="w-full mb-3 gap-2 mx-3 self-center">
+              <View className="bg-white px-4 py-3 rounded-lg">
+                <Text className="smallTextGray">Change vehicle image</Text>
+                <Pressable className="py-3 border-stroke" onPress={handleChooseImage}>
+                  <Text className="smallText">Choose a file</Text>
+                </Pressable>
+              </View>
+
+              <View className="bg-white rounded-lg">
+                <Pressable 
+                  onPress={() => setImageModalVisible(false)}
+                  className="px-4 py-3"
+                >
+                  <Text className="text-center smallTextBold">Cancel</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
