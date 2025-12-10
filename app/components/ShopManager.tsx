@@ -370,8 +370,30 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
                 </Text>
                 <View className='flex-row self-center gap-[5%] mt-[15%]'>
                   <NormalButton text='No' variant='cancel' onClick={()=>{setConfirmVisible(false);}} />
-                  <NormalButton text='Yes' variant='primary' onClick={()=>{
-                                                                              //call some add/edit shop function here
+                  <NormalButton text='Yes' variant='primary' onClick={ async ()=>{
+                                                                              if (mode == 'add'){
+                                                                              const response = await fetch("https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev/mechanics/createMechanic", {
+                                                                                method: "POST",
+                                                                                headers: {
+                                                                                  "Content-Type": "application/json",
+                                                                                },
+                                                                                body: JSON.stringify({
+                                                                                  body: shop
+                                                                                }),
+                                                                      
+                                                                              }) }else{ 
+                                                                              const response = await fetch("https://7e6tg2ovcc.execute-api.us-west-1.amazonaws.com/dev/mechanics/updateMechanic", {
+                                                                                method: "POST",
+                                                                                headers: {
+                                                                                  "Content-Type": "application/json",
+                                                                                },
+                                                                                body: JSON.stringify({
+                                                                                  body: shop
+                                                                                })
+                                                                              })
+                                                                            }
+
+                                                                  
                                                                               setConfirmVisible(false);
                                                                               onClose();
                                                                               
