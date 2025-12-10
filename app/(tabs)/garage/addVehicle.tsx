@@ -8,7 +8,10 @@ import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-nativ
 import { SafeAreaView } from "react-native-safe-area-context";
 import { type File, MAX_IMAGE_SIZE, ALLOWED_MIME_TYPES_IMAGE } from "@/_backend/api/fileUpload";
 import * as DocumentPicker from "expo-document-picker";
-import {uploadVehicleImage} from "@/_backend/api/fileUpload";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const VEHICLE_IMAGE_URI_KEY_PREFIX = 'vehicleImageUri'
+const getVehicleImageKey = (vehicleId: string) => `${VEHICLE_IMAGE_URI_KEY_PREFIX}:${vehicleId}`
 
 export const addVehicle = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -81,23 +84,11 @@ export const addVehicle = () => {
       return;
     }
 
-    // Make API call to upload file if any, and create vehicle
+    // Make API call to create vehicle
     try {
       const { userId } = await getCurrentUser()
       let vehicleImageKey: string | null = null;
 
-      // Upload vehicle image to bucket
-      if (file) {
-        try {
-          vehicleImageKey = await uploadVehicleImage(file, "vehicle");
-          console.log("Add vehicle: Image upload successful:", vehicleImageKey);
-        } catch (e: any) {
-          console.log("Add vehicle: Error upload vehicle image:", e);
-          console.log("Add vehicle: Error message:", e?.message);
-          return;
-        }
-      }
-      
       const payload = {
         userId: userId,
         VIN,
@@ -110,6 +101,15 @@ export const addVehicle = () => {
 
       const data = await createVehicle(payload)
       console.log('Add vehicle: success:', data)
+
+      const vehicleId = data?.vehicleId
+      if (file && vehicleId) {
+        try {
+          await AsyncStorage.setItem(getVehicleImageKey(String(vehicleId)), file.uri)
+        } catch (e) {
+          console.log('Add vehicle: Error saving image uri:', e)
+        }
+      }
 
       setVIN('')
       setPlateNum('')
@@ -127,12 +127,12 @@ export const addVehicle = () => {
 
   return (
     // <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <ScrollView className="flex-1 bg-white">
-        <View className="flex-1 mx-5 mt-3 gap-3 mb-5">
+      <ScrollView className="flex-1 bg-white" contentContainerStyle={{flexGrow: 1}}>
+        <View className="mx-5 mt-3 gap-3 mb-5">
 
           {/* VIN INPUT */}
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">VIN</Text>
               <Text className="dangerText"> *</Text>
             </View>
@@ -152,7 +152,7 @@ export const addVehicle = () => {
 
           {/* PLATE NUMBER INPUT */}
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">Plate number</Text>
               <Text className="dangerText"> *</Text>
             </View>
@@ -171,7 +171,7 @@ export const addVehicle = () => {
 
           {/* MAKE INPUT */}
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">Make</Text>
               <Text className="dangerText"> *</Text>
             </View>
@@ -190,7 +190,7 @@ export const addVehicle = () => {
 
           {/* MODEL INPUT */}
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">Model</Text>
               <Text className="dangerText"> *</Text>
             </View>
@@ -209,7 +209,7 @@ export const addVehicle = () => {
 
           {/* YEAR INPUT */}
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">Year</Text>
               <Text className="dangerText"> *</Text>
             </View>
@@ -236,20 +236,14 @@ export const addVehicle = () => {
             <Pressable
               disabled={!!file}
               onPress={!file ? () => setModalVisible(!modalVisible) : undefined}
-              className={`flex-1 flex-row gap-2 border border-dashed rounded-lg px-2 items-center 
-                ${isFileInvalid ? "border-dangerBrightRed" : "border-grayBorder"} 
-                ${!file ? "py-3" : "py-5"}
-                `}
+              className={`flex-row gap-2 border border-dashed rounded-lg px-2 py-3 items-center ${isFileInvalid ? "border-dangerBrightRed" : "border-grayBorder"}`}
             >
               <icons.upload/>
-              <View className={`flex-1 justify-center gap-0.5`}>
+              <View style={{flex: 1, gap: 2}}>
                 <Text className="xsTextGray">Upload</Text>
-                {/* TODO: ADD DIMENSION HERE e.g. 1024(w) X 128(h) */}
-                {!file ? (
-                  <Text className="xsTextGray">No file selected</Text>
-                ) : (
-                  <Text className="xsTextGray">1 file selected</Text>
-                )}
+                <Text className="xsTextGray">
+                  {!file ? "No file selected" : "1 file selected"}
+                </Text>
               </View>
             </Pressable>
 
