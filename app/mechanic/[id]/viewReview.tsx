@@ -178,30 +178,30 @@ const ViewReview = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <View className="flex-1 bg-white">
         <View className="flex-1 items-center justify-center">
           <Text className="smallTextGray">Loading review...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (errorMsg || !review) {
     return (
-      <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <View className="flex-1 bg-white">
         <View className="flex-1 items-center justify-center px-6">
           <Text className="smallTextGray text-center">
             {errorMsg ?? "Review not found."}
           </Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   const mechanicImageUri = getMechanicImageUri(mechanic);
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+    <View className="flex-1 bg-white">
       {/* Small popover menu near top-right */}
       <Modal
         visible={menuVisible}
@@ -284,7 +284,7 @@ const ViewReview = () => {
           <Text className="smallTextGray leading-5">{review.review}</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+      </View>
   );
 };
 

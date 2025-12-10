@@ -289,7 +289,7 @@ export const account = () => {
                           },
                         })
                       }
-                      className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm"
+                      className="p-4 border-b border-stroke bg-white"
                     >
                       <View className="flex-row gap-3">
                         {/* 🔹 Left: mechanic image */}
@@ -299,7 +299,7 @@ export const account = () => {
                             className="w-14 h-14 rounded-lg"
                           />
                         ) : (
-                          <View className="w-14 h-14 rounded-lg bg-accountOrange items-center justify-center">
+                          <View className="w-20 h-20 rounded-lg bg-accountOrange items-center justify-center">
                             <Text className="text-white font-bold">
                               {String(mechanicName ?? '?')[0]?.toUpperCase()}
                             </Text>
