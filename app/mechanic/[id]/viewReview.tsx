@@ -280,14 +280,14 @@ const ViewReview = () => {
         )}
 
         {/* REVIEW CARD */}
-        <View className="bg-[#F5F7FB] rounded-2xl p-4">
+        <View className="bg-white rounded-xl p-4">
           {/* Rating row */}
           <View className="flex-row justify-between items-center mb-3">
             <View className="flex-row items-center gap-1">
               <Text className="xsTitle">Rating:</Text>
               <Text className="xsTitle">{renderStars(review.rating)}</Text>
             </View>
-            <Text className="xsTextGray text-[11px]">
+            <Text className="smallTextGray">
               {formatFullDate(review.createdAt)}
             </Text>
           </View>

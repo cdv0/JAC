@@ -8,6 +8,7 @@ type ButtonVariant =
   | 'danger'
   | 'lightBlue'
   | 'black'
+  | 'noBorder'
 
 type NormalButtonProps = {
   onClick: () => void
@@ -66,6 +67,10 @@ export default function NormalButton({
       container: 'bg-textBlack',
       text: 'buttonWhiteText',
     },
+    noBorder: {
+      container: "bg-white",
+      text: 'buttonTextBlue underline'
+    }
   }
 
   return (
