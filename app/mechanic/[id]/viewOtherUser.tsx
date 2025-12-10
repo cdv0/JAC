@@ -218,7 +218,7 @@ const ViewOtherUser = () => {
                 sortedReviews.map((rev) => (
                   <View
                     key={rev.reviewId ?? rev.ReviewId}
-                    className="border border-stroke rounded-xl p-4"
+                    className="border-b border-stroke p-4"
                   >
                     {/* Mechanic name or id */}
                     <Text className="smallTitle">
