@@ -179,8 +179,8 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
       return(
         <View className='ml-5'>
             <Text className='buttonTextBlack text-xl font-bold mb-2'>{day}</Text>
-            <View className='flex-row ml-5 items-center'>
-              <Text className='buttonTextBlack   text-l '>From  </Text>
+            <View className='flex-row ml-5 items-center gap-[5%]'>
+              <Text className='buttonTextBlack text-l '>From</Text>
                 <View className='border border-black rounded-xl'>
                   <Pressable onPress={() => showTimePicker(`${day}-start`)}>
                     <Text className='buttonTextBlack   text-l py-2 px-2'>
@@ -188,7 +188,7 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
                     </Text>
                   </Pressable>
                 </View>
-                <Text className='buttonTextBlack   text-l '> To  </Text>
+                <Text className='buttonTextBlack   text-l '>To</Text>
                 <View className='border border-black rounded-xl'>
                   <Pressable onPress={() => showTimePicker(`${day}-end`)}>
                     <Text className='buttonTextBlack   text-l py-2 px-2'>
@@ -235,8 +235,9 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
     
   }
   const [query, setQuery] = useState('')
+  const [error, setError] = useState(false);
   const validServices = validSet;
-
+  const [confirmvisible, setConfirmVisible] = useState(false);
   return (
     <Modal isVisible={visible} style={{flex:1, margin:0}} >
         <SafeAreaView className='w-full h-full bg-white' style={{alignSelf:'center'}}>
@@ -247,15 +248,15 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
               
               <View className='w-[80%] ml-[10%] mt-[10%]'>
                 {/*Add business Name*/}
-                <Text className='buttonTextBlack   text-xl'>Business Name</Text>
+                <Text className='buttonTextBlack  text-xl'>Business Name </Text>
                 <TextInput value={shop.name} onChangeText={(newV) =>{setShop({...shop, name:newV})}} 
                   placeholder='Business Name' placeholderTextColor= "#9E9E9E"
-                  className="buttonTextBlack  border border-stroke ml-[5%] mb-5"  />
+                  className={`buttonTextBlack  border ${error && shop.name ==''?'border-dangerBrightRed':'border-stroke'} ml-[5%] mb-5`}  />
                 {/*Add business Address*/}
                 <Text className='buttonTextBlack   text-xl'>Business Address</Text>
                 <TextInput value={shop.address} onChangeText={(newV) =>{setShop({...shop, address:newV})}} 
                   placeholder='Business Address' placeholderTextColor= "#9E9E9E"
-                  className=" buttonTextBlack  border border-stroke ml-[5%] mb-5"  />
+                  className={`buttonTextBlack  border ${error && shop.address ==''?'border-dangerBrightRed':'border-stroke'} ml-[5%] mb-5`}  />
 
                 {/*Add business Website*/}
                 <Text className='buttonTextBlack   text-xl'>Business Website</Text>
@@ -337,13 +338,47 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
         
             </ScrollView>
           </KeyboardAvoidingView>
+          {error && (<View>
+                      <Text className="text-l ml-[5%] buttonTextBlack text-dangerBrightRed mb-10">
+                            *Business name and Business address must be filled
+                          </Text>
+                      </View>
+          )}   
           <View className='flex-row self-center gap-20'>
               <NormalButton text='Cancel' variant='cancel' onClick={()=>{onClose();}} />
-              <NormalButton text={mode=='add'?'add':'Save'} variant='lightBlue' onClick={()=>{
-                                                                        //call some add/edit shop function here
+              <NormalButton text={mode=='add'?'add':'Save'} variant='primary' onClick={()=>{
                                                                         
-                                                                        onClose();}} />
-          </View>        
+                                                                        if (shop.name =='' || shop.address==''){
+                                                                          setError(true);
+                                                                          return;
+                                                                        }
+                                                                        else{
+                                                                          setError(false);
+                                                                        }
+
+                                                                        setConfirmVisible(true);}} />
+          </View>
+
+          {/*Confirm modal*/}     
+          <Modal isVisible={confirmvisible} style={{flex:1, justifyContent:'center', alignItems:'center'}} backdropOpacity={0.5} onBackdropPress={()=>setConfirmVisible(false)}>
+            <View className='w-[75%] h-[30%] bg-white border-2 border-textBlack rounded-xl p-5'>
+                <Text className='buttonTextBlack text-2xl mb-8'>
+                    {mode=='add'?'Adding shop':'Editing Shop'}
+                </Text>
+                <Text className='buttonTextBlack text-l'>
+                    {mode=='add'?'Are you sure you want to create a new shop?':'Are you sure you want to submit the following changes?'}
+                </Text>
+                <View className='flex-row self-center gap-[5%] mt-[15%]'>
+                  <NormalButton text='No' variant='cancel' onClick={()=>{setConfirmVisible(false);}} />
+                  <NormalButton text='Yes' variant='primary' onClick={()=>{
+                                                                              //call some add/edit shop function here
+                                                                              setConfirmVisible(false);
+                                                                              onClose();
+                                                                              
+                                                                            }} />
+                </View>
+            </View>
+          </Modal>
         </SafeAreaView>
     </Modal>
   )
