@@ -2,55 +2,94 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 
-const s3 = new S3Client({region: "us-west-1"});
+const s3 = new S3Client({ region: "us-west-1" });
 const client = new DynamoDBClient({ region: "us-west-1" });
 const docClient = DynamoDBDocumentClient.from(client);
 
-export const handler = async (event) => {
-  try {
-    const body = JSON.parse(event.body);
-    const { fileName, fileContent, contentType, userId, email } = body; // ← added userId here
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Methods": "OPTIONS,POST",
+};
 
-    // Decode base64 to binary
+const BUCKET_NAME = process.env.BUCKET_NAME;
+const TABLE_NAME = process.env.TABLE_NAME;
+
+export const handler = async (event) => {
+  // Handle OPTIONS / preflight
+  if (
+    event.requestContext?.http?.method === "OPTIONS" ||
+    event.httpMethod === "OPTIONS"
+  ) {
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({ message: "OK" }),
+    };
+  }
+
+  try {
+    if (!BUCKET_NAME || !TABLE_NAME) {
+      throw new Error("BUCKET_NAME or TABLE_NAME env var is not set");
+    }
+
+    const body = JSON.parse(event.body || "{}");
+    const { fileName, fileContent, contentType, userId, email } = body;
+
+    if (!fileName || !fileContent || !contentType || !userId || !email) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          message: "Missing required fields: fileName, fileContent, contentType, userId, email",
+        }),
+      };
+    }
+
     const fileBuffer = Buffer.from(fileContent, "base64");
 
-    const bucketName = process.env.BUCKET_NAME;
-
-    const params = {
-      Bucket: bucketName,
+    const putParams = {
+      Bucket: BUCKET_NAME,
       Key: fileName,
       Body: fileBuffer,
       ContentType: contentType,
     };
 
-    await s3.send(new PutObjectCommand(params));
-
-    const key = `profile-images/${userId}/${fileName}`;
+    await s3.send(new PutObjectCommand(putParams));
 
     const updateParams = {
-      TableName: process.env.TABLE_NAME,
-      Key: { userId: userId,
-             email: email
-       },
+      TableName: TABLE_NAME,
+      Key: {
+        userId: userId,
+        email: email,
+      },
       UpdateExpression: "SET profileImageKey = :k",
       ExpressionAttributeValues: {
-        ":k": key,
+        ":k": fileName,
       },
+      ReturnValues: "UPDATED_NEW",
     };
 
-    await docClient.send(new UpdateCommand(updateParams));
+    const updateResult = await docClient.send(new UpdateCommand(updateParams));
 
     return {
       statusCode: 200,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({message: "Upload success", key: fileName}),
+      headers: corsHeaders,
+      body: JSON.stringify({
+        message: "Upload success",
+        key: fileName,
+        updated: updateResult.Attributes,
+      }),
     };
   } catch (err) {
     console.error("Upload error:", err);
     return {
       statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ message: "Upload failed", error: err.message }),
+      headers: corsHeaders,
+      body: JSON.stringify({
+        message: "Upload failed",
+        error: err.message ?? "Unknown error",
+      }),
     };
   }
 };
