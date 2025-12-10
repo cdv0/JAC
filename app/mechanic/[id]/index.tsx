@@ -29,6 +29,8 @@ import { ReactNativeModal as Modal } from 'react-native-modal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
+import { favoriteMechanic } from "@/_backend/api/profile";
+
 
 const Details = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -60,6 +62,7 @@ const Details = () => {
         }
 
         const userData = await readUserProfile(userId, email);
+        setUserID(userId);
         setIsAuthenticated(attrs.userType == 'Mechanic');
         setFirstName(userData.firstName ?? '');
         setLastName(userData.lastName ?? '');
@@ -84,6 +87,7 @@ const Details = () => {
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading] = useState(true);
   const [editVisible, setEditVisible] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleChoice = (
     flag: boolean,
@@ -263,6 +267,29 @@ const Details = () => {
       }
     };
 
+    async function handleFavoritePress() {
+    if (!isAuthenticated) {
+      router.push("/profile");
+      return;
+    }
+
+    try {
+      await favoriteMechanic({
+        userId: userID,
+        mechanicId: String(id),
+        name: mechanic.name,
+        imageId: String(id),
+        ratings: reviewAVG,
+        reviews: reviews.length,
+      });
+
+      setIsFavorite(true); 
+      console.log("Favorite saved!");
+    } catch (err) {
+      console.log("Error favoriting mechanic:", err);
+    }
+  }
+
     return (
       // <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
       <KeyboardAvoidingView
@@ -322,6 +349,18 @@ const Details = () => {
                 </Pressable>
               )}
             </View>
+             <View className="flex-col items-center">
+            <Pressable
+              onPress={handleFavoritePress}
+              style={{ marginLeft: 15 }}
+              hitSlop={8}
+            >
+              {isFavorite ? (
+                <images.favoriteFilled width={30} height={30} />
+              ) : (
+                <images.favoriteEmpty width={30} height={30} />
+              )}
+            </Pressable>
             <View style={{ marginTop: 30, marginLeft: 15, gap: 10 }}>
               {mechanic.Certified && (
                 <images.badge width={30} height={30} />
@@ -334,6 +373,7 @@ const Details = () => {
                 />
               </TouchableOpacity>
             )}
+          </View>
           </View>
 
           <View className="mx-5 gap-3.5">

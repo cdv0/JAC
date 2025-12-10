@@ -123,3 +123,105 @@ export async function getProfilePicture(userId: string) {
   if (!text) return null
   return `data:image/jpeg;base64,${text}`
 }
+
+
+export type FavoriteMechanicPayload = {
+  userId: string;
+  mechanicId: string;
+  name: string;
+  imageId?: string | null;
+  ratings: number;   // average rating
+  reviews: number;   // number of reviews
+};
+
+export async function favoriteMechanic(
+  payload: FavoriteMechanicPayload
+) {
+  if (!BASE_URL) {
+    throw new Error("EXPO_PUBLIC_API_URL is not defined");
+  }
+
+  const response = await fetch(`${BASE_URL}/profile/favoriteMechanic`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    console.log("favoriteMechanic: error body", text);
+
+    throw new Error(
+      `Failed to create favorite: ${response.status} ${response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+
+export interface FavoriteMechanic {
+  userId: string;
+  mechanicId: string;
+  name?: string | null;
+  imageId?: string | null;
+  ratings?: number;
+  reviews?: number;
+  createdAt?: string;
+}
+
+export async function listFavoriteMechanics(
+  userId: string
+): Promise<FavoriteMechanic[]> {
+  const searchParams = new URLSearchParams();
+  searchParams.set("userId", userId);
+
+  const url = `${BASE_URL}/profile/listFavoriteMechanics?${searchParams.toString()}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+  });
+
+  const text = await res.text();
+
+  if (!res.ok) {
+    console.log("listFavoriteMechanics: error body", text);
+    throw new Error(
+      `Failed to list favorite mechanics: ${res.status} ${res.statusText}`
+    );
+  }
+
+  if (!text) return [];
+
+  const data = JSON.parse(text);
+  return (data.items ?? []) as FavoriteMechanic[];
+}
+
+
+
+export async function deleteFavoriteMechanic(params: {
+  userId: string;
+  mechanicId: string;
+}): Promise<void> {
+  const resp = await fetch(
+    `${BASE_URL}/profile/deleteFavoriteMechanic`,
+    {
+      method: "Delete", 
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(params),
+    }
+  );
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    console.log("unfavoriteMechanic error body", text);
+    throw new Error(
+      `Failed to unfavorite mechanic: ${resp.status}`
+    );
+  }
+}
