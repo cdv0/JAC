@@ -179,8 +179,8 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
       return(
         <View className='ml-5'>
             <Text className='buttonTextBlack text-xl font-bold mb-2'>{day}</Text>
-            <View className='flex-row ml-5 items-center'>
-              <Text className='buttonTextBlack   text-l '>From  </Text>
+            <View className='flex-row ml-5 items-center gap-[5%]'>
+              <Text className='buttonTextBlack text-l '>From</Text>
                 <View className='border border-black rounded-xl'>
                   <Pressable onPress={() => showTimePicker(`${day}-start`)}>
                     <Text className='buttonTextBlack   text-l py-2 px-2'>
@@ -188,7 +188,7 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
                     </Text>
                   </Pressable>
                 </View>
-                <Text className='buttonTextBlack   text-l '> To  </Text>
+                <Text className='buttonTextBlack   text-l '>To</Text>
                 <View className='border border-black rounded-xl'>
                   <Pressable onPress={() => showTimePicker(`${day}-end`)}>
                     <Text className='buttonTextBlack   text-l py-2 px-2'>
@@ -237,7 +237,7 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
   const [query, setQuery] = useState('')
   const [error, setError] = useState(false);
   const validServices = validSet;
-
+  const [confirmvisible, setConfirmVisible] = useState(false);
   return (
     <Modal isVisible={visible} style={{flex:1, margin:0}} >
         <SafeAreaView className='w-full h-full bg-white' style={{alignSelf:'center'}}>
@@ -346,8 +346,8 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
           )}   
           <View className='flex-row self-center gap-20'>
               <NormalButton text='Cancel' variant='cancel' onClick={()=>{onClose();}} />
-              <NormalButton text={mode=='add'?'add':'Save'} variant='lightBlue' onClick={()=>{
-                                                                        //call some add/edit shop function here
+              <NormalButton text={mode=='add'?'add':'Save'} variant='primary' onClick={()=>{
+                                                                        
                                                                         if (shop.name =='' || shop.address==''){
                                                                           setError(true);
                                                                           return;
@@ -356,8 +356,29 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
                                                                           setError(false);
                                                                         }
 
-                                                                        onClose();}} />
-          </View>     
+                                                                        setConfirmVisible(true);}} />
+          </View>
+
+          {/*Confirm modal*/}     
+          <Modal isVisible={confirmvisible} style={{flex:1, justifyContent:'center', alignItems:'center'}} backdropOpacity={0.5} onBackdropPress={()=>setConfirmVisible(false)}>
+            <View className='w-[75%] h-[30%] bg-white border-2 border-textBlack rounded-xl p-5'>
+                <Text className='buttonTextBlack text-2xl mb-8'>
+                    {mode=='add'?'Adding shop':'Editing Shop'}
+                </Text>
+                <Text className='buttonTextBlack text-l'>
+                    {mode=='add'?'Are you sure you want to create a new shop?':'Are you sure you want to submit the following changes?'}
+                </Text>
+                <View className='flex-row self-center gap-[5%] mt-[15%]'>
+                  <NormalButton text='No' variant='cancel' onClick={()=>{setConfirmVisible(false);}} />
+                  <NormalButton text='Yes' variant='primary' onClick={()=>{
+                                                                              //call some add/edit shop function here
+                                                                              setConfirmVisible(false);
+                                                                              onClose();
+                                                                              
+                                                                            }} />
+                </View>
+            </View>
+          </Modal>
         </SafeAreaView>
     </Modal>
   )
