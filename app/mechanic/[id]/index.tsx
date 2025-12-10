@@ -171,7 +171,9 @@ const Details = () => {
   }, [id]); 
 
 useEffect(()=>{
-  setClaimed(mechanic.Certified && userID== mechanic.ownerid)
+  if (mechanic){
+    setClaimed(mechanic.Certified && userID== mechanic.ownerid)
+  }
 },[mechanic, userID])
 //#endregion
 
@@ -663,24 +665,24 @@ useEffect(()=>{
               </View>
             </Modal>
 
-                {/*Claim modal*/}
-                <Modal isVisible={claimVisibile} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => {setClaimVisibile(false); setClaimLoading(true)}}
-                backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'center', margin:0}}>
-                  <View className='w-[40%] h-[20%] bg-white border border-black rounded-xl items-center justify-center'>
-                      {/*Add loading*/}
-                      {(claimLoading)? 
-                      (<View className='flex-1 items-center justify-center'>
-                        <ActivityIndicator size="large" />  
-                      </View>):
-                        (isClaimed)?<Text className='buttonTextBlack'>
-                          Claim Request Sent
-                        </Text>:
-                        //Add ways to ask for help
-                        <Text className='text-dangerDarkRed buttonTextBlack'>
-                          Failed to Send Claim Request
-                          </Text>}
-                  </View> 
-                </Modal>   
+              {/*Claim modal*/}
+              <Modal isVisible={claimVisibile} animationIn="slideInRight" animationOut="slideOutRight" onBackdropPress={() => {setClaimVisibile(false); setClaimLoading(true)}}
+              backdropOpacity={0.3} style={{justifyContent:'center', alignItems:'center', margin:0}}>
+                <View className='w-[40%] h-[20%] bg-white border border-black rounded-xl items-center justify-center'>
+                    {/*Add loading*/}
+                    {(claimLoading)? 
+                    (<View className='flex-1 items-center justify-center'>
+                      <ActivityIndicator size="large" />  
+                    </View>):
+                      (isClaimed)?<Text className='buttonTextBlack'>
+                        Claim Request Sent
+                      </Text>:
+                      //Add ways to ask for help
+                      <Text className='text-dangerDarkRed buttonTextBlack'>
+                        Failed to Send Claim Request
+                        </Text>}
+                </View> 
+              </Modal>   
 
             {/*edit modal*/}
             <ShopManager
