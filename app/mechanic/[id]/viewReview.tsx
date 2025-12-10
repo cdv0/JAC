@@ -213,7 +213,7 @@ const ViewReview = () => {
   const mechanicImageUri = getMechanicImageUri(mechanic);
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-secondary">
       {/* Small popover menu near top-right */}
       <Modal
         visible={menuVisible}
@@ -227,14 +227,14 @@ const ViewReview = () => {
           onPress={() => setMenuVisible(false)}
         >
           <View className="flex-1 items-end pt-12 pr-4">
-            <View className="bg-white rounded-lg shadow-lg border border-stroke px-3 py-2">
+            <View className="bg-white rounded-lg border border-stroke px-3 py-2">
               {/* Update review */}
               <Pressable
                 className="flex-row items-center gap-2 py-2"
                 onPress={handleUpdateReview}
               >
-                <icons.pencil width={16} height={16} />
-                <Text className="smallTitle">Update review</Text>
+                <icons.pencil width={24} height={24} />
+                <Text className="xsTitle">Update review</Text>
               </Pressable>
 
               {/* Divider */}
@@ -245,8 +245,8 @@ const ViewReview = () => {
                 className="flex-row items-center gap-2 py-2"
                 onPress={handleDeleteReview}
               >
-                <icons.trash width={16} height={16} />
-                <Text className="smallTitle text-[#D32F2F]">
+                <icons.trash width={24} height={24} />
+                <Text className="xsTitle text-[#D32F2F]">
                   Delete review
                 </Text>
               </Pressable>
@@ -254,16 +254,14 @@ const ViewReview = () => {
           </View>
         </Pressable>
       </Modal>
-
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
         {/* MECHANIC HEADER CARD: image + name + address */}
         {mechanic && (
-          <View className="flex-row items-center bg-white rounded-2xl px-4 py-3 mb-4">
+          <View className="flex-row items-center bg-white px-4 py-3 mb-4">
             {/* Image */}
             {mechanicImageUri && (
               <Image
                 source={{ uri: mechanicImageUri }}
-                className="w-14 h-14 rounded-xl mr-3"
+                className="w-24 h-24 rounded-xl mr-3"
               />
             )}
 
@@ -278,6 +276,8 @@ const ViewReview = () => {
             </View>
           </View>
         )}
+
+      <ScrollView contentContainerStyle={{ padding: 16 }}>
 
         {/* REVIEW CARD */}
         <View className="bg-white rounded-xl p-4">

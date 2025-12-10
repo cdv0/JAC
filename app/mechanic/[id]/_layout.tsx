@@ -52,6 +52,7 @@ export default function mechanicLayout() {
         options={{
           headerTitle: '',
           headerBackVisible: false,
+          headerShadowVisible: false,
           headerLeft: () => (
             <Pressable
               onPress={() => router.back()}
@@ -64,6 +65,7 @@ export default function mechanicLayout() {
               </Text>
             </Pressable>
           ),
+          
         }}
       />
       <Stack.Screen
