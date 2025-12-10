@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList, Image, Modal } from "react-native";
-import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList, Image, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import { readVehicle, updateVehicleDetails, getVehicleImage } from "@/_backend/api/vehicle";
