@@ -31,6 +31,7 @@ interface MechanicViewProps {
 }
 
 interface shop{
+  mechanicID:string|null,
   name:string,
   address:string,
   hours:string[],
@@ -51,6 +52,7 @@ type schedule = Record<string, day>;
 const ShopManager = ({visible, onClose, mode='add',data}:props) => { 
   const phoneInput = useRef<PhoneInput>(null);
   const [shop, setShop] =useState<shop>({
+          mechanicID:null,
           name:'',
           address:'',
           hours:['', '', '', '' , '', '', ''],
@@ -85,6 +87,7 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
       'Sunday':{ start:'', end:''},
       })
       setShop({
+        mechanicID:null,
         name:'',
         address:'',
         hours:['', '', '', '' , '', '', ''],
@@ -123,6 +126,7 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
       'Sunday': getTime(6),
       })
       setShop({
+        mechanicID: data.mechanicID,
         name: data.name,
         address:data.address,
         hours: data.Hours,
