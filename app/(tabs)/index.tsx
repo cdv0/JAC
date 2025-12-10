@@ -1007,7 +1007,7 @@ export default function Index() {
                 <Text className="smallTextBold ">Minimum:</Text>
 
                 <View
-                  className={`border ${warning ? 'border-dangerBrightRed' : 'border-subheaderGray'} w-[30%] h-8 rounded-lg`}
+                  className={`border ${warning ? 'border-dangerBrightRed' : 'border-subheaderGray'} w-[30%] h-11 rounded-lg justify-center`}
                 >
                   <TextInput
                     value={tempMinP}
@@ -1023,7 +1023,7 @@ export default function Index() {
                 <Text className="buttonTextBlack">Maximum:</Text>
 
                 <View
-                  className={`border ${warning ? 'boasdsaq1123rder-dangerBrightRed' : 'border-subheaderGray'} w-[30%] h-8 rounded-lg`}
+                  className={`border ${warning ? 'border-dangerBrightRed' : 'border-subheaderGray'} w-[30%] h-11 rounded-lg justify-center`}
                 >
                   <TextInput
                     value={tempMaxP}
