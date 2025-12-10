@@ -6,6 +6,7 @@ import {
 } from '@/_backend/api/fileUpload'
 import { deleteAccount, readUserProfile } from '@/_backend/api/profile'
 import NormalButton from '@/app/components/NormalButton'
+import ShopManager from '@/app/components/ShopManager'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   deleteUser,
@@ -34,6 +35,8 @@ export default function Account() {
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [userId, setUserId] = useState<string>('')
+  const [mechanic, setMechanic] = useState<boolean>(false)
+  const [editShop, setEditShop] = useState<boolean>(false)
 
   useEffect(() => {
     ;(async () => {
@@ -49,12 +52,22 @@ export default function Account() {
         const attrs = await fetchUserAttributes()
         const emailAttr = attrs.email!.toString()
 
-        const userData = await readUserProfile(currentUserId, emailAttr)
+        if (attrs.locale === 'Mechanic') {
+          const name = attrs.name!.split(' ')
+          setFirstName(name?.[0] ?? '')
+          setLastName(name?.[1] ?? '')
+          setEmail(attrs.email ?? '')
+          setCreatedAt('')
 
-        setFirstName(userData.firstName ?? '')
-        setLastName(userData.lastName ?? '')
-        setEmail(emailAttr ?? '')
-        setCreatedAt(attrs.createdAt ?? '')
+          setMechanic(true)
+        } else {
+          const userData = await readUserProfile(currentUserId, emailAttr)
+
+          setFirstName(userData.firstName ?? '')
+          setLastName(userData.lastName ?? '')
+          setEmail(emailAttr ?? '')
+          setCreatedAt(attrs.createdAt ?? '')
+        }
       } catch {}
     })()
   }, [])
@@ -164,6 +177,7 @@ export default function Account() {
             <Text className="mt-2 text-xs text-gray-500">Uploading...</Text>
           )}
         </View>
+
         <View className="flex items-center h-full px-2">
           {deleteAccountModal && (
             <View className="absolute z-40 flex w-4/5 gap-6 px-8 py-8 mt-20 bg-white border-2 rounded-xl border-stroke">
@@ -250,6 +264,21 @@ export default function Account() {
               </View>
             </Pressable>
           </View>
+
+          {mechanic && (
+            <View className="flex flex-col gap-4 mt-10">
+              <Pressable onPress={() => setEditShop(true)}>
+                <Text className="p-2 text-lg font-extrabold text-black bg-white border-2 border-secondary rounded-xl">
+                  Edit Mechanic Shop
+                </Text>
+              </Pressable>
+              <ShopManager
+                mode="edit"
+                visible={editShop}
+                onClose={() => setEditShop(false)}
+              />
+            </View>
+          )}
 
           <Pressable
             className="items-center mt-10 "

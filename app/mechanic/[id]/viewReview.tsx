@@ -26,19 +26,19 @@ import { icons } from "@/constants/icons";
 function getMechanicImageUri(mechanic: Mechanic | null): string | undefined {
   if (!mechanic) return undefined;
 
-  // If you already store a full URL somewhere, use that directly:
-  // if ((mechanic as any).imageUrl) return (mechanic as any).imageUrl;
+  // This matches what you're already using in Details.tsx
+  const img =
+    (mechanic as any).Image ??
+    (mechanic as any).image ??
+    (mechanic as any).imageUrl;
 
-  // Otherwise, build from imageKey + your base URL:
-  if ((mechanic as any).imageKey) {
-    const imageKey = (mechanic as any).imageKey as string;
-    // TODO: replace with your real public S3 URL / CloudFront domain
-    const BASE_IMAGE_URL = "https://YOUR-S3-PUBLIC-URL-HERE"; // <-- change this
-    return `${BASE_IMAGE_URL}/${imageKey}`;
+  if (typeof img === "string" && img.length > 0) {
+    return img;
   }
 
   return undefined;
 }
+
 
 const ViewReview = () => {
   const params = useLocalSearchParams<{
@@ -114,7 +114,7 @@ const ViewReview = () => {
           const mechDetail = await getMechanicById(mechanicId);
           console.log(
             "ViewReview: mechDetail from getMechanicById",
-            mechDetail
+            mechDetail, 
           );
 
           if (!mechDetail) {
@@ -178,30 +178,30 @@ const ViewReview = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <View className="flex-1 bg-white">
         <View className="flex-1 items-center justify-center">
           <Text className="smallTextGray">Loading review...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (errorMsg || !review) {
     return (
-      <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <View className="flex-1 bg-white">
         <View className="flex-1 items-center justify-center px-6">
           <Text className="smallTextGray text-center">
             {errorMsg ?? "Review not found."}
           </Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   const mechanicImageUri = getMechanicImageUri(mechanic);
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+    <View className="flex-1 bg-white">
       {/* Small popover menu near top-right */}
       <Modal
         visible={menuVisible}
@@ -284,7 +284,7 @@ const ViewReview = () => {
           <Text className="smallTextGray leading-5">{review.review}</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+      </View>
   );
 };
 
