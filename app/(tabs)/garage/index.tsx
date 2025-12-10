@@ -1,4 +1,4 @@
-import { listVehicles, type Vehicle } from "@/_backend/api/vehicle";
+import { listVehicles, type Vehicle, getVehicleImage } from "@/_backend/api/vehicle";
 import NormalButton from "@/app/components/NormalButton";
 import { icons } from "@/constants/icons";
 import { useFocusEffect } from "@react-navigation/native";
@@ -6,26 +6,23 @@ import { getCurrentUser } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View, Image } from "react-native";
+import { FlatList, Pressable, Text, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import decodeBase64Image from "@/app/components/ImageDecode";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const VEHICLE_IMAGE_URI_KEY_PREFIX = 'vehicleImageUri'
-const getVehicleImageKey = (vehicleId: string) => `${VEHICLE_IMAGE_URI_KEY_PREFIX}:${vehicleId}`
 
 export const garage = () => {
   const router = useRouter();
-  const [items, setItems] = useState<Vehicle[]>([]);  // List of vehicles
+  const [items, setItems] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(false);
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
 
-  const [vehicleImages, setVehicleImages] = useState<Record<string, string | null>>({});
+  // vehicleId -> data URL from getVehicleImage
+  const [vehicleImages, setVehicleImages] = useState<
+    Record<string, string | null>
+  >({});
 
   const numColumns = 2;
 
-  // Check user authentication
-  const checkAuth = useCallback(async() => {
+  const checkAuth = useCallback(async () => {
     try {
       await getCurrentUser();
       setIsAuthed(true);
@@ -34,38 +31,40 @@ export const garage = () => {
     }
   }, []);
 
-  // Load: Retrieve userId and call API to list vehicles
   const load = useCallback(async () => {
     try {
       setLoading(true);
+
       const { userId } = await getCurrentUser();
       const data = await listVehicles(userId);
+
       const sorted = (data.items || []).slice().sort((a, b) =>
-        (a.model).localeCompare(b.model)
+        a.model.localeCompare(b.model)
       );
       setItems(sorted);
 
+      // Fetch vehicle images from API instead of AsyncStorage
       const imageResults = await Promise.all(
         sorted.map(async (v) => {
           try {
-            const key = getVehicleImageKey(v.vehicleId);
-            const uri = await AsyncStorage.getItem(key);
+            const uri = await getVehicleImage(userId, v.vehicleId);
             return { vehicleId: v.vehicleId, uri };
           } catch (e: any) {
-            console.log("Garage AsyncStorage image error for", v.vehicleId, e?.message);
+            console.log(
+              "Garage image fetch error for",
+              v.vehicleId,
+              e?.message
+            );
             return { vehicleId: v.vehicleId, uri: null };
           }
         })
       );
 
-      setVehicleImages((prev) => {
-        const next = { ...prev };
-        for (const { vehicleId, uri } of imageResults) {
-          next[vehicleId] = uri;
-        }
-        return next;
-      });
-
+      const next: Record<string, string | null> = {};
+      for (const { vehicleId, uri } of imageResults) {
+        next[vehicleId] = uri;
+      }
+      setVehicleImages(next);
     } catch (e: any) {
       console.log("Garage vehicle list error:", e?.message);
       setItems([]);
@@ -75,17 +74,14 @@ export const garage = () => {
     }
   }, []);
 
-  // Initial authentication check
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);  // Add checkAuth as a dependency since the function is dependent on it
+  }, [checkAuth]);
 
-  // Reload when the screen is focused again
   useFocusEffect(
     useCallback(() => {
-      // Only try to load once we know auth state
       if (isAuthed !== null) load();
-    }, [load, isAuthed])  // Add load and isAuthed as a dependency becuase the function is dependent on it
+    }, [load, isAuthed])
   );
 
   useEffect(() => {
@@ -98,21 +94,24 @@ export const garage = () => {
         case "signedOut":
           setIsAuthed(false);
           setItems([]);
+          setVehicleImages({});
           break;
         default:
           break;
       }
     });
     return () => sub();
-  }, [load]);  // Add load as a dependency in case the function changes since it's being used in the function
+  }, [load]);
 
-  // Align the vehicle card at the start of the row if there's only one vehicle card in the row
   const formatData = (items: any[], numColumns: number) => {
     const data = [...items];
     const numberOfFullRows = Math.floor(data.length / numColumns);
 
     let numberOfElementsLastRow = data.length - numberOfFullRows * numColumns;
-    while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+    while (
+      numberOfElementsLastRow !== numColumns &&
+      numberOfElementsLastRow !== 0
+    ) {
       data.push({ key: `blank-${numberOfElementsLastRow}`, empty: true });
       numberOfElementsLastRow = numberOfElementsLastRow + 1;
     }
@@ -121,80 +120,90 @@ export const garage = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <ScrollView>
-        <View className="flex-1 mx-5">
-
-          {/* Top bar */}
-          <View className="flex-row justify-between items-end mt-6 mb-5">
-            <Text className="mediumTitle">Garage</Text>
-            <NormalButton
-              text="Add vehicle"
-              paddingHorizontal={20}
-              variant="primary"
-              onClick={() => router.push("/garage/addVehicle")}
-            />
-          </View>
-          
-          {/* Main content: Vehicles list */}
-          <FlatList
-            className="mt-3"
-            data={formatData(items, numColumns)}
-            keyExtractor={(v: any) => (v.empty ? v.key : v.vehicleId)}
-            numColumns={numColumns}
-            columnWrapperStyle={{ marginBottom: 16, gap: 16 }}
-            ListEmptyComponent={
-              <View className="mt-10 items-center">
-                <Text className="smallTextGray">{loading ? "Loading..." : "No vehicles yet."}</Text>
-              </View>
+      <View className="flex-1 mx-5">
+        <FlatList
+          className="mt-3"
+          data={formatData(items, numColumns)}
+          keyExtractor={(v: any) => (v.empty ? v.key : v.vehicleId)}
+          numColumns={numColumns}
+          columnWrapperStyle={{ marginBottom: 16, gap: 16 }}
+          contentContainerStyle={{
+            paddingBottom: 24,
+          }}
+          ListHeaderComponent={
+            <View className="mt-6 mb-5 flex-row items-end justify-between">
+              <Text className="mediumTitle">Garage</Text>
+              <NormalButton
+                text="Add vehicle"
+                paddingHorizontal={20}
+                variant="primary"
+                onClick={() => router.push("/garage/addVehicle")}
+              />
+            </View>
+          }
+          ListEmptyComponent={
+            <View className="mt-10 items-center">
+              <Text className="smallTextGray">
+                {loading ? "Loading..." : "No vehicles yet."}
+              </Text>
+            </View>
+          }
+          renderItem={({ item }: { item: any }) => {
+            if (item.empty) {
+              return (
+                <View style={{ flex: 1 }}>
+                  <View
+                    style={{ opacity: 0 }}
+                    className="mb-3 rounded-lg border border-stroke p-4"
+                  />
+                </View>
+              );
             }
 
-            renderItem={({ item }: { item: any }) => {
-              if (item.empty) {
-                return (
-                  <View style={{ flex: 1 }}>
-                    <View style={{ opacity: 0 }} className="border border-stroke rounded-lg p-4 mb-3" />
-                  </View>
-                );
-              }
+            const img = vehicleImages[item.vehicleId];
 
-              const img = vehicleImages[item.vehicleId];
-
-              return (
-                <Pressable onPress={() => router.push(`/garage/vehicle/${item.vehicleId}`)} style={{ flex: 1 }}>
-                  {/* Vehicle card */}
-                  <View className="border border-stroke rounded-lg p-4 gap-4 ">
-                    {/* Vehicle image */}
-                    <View className="items-center justify-center h-24">
-                      {img ? (
-                        <Image
-                          source={{ uri: img }}
-                          className="h-full w-full rounded-lg"
-                        />
-                      ) : (
-                        <icons.noImage height={50} width={70} />
-                      )}
-                    </View>
-                                {/* Vehicle card's text */}
-                    <View>
-                      <Text className="buttonTextBlue text-center">{item.model}</Text>
-                      <Text className="smallThinTextBlue text-center">{item.make} {item.year}</Text>
-                    </View>
-                    {/* Vehicle card's select button */}
-                    <View className="mx-1.5">
-                      <NormalButton 
-                        text="Select"
-                        variant="lightBlue"
-                        onClick={() => router.push(`/garage/vehicle/${item.vehicleId}`)}
-                        grow
+            return (
+              <Pressable
+                onPress={() => router.push(`/garage/vehicle/${item.vehicleId}`)}
+                style={{ flex: 1 }}
+              >
+                <View className="gap-4 rounded-lg border border-stroke p-4">
+                  <View className="h-24 items-center justify-center">
+                    {img ? (
+                      <Image
+                        source={{ uri: img }}
+                        className="h-full w-full rounded-lg"
                       />
-                    </View>
+                    ) : (
+                      <icons.noImage height={50} width={70} />
+                    )}
                   </View>
-                </Pressable>
-              );
-            }}
-          />
-        </View>
-      </ScrollView>
+
+                  <View>
+                    <Text className="buttonTextBlue text-center">
+                      {item.model}
+                    </Text>
+                    <Text className="smallThinTextBlue text-center">
+                      {item.make} {item.year}
+                    </Text>
+                  </View>
+
+                  <View className="mx-1.5">
+                    <NormalButton
+                      text="Select"
+                      variant="lightBlue"
+                      onClick={() =>
+                        router.push(`/garage/vehicle/${item.vehicleId}`)
+                      }
+                      grow
+                    />
+                  </View>
+                </View>
+              </Pressable>
+            );
+          }}
+        />
+      </View>
     </SafeAreaView>
   );
 };
