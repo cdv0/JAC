@@ -14,7 +14,7 @@ interface Props{
 
 const SearchBar = ({placeholder1, value1, onChangeText1, placeholder2, value2,  onChangeText2}:Props) => {
   return (
-    <View className='border border-stroke flex-row items-center bg-white rounded-full px-2 py-1 my-4 mx-5'>
+    <View className='border border-stroke flex-row items-center bg-white rounded-full px-2 py-2 my-4 mx-5'>
       {/*General search*/}
       <icons.search width={55} height={25}/>
       <TextInput

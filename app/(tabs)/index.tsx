@@ -772,16 +772,16 @@ export default function Index() {
         ? applyFilter().filter((x) => x.Distance <= sliderValue)
         : applyFilter()
   return (
-    <SafeAreaView className="flex-1" edges={['right', 'top', 'left']}>
+    // <SafeAreaView className="flex-1" edges={['right', 'top', 'left']}>
       <View className="flex-1 bg-white ">
         <View className="justify-center w-full h-[18%]">
           {/*Banner */}
           <ImageBackground
             source={require('@/public/assets/images/test.png')}
-            imageStyle={{ width: 'auto', height: 140, marginTop: -60 }}
+            className="flex-1"
             resizeMode="cover"
           >
-            <View className="items-end mr-[5%]">
+            <View className="items-end mr-[6%] mt-[20%]">
               <NormalButton
                 onClick={() => {
                   router.push('/(tabs)/garage')
@@ -803,7 +803,7 @@ export default function Index() {
             setLQuery(newL)
           }}
         />
-        <View>
+        <View className="mx-3">
           {/*Filter Buttons */}
           <ScrollView
             horizontal={true}
@@ -888,7 +888,7 @@ export default function Index() {
           </ScrollView>
         </View>
 
-        <Text className="mt-5 mb-5 ml-5 text-2xl">Find Nearby</Text>
+        <Text className="mt-5 mb-5 ml-5 mediumTitle">Find Nearby</Text>
 
         {/*Rendering Mechanic cards */}
         <View style={{ flex: 1 }}>
@@ -1048,11 +1048,11 @@ export default function Index() {
               </Text>
 
               <View className="h-[10%] ml-[5%] mr-[5%] ">
-                <Text className="self-center buttonTextBlack">
-                  {`${
-                    tempSliderValue == maxD ? `${tempSliderValue}+` : tempSliderValue
-                  } mi`}
-                </Text>
+              <Text className="text-textBlack">
+                {`Set miles: ${
+                  tempSliderValue == maxD ? `${tempSliderValue}+` : tempSliderValue
+                } mi`}
+              </Text>
 
                 <Slider
                   style={{ opacity: userLoc ? 1 : 0.5 }}
@@ -1264,6 +1264,6 @@ export default function Index() {
           </View>
         </Modal>
       </View>
-    </SafeAreaView>
+    // </SafeAreaView>
   )
 }

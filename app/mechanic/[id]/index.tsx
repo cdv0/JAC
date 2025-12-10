@@ -235,20 +235,20 @@ const Details = () => {
     }
 
     return(
-      <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
+      // <SafeAreaView className='flex-1 bg-subheaderGray' edges={['right', 'bottom','left']}>
         <KeyboardAvoidingView className='flex-1' behavior='padding' keyboardVerticalOffset={100}>
         <ScrollView contentContainerStyle={{ paddingBottom: 10, gap:10 }} showsVerticalScrollIndicator={false}>
-              <View className='w-full bg-white flex-row pl-[5%] py-[5%]'>
+              <View className='w-full bg-white flex-row px-5 py-7 gap-8'>
                   {!mechanic.Image?(<images.defaultImage width={120} height={120} />):
                               <Image source={{uri:String(mechanic.Image)}} className='w-[120] h-[120]'/>
                               }
-                  <View className='ml-[5%] justify-center'>
-                      <Text className='text-2xl buttonTextBlack'>{mechanic.name}</Text>
+                  <View className='flex-1 flex-col'>
+                      <Text className='mediumTitle'>{mechanic.name}</Text>
                       <View className='flex-row'>
-                        <Text className='buttonTextBlack'>Ratings: </Text>
+                        <Text className='smallTextBold'>Ratings: </Text>
                         <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
-                      <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
+                      <Text className='smallTextBold mb-[10]'>Reviews: {reviews.length}</Text>
                       {isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
                       text={isClaimed?'Claimed':'Claim Business'} 
                       onPress={async ()=>{
@@ -490,10 +490,7 @@ const Details = () => {
                 <ShopManager mode='edit' visible={editVisible} onClose={()=>setEditVisible(false)} data={{... mechanic}}/>
         </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
-      
-          
-      
+      // </SafeAreaView>
     )
   }
 }
