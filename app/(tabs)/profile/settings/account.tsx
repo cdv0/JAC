@@ -4,10 +4,9 @@ import {
   uploadProfilePicture,
   type File,
 } from '@/_backend/api/fileUpload'
-import { deleteAccount, readUserProfile } from '@/_backend/api/profile'
+import { deleteAccount, readUserProfile, getProfilePicture } from '@/_backend/api/profile'
 import NormalButton from '@/app/components/NormalButton'
 import ShopManager from '@/app/components/ShopManager'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   deleteUser,
   fetchUserAttributes,
@@ -20,10 +19,6 @@ import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Alert, Image, Pressable, Text, View } from 'react-native'
 import { ChevronRightIcon } from 'react-native-heroicons/outline'
-
-const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
-const getProfileImageKey = (userId: string) =>
-  `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
 
 export default function Account() {
   const [firstName, setFirstName] = useState<string>('')
@@ -45,9 +40,13 @@ export default function Account() {
         const currentUserId = user.userId
         setUserId(currentUserId)
 
-        const cacheKey = getProfileImageKey(currentUserId)
-        const cachedUri = await AsyncStorage.getItem(cacheKey)
-        if (cachedUri) setProfileImage(cachedUri)
+        try {
+          const uri = await getProfilePicture(currentUserId)
+          if (uri) {
+            setProfileImage(uri)
+          }
+        } catch {
+        }
 
         const attrs = await fetchUserAttributes()
         const emailAttr = attrs.email!.toString()
@@ -68,7 +67,8 @@ export default function Account() {
           setEmail(emailAttr ?? '')
           setCreatedAt(attrs.createdAt ?? '')
         }
-      } catch {}
+      } catch {
+      }
     })()
   }, [])
 
@@ -107,7 +107,22 @@ export default function Account() {
         return
       }
 
-      if (!userId || !email) {
+      if (!userId) {
+        Alert.alert('Error', 'Missing user information.')
+        return
+      }
+
+      let effectiveEmail = email
+      if (!effectiveEmail) {
+        try {
+          const attrs = await fetchUserAttributes()
+          effectiveEmail = attrs.email ?? ''
+          setEmail(effectiveEmail)
+        } catch {
+        }
+      }
+
+      if (!effectiveEmail) {
         Alert.alert('Error', 'Missing user information.')
         return
       }
@@ -120,17 +135,19 @@ export default function Account() {
         size: pickedFile.size,
         mimeType: pickedFile.mimeType,
         userId,
-        email,
+        email: effectiveEmail,
       }
 
       await uploadProfilePicture(payload)
 
-      const cacheKey = getProfileImageKey(userId)
-      setProfileImage(pickedFile.uri)
-      await AsyncStorage.setItem(cacheKey, pickedFile.uri)
+      const uri = await getProfilePicture(userId)
+      if (uri) {
+        setProfileImage(uri)
+      }
 
       Hub.dispatch('profile', { event: 'profileImageUpdated' })
-    } catch {
+    } catch (err) {
+      console.log('uploadProfilePicture error', err)
       Alert.alert('Error', 'There was a problem uploading your picture.')
     } finally {
       setUploading(false)
@@ -138,8 +155,6 @@ export default function Account() {
   }
 
   const deleteAccountHandler = async () => {
-    // call lambda to delete content from DB
-
     const result = await deleteAccount(userId, email)
 
     try {
@@ -157,7 +172,6 @@ export default function Account() {
   }
 
   return (
-    // <SafeAreaView className="flex-col" edges={['top', 'bottom']}>
     <View className="flex flex-col justify-start">
       <View className="h-full px-2 pt-5">
         <View className="items-center mb-5">
@@ -291,6 +305,5 @@ export default function Account() {
         </View>
       </View>
     </View>
-    // </SafeAreaView>
   )
 }

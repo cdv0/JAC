@@ -44,29 +44,33 @@ export async function uploadVehicleImage(payload: File, type: "vehicle" | "recor
   return data.key as string;
 }
 
-// POST /profile/uploadProfilePicture
-export async function uploadProfilePicture(payload: File) {
-  const base64 = Base64.encode(payload.uri);
+export async function uploadProfilePicture(
+  payload: File & { userId: string; email: string }
+) {
+  const { uri, name, mimeType, userId, email } = payload
 
-  const response = await fetch(BASE_URL+"/profile/uploadProfilePicture", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const fileContent = await FileSystem.readAsStringAsync(uri, {
+    encoding: FileSystem.EncodingType.Base64,
+  })
+
+  const res = await fetch(`${BASE_URL}/profile/uploadProfilePicture`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      fileName: payload.name,
-      fileContent: base64,
-      contentType: payload.mimeType,
-      userId: payload.userId,
-      email: payload.email,
+      fileName: name,
+      fileContent,
+      contentType: mimeType,
+      userId,
+      email,
     }),
-  });
+  })
 
-  const text = await response.text();
-  if (!response.ok) {
-    throw new Error(text || `HTTP ${response.status}`);
+  const text = await res.text()
+  if (!res.ok) {
+    throw new Error(text || `HTTP ${res.status}`)
   }
 
-  const data = await JSON.parse(text);
-  return data.key as string;
+  return text ? JSON.parse(text) : {}
 }
 
 export async function updateVehicleImageRemote(params: {

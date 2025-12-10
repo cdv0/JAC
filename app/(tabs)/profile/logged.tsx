@@ -1,18 +1,13 @@
-import { readUserProfile } from '@/_backend/api/profile'
+import { readUserProfile, getProfilePicture } from '@/_backend/api/profile'
 import { getReviewsByUser, getMechanicById } from '@/_backend/api/review'
 import NormalButton from '@/app/components/NormalButton'
 import { icons } from '@/constants/icons'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect } from '@react-navigation/native'
 import { fetchUserAttributes, getCurrentUser } from 'aws-amplify/auth'
 import { useRouter } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Image, Pressable, ScrollView, Text, View } from 'react-native'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
-
-const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri'
-const getProfileImageKey = (userId: string) =>
-  `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`
 
 type SortOption = 'dateNewest' | 'dateOldest' | 'ratingHigh' | 'ratingLow'
 
@@ -41,7 +36,14 @@ export const account = () => {
 
       console.log('userid:', userId, 'email:', email)
 
-      // special handling for mechanics
+      try {
+        const uri = await getProfilePicture(userId)
+        if (uri) {
+          setProfileImage(uri)
+        }
+      } catch {
+      }
+
       if (attrs.locale === 'Mechanic') {
         const name = attrs.name?.split(' ')
         console.log('name: ', name)
@@ -90,38 +92,6 @@ export const account = () => {
       console.log('Account: Error loading user data:', e)
       console.log('Account: Error message:', e.message)
     }
-  }, [])
-
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const { userId } = await getCurrentUser()
-        const cacheKey = getProfileImageKey(userId)
-        const cachedUri = await AsyncStorage.getItem(cacheKey)
-        if (cachedUri) {
-          setProfileImage(cachedUri)
-        }
-
-        const attrs = await fetchUserAttributes()
-        const email = attrs.email
-        if (!email) {
-          throw new Error(
-            'No email on the Cognito profile (check pool/app-client readable attributes).'
-          )
-        }
-
-        const userData = await readUserProfile(userId, email)
-        setFirstName(userData.firstName ?? '')
-        setLastName(userData.lastName ?? '')
-        setCreatedAt(userData.createdAt ?? '')
-
-        const reviewData = await getReviewsByUser(userId)
-        setReviews(reviewData ?? [])
-      } catch (e: any) {
-        console.log('Account: Error loading user data:', e)
-        console.log('Account: Error message:', e.message)
-      }
-    })()
   }, [])
 
   useEffect(() => {

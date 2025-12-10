@@ -97,7 +97,6 @@ export async function sendContactEmail(payload: {
   try {
     data = await res.json()
   } catch {
-    // ignore
   }
 
   if (!res.ok) {
@@ -107,4 +106,20 @@ export async function sendContactEmail(payload: {
   }
 
   return data
+}
+
+export async function getProfilePicture(userId: string) {
+  const url =
+    `${BASE_URL}/profile/getProfilePicture` +
+    `?userId=${encodeURIComponent(userId)}`
+  const res = await fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+  })
+  const text = await res.text()
+  if (!res.ok) {
+    throw new Error(text || `HTTP ${res.status}`)
+  }
+  if (!text) return null
+  return `data:image/jpeg;base64,${text}`
 }

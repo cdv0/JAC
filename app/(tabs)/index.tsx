@@ -950,7 +950,7 @@ export default function Index() {
                 />
               </View>
 
-              <View className="w-1/2 px-1 mb-2">
+              <View className={`w-1/2 px-1 mb-2 ${!userLoc?'opacity-50':''}`}>
                 <NormalButton
                   text="Distance"
                   variant={sortOpt === '2' ? 'primary' : 'outline'}
@@ -1033,8 +1033,8 @@ export default function Index() {
               </Text>
 
               <View className="h-[10%] ml-[5%] mr-[5%] ">
-                <Text className="">
-                  {`Set distance: ${
+                <Text className="self-center buttonTextBlack">
+                  {`${
                     tempSliderValue == maxD ? `${tempSliderValue}+` : tempSliderValue
                   } mi`}
                 </Text>
@@ -1055,8 +1055,8 @@ export default function Index() {
                 />
 
                 <View className="flex-row justify-between">
-                  <Text>{minD} mi</Text>
-                  <Text>{maxD}+ mi</Text>
+                  <Text className='buttonTextBlue'>{minD} mi</Text>
+                  <Text className='buttonTextBlue'>{maxD}+ mi</Text>
                 </View>
                 {!userLoc && (
                   <Text className="text-l buttonTextBlack text-subheaderGray mt-[10]">

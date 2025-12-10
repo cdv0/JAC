@@ -4,10 +4,7 @@ import { View, Text, Image } from 'react-native';
 import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
 import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const PROFILE_IMAGE_URI_KEY_PREFIX = 'profileImageUri';
-const getProfileImageKey = (userId: string) => `${PROFILE_IMAGE_URI_KEY_PREFIX}:${userId}`;
+import { getProfilePicture } from '@/_backend/api/profile';
 
 const TabIcon = ({ Icon }: any) => {
   return (
@@ -35,9 +32,8 @@ const _layout = () => {
   async function fetchProfileImage() {
     try {
       const user = await getCurrentUser();
-      const cacheKey = getProfileImageKey(user.userId);
-      const uri = await AsyncStorage.getItem(cacheKey);
-      setProfileImage(uri);
+      const uri = await getProfilePicture(user.userId);
+      setProfileImage(uri ?? null);
     } catch {
       setProfileImage(null);
     }
