@@ -111,10 +111,8 @@ export async function getVehicleImage(userId: string, vehicleId: string) {
         const errorText = await response.text();
         throw new Error(errorText || `HTTP ${response.status}`);
     }
-
-    const data = await response.json();
     
-    const base64string = data.body as string;
+    const base64string = await response.text();
     
 
     const dataUrl = `data:image/jpeg;base64,${base64string}`;

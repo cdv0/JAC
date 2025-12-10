@@ -42,6 +42,7 @@ const Details = () => {
   const [more, setMore] = useState(false);
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [userID, setUserID] = useState('');
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const displayName = firstName || lastName ? `${firstName} ${lastName}`.trim() : null;
@@ -69,6 +70,9 @@ const Details = () => {
           throw new Error(
             'No email on the Cognito profile (check pool/app-client readable attributes).'
           )
+        }
+        else if(userID){
+          setUserID(userID)
         }
 
         const userData = await readUserProfile(userId, email)
@@ -123,9 +127,9 @@ const Details = () => {
         )
 
         console.log(
-          'Raw backendReviews from Lambda:',
+          "Raw backendReviews from Lambda:",
           JSON.stringify(backendReviews, null, 2)
-        )
+        );
 
         setReviews(
           backendReviews.map((r: any) => ({
@@ -165,6 +169,10 @@ const Details = () => {
 
     fetchData();
   }, [id]); 
+
+useEffect(()=>{
+  setClaimed(mechanic.Certified && userID== mechanic.ownerid)
+},[mechanic, userID])
 //#endregion
 
   //#region Helper Functions
@@ -178,12 +186,11 @@ const Details = () => {
   }
 
   //temporary for testing
-  const claim = async () => {
-    setTimeout(() => {
+  const claim = async() =>{
+    setTimeout(()=>{
       let temp = Math.random()
-      setClaimed(temp < 0.5)
-      setClaimLoading(false)
-    }, 5000)
+      setClaimed(temp<0.5)
+      setClaimLoading(false)}, 5000)
   }
   //#endregion
 
@@ -256,11 +263,12 @@ const Details = () => {
 
       if (choice == '') {
         return temp
-      } else if (choice == '5')
-        return temp.filter((x) => x.Rating == Number(choice))
-      else {
+      }
+      else if (choice =='5')
+        return temp.filter(x=> x.Rating == Number(choice))
+      else{
         const bound = Number(choice)
-        return temp.filter((x) => bound <= x.Rating && x.Rating < bound + 1)
+        return temp.filter(x=> bound<=x.Rating && x.Rating<bound + 1)
       }
     }
 
@@ -279,7 +287,7 @@ const Details = () => {
                         <StarRatingDisplay color={'black'} starSize={20} StarIconComponent={Star} rating={reviewAVG} starStyle={{marginHorizontal:-1}}/>
                       </View>
                       <Text className='buttonTextBlack mb-[10]'>Reviews: {reviews.length}</Text>
-                      {!mechanic.Certified && isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
+                      {isClaimed  || isAuthenticated && asMechanic && <ToggleButton flag={isClaimed} 
                       text={isClaimed?'Claimed':'Claim Business'} 
                       onPress={async ()=>{
                                       /**
@@ -525,7 +533,7 @@ const Details = () => {
                           id: String(id),
                           reviewId: item.ReviewId,
                           mechanicId: item.MechanicId,
-                          userId: item.UserId,
+                          userId: item.UserId, 
                         },
                       })
                     }
@@ -533,6 +541,7 @@ const Details = () => {
                     <ViewReviews {...item} />
                   </Pressable>
                 )}
+                initialNumToRender={4}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ gap: 10 }}
                 ListEmptyComponent={
