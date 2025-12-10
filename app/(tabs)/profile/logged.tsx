@@ -271,7 +271,7 @@ export const account = () => {
                       {imageUri ? (
                         <Image
                           source={{ uri: imageUri }}
-                          className="w-14 h-14 rounded-lg"
+                          className="w-24 h-24 rounded-lg"
                         />
                       ) : (
                         <View className="items-center justify-center w-20 h-20 rounded-lg bg-accountOrange">

@@ -22,6 +22,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import StarRating from "react-native-star-rating-widget";
 import NormalButton from "../../components/NormalButton"; // adjust path if needed
 
+// 🔹 SAME HELPER AS IN viewReview.tsx
+function getMechanicImageUri(mechanic: Mechanic | null): string | undefined {
+  if (!mechanic) return undefined;
+
+  const img =
+    (mechanic as any).Image ??
+    (mechanic as any).image ??
+    (mechanic as any).imageUrl;
+
+  if (typeof img === "string" && img.length > 0) {
+    return img;
+  }
+
+  return undefined;
+}
+
 const UpdateReview = () => {
   const { id, reviewId } = useLocalSearchParams<{
     id: string;
@@ -39,7 +55,6 @@ const UpdateReview = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Helper: format date + stars (same as viewReview)
   function formatFullDate(iso?: string) {
     if (!iso) return "";
     const d = new Date(iso);
@@ -101,20 +116,18 @@ const UpdateReview = () => {
   const handleSubmit = async () => {
     if (!rating || !reviewText.trim()) return;
     if (!userId || !reviewId) return;
-  
+
     try {
       setSubmitting(true);
       await updateReview(reviewId, userId, rating, reviewText.trim());
-  
-      
-      router.replace("/profile/logged");     
+
+      router.replace("/profile/logged");
     } catch (err) {
       console.error("UpdateReview: submit error", err);
     } finally {
       setSubmitting(false);
     }
   };
-  
 
   if (loading) {
     return (
@@ -139,38 +152,43 @@ const UpdateReview = () => {
     );
   }
 
+  // 🔹 Use the same helper to get the banner image URI
+  const mechanicImageUri = getMechanicImageUri(mechanic);
+
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["right", "top", "left"]}>
+    //<SafeAreaView className="flex-1 bg-white" edges={["right", "top", "left"]}>
+        <View className="flex-1 bg-white">
+      {/* MECHANIC BANNER */}
+      <View className="flex-row items-center gap-3 bg-white mb-4 pt-4 px-4">
+        {mechanicImageUri ? (
+          <Image
+            source={{ uri: mechanicImageUri }}
+            className="w-24 h-24 rounded-lg bg-secondary"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="w-24 h-24 rounded-lg bg-secondary" />
+        )}
+
+        <View className="flex-1">
+          <Text className="smallTitle">
+            {mechanic?.name ?? `Mechanic ${originalReview.mechanicId}`}
+          </Text>
+          {mechanic?.address ? (
+            <Text className="xsTextGray" numberOfLines={2}>
+              {mechanic.address}
+            </Text>
+          ) : null}
+        </View>
+      </View>
+
       <ScrollView
         contentContainerStyle={{ padding: 16 }}
         showsVerticalScrollIndicator={false}
+        className="bg-secondary"
       >
-        {/* MECHANIC BANNER (from viewReview) */}
-        <View className="flex-row items-center gap-3 bg-white mb-4">
-          {mechanic?.imageUri ? (
-            <Image
-              source={{ uri: mechanic.imageUri }}
-              className="w-16 h-16 rounded-lg bg-secondary"
-              resizeMode="cover"
-            />
-          ) : (
-            <View className="w-16 h-16 rounded-lg bg-secondary" />
-          )}
-
-          <View className="flex-1">
-            <Text className="xsTitle">
-              {mechanic?.name ?? `Mechanic ${originalReview.mechanicId}`}
-            </Text>
-            {mechanic?.address ? (
-              <Text className="xsTextGray" numberOfLines={2}>
-                {mechanic.address}
-              </Text>
-            ) : null}
-          </View>
-        </View>
-
         {/* EDIT FORM */}
-        <View className="border border-stroke rounded-xl mb-6 p-4">
+        <View className="bg-white border border-stroke rounded-xl mb-6 p-4">
           <View className="flex-row mb-4">
             <Text className="buttonTextBlack mb-2">Rate your experience</Text>
             <StarRating
@@ -183,25 +201,27 @@ const UpdateReview = () => {
 
           <View className="mb-2">
             <TextInput
-              className="border border-stroke rounded-xl p-3 min-h-[140px]"
+              className="bg-white border border-stroke rounded-xl p-3 min-h-[140px]"
               multiline
-              value={reviewText}             
+              value={reviewText}
               onChangeText={setReviewText}
               placeholder=""
             />
           </View>
 
-          <NormalButton
-            text={submitting ? "Saving..." : "Save"}
-            onClick={handleSubmit}
-          />
+          <View className="p-4">
+            <NormalButton
+              text={submitting ? 'Saving...' : 'Save'}
+              onClick={handleSubmit}
+            />
+          </View>
         </View>
 
         {/* SPACER */}
-        <View className="h-6" />
+        <View className="h-4" />
 
-        {/* PREVIOUS REVIEW (viewReview-style card) */}
-        <View className="bg-[#F5F7FB] rounded-2xl p-4">
+        {/* PREVIOUS REVIEW CARD */}
+        <View className="bg-white rounded-2xl p-4">
           <View className="flex-row justify-between items-center mb-3">
             <View className="flex-row items-center gap-1">
               <Text className="xsTitle">Previous rating:</Text>
@@ -209,17 +229,18 @@ const UpdateReview = () => {
                 {renderStars(originalReview.rating)}
               </Text>
             </View>
-            <Text className="xsTextGray text-[11px]">
+            <Text className="smallTextGray text-[11px]">
               {formatFullDate(originalReview.createdAt)}
             </Text>
           </View>
 
-          <Text className="smallTextGray leading-5">
+          <Text className="smallTextBlack leading-5">
             {originalReview.review}
           </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
+    //</SafeAreaView>
   );
 };
 
