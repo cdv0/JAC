@@ -140,7 +140,7 @@ export const ServiceRecord = () => {
       <ScrollView className="flex-1 bg-white">
         <View className="mx-5 mt-3 gap-3 mb-5">
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">Title</Text>
               <Text className="dangerText"> *</Text>
             </View>
@@ -159,7 +159,7 @@ export const ServiceRecord = () => {
           </View>
 
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">Service date</Text>
               <Text className="dangerText"> *</Text>
             </View>
@@ -224,7 +224,7 @@ export const ServiceRecord = () => {
           </View>
 
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">Mileage</Text>
             </View>
             <TextInput
@@ -238,7 +238,7 @@ export const ServiceRecord = () => {
           </View>
 
           <View className="gap-2">
-            <View className="flex-1 flex-row">
+            <View className="flex-row">
               <Text className="smallTextBold">Note</Text>
             </View>
             <TextInput
@@ -268,7 +268,7 @@ export const ServiceRecord = () => {
                 `}
             >
               <icons.upload />
-              <View className="flex-1 justify-center gap-0.5">
+              <View className="justify-center gap-0.5">
                 <Text className="xsTextGray">Upload</Text>
                 <Text className="xsTextGray">
                   {files.length} files selected

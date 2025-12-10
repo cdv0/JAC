@@ -105,3 +105,21 @@ export async function deleteServiceRecord (payload: {serviceRecordId: string, ve
 
   return (text ? JSON.parse(text) : {}) as { message: string; serviceRecordId: string };
 }
+
+export async function getServiceRecordFileUri(fileKey: string): Promise<string> {
+  const url =
+    `${BASE_URL}/vehicle/serviceRecord/getServiceRecordFile` +
+    `?fileKey=${encodeURIComponent(fileKey)}`
+
+  const res = await fetch(url, { method: 'GET' })
+  const base64 = await res.text()
+
+  if (!res.ok) {
+    throw new Error(base64 || `HTTP ${res.status}`)
+  }
+
+  const contentType =
+    res.headers.get('Content-Type') || 'image/jpeg'
+
+  return `data:${contentType};base64,${base64}`
+}
