@@ -1,9 +1,7 @@
 import { images } from '@/constants/images';
 import { Link } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 import Star from './Star';
 type MechanicViewProps = {
     mechanicID: string,
@@ -11,49 +9,15 @@ type MechanicViewProps = {
     Image: string,
     Certified:boolean,
     Distance?: number,
+    Rating: number,
+    Review: number
 }
 
-type ReviewProps ={
-    mechanicId:string,
-    rating: number
-}
 
 export default function MechanicView(
     {
-        name, Image:image, mechanicID, Certified, Distance
+        name, Image:image, mechanicID, Certified, Distance, Rating, Review
     }: MechanicViewProps){
-        const[reviews, setReviews] = useState<any>([])
-        const [reviewAVG, setreviewAVG] = useState<Float>(0);
-        const [loading, setLoading] = useState(true);
-        useEffect(() => {
-                    const data = async () => {
-                        try {
-                            const file = await fetch("/local/dummy/review2.json");
-                            const reviewData = await file.json();
-                            const reviews = reviewData.filter((x:ReviewProps) =>x.mechanicId === mechanicID) as ReviewProps[]
-                            setReviews(reviews || [])     
-                            let sum = 0;
-                            reviews.forEach(x=>{
-                                sum+=x.rating
-                            }) 
-                            setreviewAVG(sum/reviews.length)
-                            setLoading(false)            
-                        } catch (error) {
-                            console.error("Error loading mechanics data:", error);
-                        }
-                       
-                    }
-                    data();
-                }, [mechanicID]);
-
-        if (loading){
-            return(
-              <View className='items-center rounded-xl justify-center border border-stroke py-[5%] w-[175] h-[250]' >
-                <ActivityIndicator size="large" />
-              </View>
-            )
-          }
-          
                       
         return(
             
@@ -78,10 +42,10 @@ export default function MechanicView(
                              <View className="flex-row ">
                                 <Text className='buttonTextBlack'>Rating:</Text>
                                 {/*todo: Fix inconsisent star sizes */}
-                                <StarRatingDisplay color={'black'} starSize={18} starStyle={{ marginHorizontal: -1 }} StarIconComponent={Star} style={{ alignItems:'center'}} rating={reviewAVG } />
+                                <StarRatingDisplay color={'black'} starSize={18} starStyle={{ marginHorizontal: -1 }} StarIconComponent={Star} style={{ alignItems:'center'}} rating={Rating} />
                                 
                             </View> 
-                            <Text className='buttonTextBlack'>Reviews: {reviews.length}</Text>
+                            <Text className='buttonTextBlack'>Reviews: {Review}</Text>
                             {(Distance && Distance !== Number.POSITIVE_INFINITY) && <Text className='text-s smallTextGray'>{Distance.toFixed(1)} mi</Text>}
                         </View>
                     </View> 
