@@ -1,36 +1,100 @@
-import NormalButton from "./NormalButton";
-import React, {useState} from "react";
+import React, { useState } from 'react';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
+import NormalButton from './NormalButton';
 
-const [isClaimed, setisClaimed] = useState(false)''
+interface ClaimModalProps {
+  isClaimed: boolean;
+  visible: boolean;
+  onClose: () => void;
+}
 
-const [showModal, setShowModal] = useState(true);
-
-const 
-export const ClaimModal = (isClaimed: boolean) =>{
-    return(
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 mb-3">
+export const ClaimModal: React.FC<ClaimModalProps> = ({
+  isClaimed,
+  visible,
+  onClose,
+}) => {
+  return (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <Pressable style={styles.modalContainer} onPress={(e) => e.stopPropagation()}>
+          <View style={styles.content}>
+            <View style={styles.textContainer}>
+              <Text style={styles.title}>
                 {isClaimed ? 'Business Already Claimed' : 'Claim This Business'}
-              </h2>
-              
-              <p className="text-gray-700">
+              </Text>
+
+              <Text style={styles.description}>
                 {isClaimed
                   ? 'Mechanic is already claimed. If you believe something is wrong please contact us at JAC@gmail.com'
                   : 'Please contact us at JAC@gmail.com to claim this business with the necessary business information'}
-              </p>
-            </div>
+              </Text>
+            </View>
 
-            <div className="flex justify-end">
-              <NormalButton onClick={() => setShowModal(false)}>
-                Close
-              </NormalButton>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+            <View style={styles.buttonContainer}>
+              <NormalButton text = "Close" onClick={()=> {onClose();}}/>
+            </View>
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    maxWidth: 448,
+    width: '100%',
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  content: {
+    width: '100%',
+  },
+  textContainer: {
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 12,
+  },
+  description: {
+    fontSize: 16,
+    color: '#374151',
+    lineHeight: 24,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+
+});
