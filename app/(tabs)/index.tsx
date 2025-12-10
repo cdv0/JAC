@@ -1,3 +1,4 @@
+import { icons } from '@/constants/icons'
 import Slider from '@react-native-community/slider'
 import * as Location from 'expo-location'
 import { router } from 'expo-router'
@@ -20,7 +21,6 @@ import MechanicView from '../components/MechanicView'
 import NormalButton from '../components/NormalButton'
 import SearchBar from '../components/SearchBar'
 import ToggleButton from '../components/ToggleButton'
-import { icons } from '@/constants/icons'
 
 interface Mechanics {
   mechanicID: string
@@ -48,7 +48,6 @@ export default function Index() {
         const file = await fetch(
           process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string
         )
-        //const file = await fetch("/local/dummy/mechanics2.json")
         const mechanicsData = await file.json()
         const temp = mechanicsData.data
         temp.forEach(async (x: Mechanics) => {

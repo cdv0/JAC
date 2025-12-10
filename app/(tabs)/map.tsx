@@ -10,12 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import MapView, {
-  Callout,
-  Camera,
-  Marker,
-  PROVIDER_GOOGLE,
-} from 'react-native-maps'
+import MapView, { Callout, Camera, Marker } from 'react-native-maps'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import Star from '../components/Star'
 
@@ -41,14 +36,22 @@ const map = () => {
     Record<string, number>
   >({})
 
-  const zoomBy = async (delta: number) => {
+  const zoomOut = async () => {
     if (!mapRef.current) return
 
-    const cam = await mapRef.current.getCamera()
-    mapRef.current.animateCamera(
-      { zoom: (cam.zoom ?? 14) + delta },
-      { duration: 200 }
-    )
+    let cam = await mapRef.current.getCamera()
+    cam.altitude! *= 2
+    console.log(cam.altitude)
+    mapRef.current.animateCamera(cam)
+  }
+
+  const zoomIn = async () => {
+    if (!mapRef.current) return
+
+    let cam = await mapRef.current.getCamera()
+    cam.altitude! /= 2
+
+    mapRef.current.animateCamera(cam)
   }
 
   const saveCamera = async () => {
@@ -85,6 +88,7 @@ const map = () => {
           longitude: location.coords.longitude,
         },
         zoom: 15,
+        altitude: 390000,
         pitch: 0,
         heading: 0,
       }
@@ -251,13 +255,13 @@ const map = () => {
         </MapView>
         <View className="absolute gap-2 bottom-6 right-6">
           <TouchableOpacity
-            onPress={() => zoomBy(+1)}
+            onPress={() => zoomIn()}
             className="flex justify-center p-1 bg-white border border-black"
           >
             <Text className="size-auto">+</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => zoomBy(-1)}
+            onPress={() => zoomOut()}
             className="flex justify-center p-1 bg-white border border-black"
           >
             <Text className="size-auto">-</Text>
