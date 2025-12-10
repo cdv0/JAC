@@ -1,4 +1,4 @@
-import { listVehicles, type Vehicle, getVehicleImage } from "@/_backend/api/vehicle";
+import { listVehicles, type Vehicle } from "@/_backend/api/vehicle";
 import NormalButton from "@/app/components/NormalButton";
 import { icons } from "@/constants/icons";
 import { useFocusEffect } from "@react-navigation/native";
@@ -9,6 +9,10 @@ import { useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable, ScrollView, Text, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import decodeBase64Image from "@/app/components/ImageDecode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const VEHICLE_IMAGE_URI_KEY_PREFIX = 'vehicleImageUri'
+const getVehicleImageKey = (vehicleId: string) => `${VEHICLE_IMAGE_URI_KEY_PREFIX}:${vehicleId}`
 
 export const garage = () => {
   const router = useRouter();
@@ -41,23 +45,23 @@ export const garage = () => {
       );
       setItems(sorted);
 
-      // Get vehicle images
       const imageResults = await Promise.all(
         sorted.map(async (v) => {
           try {
-            const dataUrl = await getVehicleImage(userId, v.vehicleId);
-            return { vehicleId: v.vehicleId, dataUrl };
+            const key = getVehicleImageKey(v.vehicleId);
+            const uri = await AsyncStorage.getItem(key);
+            return { vehicleId: v.vehicleId, uri };
           } catch (e: any) {
-            console.log("getVehicleImage error for", v.vehicleId, e?.message);
-            return { vehicleId: v.vehicleId, dataUrl: null };
+            console.log("Garage AsyncStorage image error for", v.vehicleId, e?.message);
+            return { vehicleId: v.vehicleId, uri: null };
           }
         })
       );
 
       setVehicleImages((prev) => {
         const next = { ...prev };
-        for (const { vehicleId, dataUrl } of imageResults) {
-          next[vehicleId] = dataUrl;
+        for (const { vehicleId, uri } of imageResults) {
+          next[vehicleId] = uri;
         }
         return next;
       });

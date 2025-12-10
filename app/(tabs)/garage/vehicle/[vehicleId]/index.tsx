@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList, Image, Modal } from "react-native";
+import { View, Text, ActivityIndicator, Pressable, ScrollView, TextInput, FlatList, Image, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import { readVehicle, updateVehicleDetails, getVehicleImage } from "@/_backend/api/vehicle";
@@ -130,6 +131,14 @@ export default function VehicleDetail() {
         }
 
         setVehicle(true);
+
+        try {
+          const key = getVehicleImageKey(String(vehicleId));
+          const uri = await AsyncStorage.getItem(key);
+          setVehicleImageUri(uri);
+        } catch (e: any) {
+          console.log("Vehicle: Error loading image uri:", e?.message);
+        }
       } catch (e: any) {
         console.log("Failed to load vehicle.")
       } finally {
@@ -517,6 +526,37 @@ export default function VehicleDetail() {
             )}
           </View>
         </View>
+
+        <Modal
+          transparent={true}
+          visible={imageModalVisible}
+          onRequestClose={() => setImageModalVisible(false)}
+        >
+          <View className="flex-1 justify-end px-2">
+            <Pressable 
+              className="absolute inset-0 bg-black/40"
+              onPress={() => setImageModalVisible(false)}>
+            </Pressable>
+
+            <View className="w-full mb-3 gap-2 mx-3 self-center">
+              <View className="bg-white px-4 py-3 rounded-lg">
+                <Text className="smallTextGray">Change vehicle image</Text>
+                <Pressable className="py-3 border-stroke" onPress={handleChooseImage}>
+                  <Text className="smallText">Choose a file</Text>
+                </Pressable>
+              </View>
+
+              <View className="bg-white rounded-lg">
+                <Pressable 
+                  onPress={() => setImageModalVisible(false)}
+                  className="px-4 py-3"
+                >
+                  <Text className="text-center smallTextBold">Cancel</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         <Modal
           transparent={true}

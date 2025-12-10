@@ -8,7 +8,10 @@ import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-nativ
 import { SafeAreaView } from "react-native-safe-area-context";
 import { type File, MAX_IMAGE_SIZE, ALLOWED_MIME_TYPES_IMAGE } from "@/_backend/api/fileUpload";
 import * as DocumentPicker from "expo-document-picker";
-import {uploadVehicleImage} from "@/_backend/api/fileUpload";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const VEHICLE_IMAGE_URI_KEY_PREFIX = 'vehicleImageUri'
+const getVehicleImageKey = (vehicleId: string) => `${VEHICLE_IMAGE_URI_KEY_PREFIX}:${vehicleId}`
 
 export const addVehicle = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -81,23 +84,11 @@ export const addVehicle = () => {
       return;
     }
 
-    // Make API call to upload file if any, and create vehicle
+    // Make API call to create vehicle
     try {
       const { userId } = await getCurrentUser()
       let vehicleImageKey: string | null = null;
 
-      // Upload vehicle image to bucket
-      if (file) {
-        try {
-          vehicleImageKey = await uploadVehicleImage(file, "vehicle");
-          console.log("Add vehicle: Image upload successful:", vehicleImageKey);
-        } catch (e: any) {
-          console.log("Add vehicle: Error upload vehicle image:", e);
-          console.log("Add vehicle: Error message:", e?.message);
-          return;
-        }
-      }
-      
       const payload = {
         userId: userId,
         VIN,
@@ -110,6 +101,15 @@ export const addVehicle = () => {
 
       const data = await createVehicle(payload)
       console.log('Add vehicle: success:', data)
+
+      const vehicleId = data?.vehicleId
+      if (file && vehicleId) {
+        try {
+          await AsyncStorage.setItem(getVehicleImageKey(String(vehicleId)), file.uri)
+        } catch (e) {
+          console.log('Add vehicle: Error saving image uri:', e)
+        }
+      }
 
       setVIN('')
       setPlateNum('')
