@@ -41,6 +41,7 @@ export const account = () => {
 
       console.log('userid:', userId, 'email:', email)
 
+      // special handling for mechanics
       if (attrs.locale === 'Mechanic') {
         const name = attrs.name?.split(' ')
         console.log('name: ', name)
@@ -54,12 +55,11 @@ export const account = () => {
       setFirstName(userData.firstName ?? '')
       setLastName(userData.lastName ?? '')
       setCreatedAt(userData.createdAt ?? '')
-  
+
       const reviewData = await getReviewsByUser(userId)
       const safeReviews = reviewData ?? []
       setReviews(safeReviews)
-  
-      // 🔹 NEW: fetch mechanic info (including Image) for each unique mechanicId
+
       const mechanicIds = [
         ...new Set(
           safeReviews
@@ -67,12 +67,12 @@ export const account = () => {
             .filter(Boolean)
         ),
       ]
-  
+
       if (mechanicIds.length === 0) {
         setMechanicsById({})
         return
       }
-  
+
       const entries = await Promise.all(
         mechanicIds.map(async (id) => {
           try {
@@ -84,14 +84,13 @@ export const account = () => {
           }
         })
       )
-  
+
       setMechanicsById(Object.fromEntries(entries))
     } catch (e: any) {
       console.log('Account: Error loading user data:', e)
       console.log('Account: Error message:', e.message)
     }
   }, [])
-  
 
   useEffect(() => {
     ;(async () => {
@@ -175,9 +174,9 @@ export const account = () => {
   }, [reviews, sortOption])
 
   return (
-    // <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
     <ScrollView className="flex-1 bg-white">
       <View className="flex-1 gap-5 mt-5 mb-5">
+        {/* Header */}
         <View className="flex-row items-center justify-center gap-10 pb-12 bg-white border-b border-secondary">
           {profileImage ? (
             <Image
@@ -205,6 +204,7 @@ export const account = () => {
           </View>
         </View>
 
+        {/* Body */}
         <View className="flex-1 gap-6 mx-5">
           <View className="flex-row justify-between">
             <Text className="mediumTitle">Reviews</Text>
@@ -268,81 +268,80 @@ export const account = () => {
             </View>
           )}
 
-            <View className="gap-4 pb-10">
-              {sortedReviews.length === 0 ? (
-                <Text className="smallTextGray text-center">
-                  No reviews yet.
-                </Text>
-              ) : (
-                sortedReviews.map((rev) => {
-                  const mechId = rev.mechanicId ?? rev.MechanicId
-                  const mechanic = mechId ? mechanicsById[String(mechId)] : null
-                  const imageUri = mechanic?.Image ?? null
-                  const mechanicName =
-                    rev.mechanicName ?? mechanic?.name ?? mechId
-                
-                  return (
-                    <Pressable
-                      key={rev.reviewId ?? rev.ReviewId}
-                      onPress={() =>
-                        router.push({
-                          pathname: '/mechanic/[id]/viewReview',
-                          params: {
-                            id: mechId,
-                            reviewId: rev.reviewId ?? rev.ReviewId,
-                          },
-                        })
-                      }
-                      className="p-4 border-b border-stroke bg-white"
-                    >
-                      <View className="flex-row gap-3">
-                        {/* 🔹 Left: mechanic image */}
-                        {imageUri ? (
-                          <Image
-                            source={{ uri: imageUri }}
-                            className="w-14 h-14 rounded-lg"
+          <View className="gap-4 pb-10">
+            {sortedReviews.length === 0 ? (
+              <Text className="text-center smallTextGray">
+                No reviews yet.
+              </Text>
+            ) : (
+              sortedReviews.map((rev) => {
+                const mechId = rev.mechanicId ?? rev.MechanicId
+                const mechanic = mechId
+                  ? mechanicsById[String(mechId)]
+                  : null
+                const imageUri = mechanic?.Image ?? null
+                const mechanicName =
+                  rev.mechanicName ?? mechanic?.name ?? mechId
+
+                return (
+                  <Pressable
+                    key={rev.reviewId ?? rev.ReviewId}
+                    onPress={() =>
+                      router.push({
+                        pathname: '/mechanic/[id]/viewReview',
+                        params: {
+                          id: mechId,
+                          reviewId: rev.reviewId ?? rev.ReviewId,
+                        },
+                      })
+                    }
+                    className="p-4 bg-white border-b border-stroke"
+                  >
+                    <View className="flex-row gap-3">
+                      {imageUri ? (
+                        <Image
+                          source={{ uri: imageUri }}
+                          className="w-14 h-14 rounded-lg"
+                        />
+                      ) : (
+                        <View className="items-center justify-center w-20 h-20 rounded-lg bg-accountOrange">
+                          <Text className="font-bold text-white">
+                            {String(mechanicName ?? '?')[0]?.toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
+
+                      <View className="flex-1">
+                        <Text className="smallTitle" numberOfLines={1}>
+                          {mechanicName}
+                        </Text>
+
+                        <Text className="smallTextGray" numberOfLines={2}>
+                          {rev.review ?? rev.Review}
+                        </Text>
+
+                        <View className="flex-row items-center mt-2">
+                          <Text className="mr-1">Rating</Text>
+                          <StarRatingDisplay
+                            color="black"
+                            starSize={16}
+                            starStyle={{ width: 4 }}
+                            rating={Number(rev.rating ?? rev.Rating ?? 0)}
                           />
-                        ) : (
-                          <View className="w-20 h-20 rounded-lg bg-accountOrange items-center justify-center">
-                            <Text className="text-white font-bold">
-                              {String(mechanicName ?? '?')[0]?.toUpperCase()}
-                            </Text>
-                          </View>
-                        )}
-                
-                        {/* 🔹 Right: existing text & rating */}
-                        <View className="flex-1">
-                          <Text className="smallTitle" numberOfLines={1}>
-                            {mechanicName}
+                          <Text className="ml-2">
+                            ({rev.rating ?? rev.Rating}/5)
                           </Text>
-                
-                          <Text className="smallTextGray" numberOfLines={2}>
-                            {rev.review ?? rev.Review}
-                          </Text>
-                
-                          <View className="flex-row items-center mt-2">
-                            <Text className="mr-1">Rating</Text>
-                            <StarRatingDisplay
-                              color="black"
-                              starSize={16}
-                              starStyle={{ width: 4 }}
-                              rating={Number(rev.rating ?? rev.Rating ?? 0)}
-                            />
-                            <Text className="ml-2">
-                              ({rev.rating ?? rev.Rating}/5)
-                            </Text>
-                          </View>
                         </View>
                       </View>
-                    </Pressable>
-                  )
-                }) 
-              )}   
+                    </View>
+                  </Pressable>
+                )
+              })
+            )}
           </View>
         </View>
       </View>
     </ScrollView>
-    // </SafeAreaView>
   )
 }
 
