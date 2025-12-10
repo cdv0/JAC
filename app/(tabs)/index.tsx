@@ -1,3 +1,4 @@
+import { getReviewsByMechanic } from '@/_backend/api/review'
 import { icons } from '@/constants/icons'
 import Slider from '@react-native-community/slider'
 import * as Location from 'expo-location'
@@ -49,22 +50,35 @@ export default function Index() {
           process.env['EXPO_PUBLIC_GET_MECHANICS_URL'] as string
         )
         const mechanicsData = await file.json()
-        const temp = mechanicsData.data
-        temp.forEach(async (x: Mechanics) => {
-          x.Services = x.Services.map((serv) => serv.toLocaleLowerCase())
-          try {
-            const data = await fetch(
-              (process.env['EXPO_PUBLIC_GET_MECHANIC_RATING_URL'] as string) +
-                `?mechanicId=${x.mechanicID}`
-            )
-            const response = await data.json()
-            x.Rating = response?.average ?? 0
-            x.Review = response?.length ?? 0
-          } catch {
-            x.Rating = 0
-            x.Review = 0
+        const temp = mechanicsData.data as Mechanics[]
+        const modTemp = async() =>{
+          for (const x of temp){
+            x.Services = x.Services.map((serv) => serv.toLocaleLowerCase())
+            console.log("ID: "+x.mechanicID)
+            const { reviews: backendReviews, average } = await getReviewsByMechanic(
+                      String(x.mechanicID))
+            
+            if (backendReviews.length > 0) {
+                // Prefer backend average, fallback to computed
+                const avg =
+                  typeof average === 'number' && !Number.isNaN(average)
+                    ? average
+                    : backendReviews.reduce(
+                        (acc: number, r: any) =>
+                          acc + Number(r.Rating ?? r.rating ?? 0),
+                        0
+                      ) / backendReviews.length
+                x.Rating = avg;
+                console.log("x.Rating",x.Rating);
+                x.Review = backendReviews.length
+              } else {
+                x.Rating = 0
+                x.Review = 0
+              }
           }
-        })
+        }
+        await modTemp();
+        console.log(temp.map((x:Mechanics)=>x.Review))
         setMechanics(temp)
       } catch (error) {
         console.error('Error loading mechanics data:', error)
@@ -121,6 +135,7 @@ export default function Index() {
       })
     }
   }, [dataReady, locReady])
+
 
   const [categories, setCategories] = useState<string[]>([])
   //#region helper functions
