@@ -1,4 +1,4 @@
-import { readUserProfile } from '@/_backend/api/profile';
+import { favoriteMechanic, readUserProfile } from '@/_backend/api/profile';
 import { getMechanicById, getReviewsByMechanic } from '@/_backend/api/review';
 import NormalButton from '@/app/components/NormalButton';
 import ShopManager from '@/app/components/ShopManager';
@@ -26,10 +26,8 @@ import {
   View,
 } from 'react-native';
 import { ReactNativeModal as Modal } from 'react-native-modal';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
-import { favoriteMechanic } from "@/_backend/api/profile";
 
 
 const Details = () => {
@@ -59,6 +57,9 @@ const Details = () => {
           throw new Error(
             'No email on the Cognito profile (check pool/app-client readable attributes).'
           );
+        }
+        else if(userID){
+          setUserID(userID)
         }
 
         const userData = await readUserProfile(userId, email);
@@ -178,6 +179,11 @@ const Details = () => {
 
     fetchData();
   }, [id]);
+
+  useEffect(()=>{
+    if(mechanic)
+      setClaimed(mechanic.Certified && userID== mechanic.ownerid)
+},[mechanic, userID])
 
   // temporary for testing
   const claim = async () => {
@@ -325,7 +331,7 @@ const Details = () => {
               <Text className="smallTextBold mb-[6]">
                 Reviews: {reviews.length}
               </Text>
-              {isAuthenticated && asMechanic && (
+              {isClaimed  || isAuthenticated && asMechanic && (
                 <Pressable
                   onPress={async () => {
                     /**
