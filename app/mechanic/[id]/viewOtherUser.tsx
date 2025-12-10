@@ -117,8 +117,8 @@ const ViewOtherUser = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
-      <ScrollView>
+    // <SafeAreaView className="flex-1 bg-white" edges={["top", "bottom"]}>
+      <ScrollView className="bg-white pt-6">
         <View className="flex-1 mt-5 gap-5 mb-5">
           {/* ACCOUNT BANNER */}
           <View className="flex-row items-center justify-center bg-white pb-12 gap-10 border-b border-secondary">
@@ -167,41 +167,39 @@ const ViewOtherUser = () => {
                 </View>
 
                 <View className="gap-3">
-                  <View className="flex-1 flex-row gap-3">
+                  <View className="flex-row flex-1 gap-3">
                     <NormalButton
                       variant={
-                        sortOption === "dateNewest" ? "primary" : "outline"
+                        sortOption === 'dateNewest' ? 'primary' : 'outline'
                       }
-                      text="Date: Newest - Oldest"
+                      text="Newest to Oldest"
                       grow={true}
-                      onClick={() => setSortOption("dateNewest")}
+                      onClick={() => setSortOption('dateNewest')}
                     />
                     <NormalButton
                       variant={
-                        sortOption === "dateOldest" ? "primary" : "outline"
+                        sortOption === 'dateOldest' ? 'primary' : 'outline'
                       }
-                      text="Date: Oldest - Newest"
+                      text="Oldest to Newest"
                       grow={true}
-                      onClick={() => setSortOption("dateOldest")}
+                      onClick={() => setSortOption('dateOldest')}
                     />
                   </View>
 
-                  <View className="flex-1 flex-row gap-3">
+                  <View className="flex-row flex-1 gap-3">
                     <NormalButton
                       variant={
-                        sortOption === "ratingHigh" ? "primary" : "outline"
+                        sortOption === 'ratingHigh' ? 'primary' : 'outline'
                       }
-                      text="Highest Rating First"
+                      text="Highest Rating"
                       grow={true}
-                      onClick={() => setSortOption("ratingHigh")}
+                      onClick={() => setSortOption('ratingHigh')}
                     />
                     <NormalButton
-                      variant={
-                        sortOption === "ratingLow" ? "primary" : "outline"
-                      }
-                      text="Lowest Rating First"
+                      variant={sortOption === 'ratingLow' ? 'primary' : 'outline'}
+                      text="Lowest Rating"
                       grow={true}
-                      onClick={() => setSortOption("ratingLow")}
+                      onClick={() => setSortOption('ratingLow')}
                     />
                   </View>
                 </View>
@@ -252,7 +250,7 @@ const ViewOtherUser = () => {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 };
 

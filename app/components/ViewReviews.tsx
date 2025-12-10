@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react'
 import { ActivityIndicator, Image, Text, View } from 'react-native'
 import { StarRatingDisplay } from 'react-native-star-rating-widget'
 import Star from './Star'
-type ReviewProps ={
-    Rating: number,
-    Review: String,
-    UserId: string,
-    CreatedAt: string
-}
-const ViewReviews = ({Rating, Review, UserId, CreatedAt}:ReviewProps) => {
 
+type ReviewProps = {
+  Rating: number
+  Review: string
+  UserId: string
+  CreatedAt: string
+}
+
+const ViewReviews = ({ Rating, Review, UserId, CreatedAt }: ReviewProps) => {
   const time = new Date(CreatedAt)
   const options = {
     year: 'numeric',
@@ -19,41 +20,45 @@ const ViewReviews = ({Rating, Review, UserId, CreatedAt}:ReviewProps) => {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true 
-} as Intl.DateTimeFormatOptions;
-  const [name, setName]=useState('');
-  const [profilePic, setProfilePic] =useState('');
-  const [loading, setLoading] = useState(true);
-  const formattedDate = time.toLocaleDateString('en-us', options).replace(',', ' at ')
-  
-  useEffect( ()=>{
-    const getUserName = async()=>{
-      try{
-        console.log(UserId);
-        const userData = await getUserById(UserId as string);
-        const first = userData.firstName;
-        const last = userData.lastName;
-        console.log("First: " + first);
-        if(first && last)
-          setName(`${first} ${last}`);
-      }
-      catch{
-        console.log("Unable to load user name")
-      }
-      
-    }
-  const getUserImage = async()=>{
-        const uri = await AsyncStorage.getItem('profileImageUri:' + UserId).catch(()=>console.log("Unable to retrieve image"));
-        console.log("Image: "+ uri);
-        setProfilePic(uri||'');
+    hour12: true,
+  } as Intl.DateTimeFormatOptions
 
-  }
-  const runner = async ()=>{
-     await Promise.all([getUserName(), getUserImage()])
-  }
-  runner()
-  setLoading(false);
-  },[UserId])
+  const [name, setName] = useState('')
+  const [profilePic, setProfilePic] = useState('')
+  const [loading, setLoading] = useState(true)
+  const formattedDate = time
+    .toLocaleDateString('en-us', options)
+    .replace(',', ' at ')
+
+  useEffect(() => {
+    const getUserName = async () => {
+      try {
+        console.log(UserId)
+        const userData = await getUserById(UserId as string)
+        const first = userData.firstName
+        const last = userData.lastName
+        console.log('First: ' + first)
+        if (first && last) setName(`${first} ${last}`)
+      } catch {
+        console.log('Unable to load user name')
+      }
+    }
+
+    const getUserImage = async () => {
+      const uri = await AsyncStorage.getItem(
+        'profileImageUri:' + UserId
+      ).catch(() => console.log('Unable to retrieve image'))
+      console.log('Image: ' + uri)
+      setProfilePic(uri || '')
+    }
+
+    const runner = async () => {
+      await Promise.all([getUserName(), getUserImage()])
+      setLoading(false)
+    }
+
+    runner()
+  }, [UserId])
 
   if (loading) {
     return (
@@ -64,36 +69,47 @@ const ViewReviews = ({Rating, Review, UserId, CreatedAt}:ReviewProps) => {
   }
 
   return (
-    <View className=' border-b-2 border-stroke px-5 py-3'>
-      <View className='flex-row ml-5'>
-        <View className='items-center'>
-          {profilePic!=''?
-          <Image source={{uri:profilePic}} className='w-[50] h-[50] border border-black rounded-full'/>:
-          <View className='w-[50] h-[50] border border-black rounded-full justify-center items-center'>
-            {/*Update to retrieve the user profile*/}   
-            <Text className='buttonTextBlack'>
-              {name.split(' ').map(x=>(x[0])).join('')}
-            </Text>
-          </View>}
-        </View>
-        
-        <View className='w-full'>
-          <View className='ml-5'>
-            {/*Update to retrieve user name instead of id*/}
-            <Text className='ml-2 buttonTextBlack'>
-              {name}
-            </Text>
-            <Text className='ml-2 buttonTextBlack'>
-              {formattedDate}
-            </Text>
-            <StarRatingDisplay color={'black'} starSize={18} StarIconComponent={Star} starStyle={{marginHorizontal:-1}} style={{ alignItems:'center', marginLeft:5}} rating={Rating}/>
+    // OUTER background (secondary)
+    <View className="bg-secondary py-3 px-4">
+      {/* INNER white card */}
+      <View className="bg-white rounded-xl border border-stroke py-3">
+        <View className="flex-row ml-5">
+          <View className="items-center">
+            {profilePic !== '' ? (
+              <Image
+                source={{ uri: profilePic }}
+                className="w-[50] h-[50] border border-black rounded-full"
+              />
+            ) : (
+              <View className="w-[50] h-[50] border border-black rounded-full justify-center items-center">
+                <Text className="buttonTextBlack">
+                  {name
+                    .split(' ')
+                    .map((x) => x[0])
+                    .join('')}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <View className="w-full">
+            <View className="ml-5">
+              <Text className="ml-2 buttonTextBlack">{name}</Text>
+              <Text className="ml-2 buttonTextBlack">{formattedDate}</Text>
+              <StarRatingDisplay
+                color={'black'}
+                starSize={18}
+                StarIconComponent={Star}
+                starStyle={{ marginHorizontal: -1 }}
+                style={{ alignItems: 'center', marginLeft: 5 }}
+                rating={Rating}
+              />
+            </View>
           </View>
         </View>
-          
+
+        <Text className="buttonTextBlack mx-5 mt-5">{Review}</Text>
       </View>
-      <Text className='buttonTextBlack mx-5 mt-5'>
-        {Review}
-      </Text>
     </View>
   )
 }

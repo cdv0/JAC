@@ -48,14 +48,15 @@ export const account = () => {
 };
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["right", "top", "left"]}>
+    // <SafeAreaView className="flex-1 bg-white" edges={["right", "top", "left"]}>
       <ScrollView
         contentContainerStyle={{ padding: 16 }}
         showsVerticalScrollIndicator={false}
+        className="bg-secondary"
       >
-        <View className="border border-stroke rounded-xl mb-6 p-4">
+        <View className=" bg-white border border-stroke rounded-xl mb-6 p-4">
         <View className="flex-row mb-6">
-          <Text className="buttonTextBlack mb-2">Rate your experience</Text>
+          <Text className="buttonTextBlack">Rate your experience  </Text>
           <StarRating
             rating={rating}
             onChange={setRating}
@@ -63,7 +64,7 @@ export const account = () => {
             starSize={26}
           />
         </View>
-        <View className="mb-6">
+        <View className="mb-3">
           <TextInput
             className="border border-stroke rounded-xl p-3 min-h-[140px]"
             multiline
@@ -76,7 +77,7 @@ export const account = () => {
 
         <NormalButton text="Submit" onClick={handleSubmit} />
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 }
 
