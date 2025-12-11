@@ -1,4 +1,4 @@
-import { readUserProfile } from '@/_backend/api/profile';
+import { favoriteMechanic, readUserProfile } from '@/_backend/api/profile';
 import { getMechanicById, getReviewsByMechanic } from '@/_backend/api/review';
 import NormalButton from '@/app/components/NormalButton';
 import ShopManager from '@/app/components/ShopManager';
@@ -26,13 +26,12 @@ import {
   View,
 } from 'react-native';
 import { ReactNativeModal as Modal } from 'react-native-modal';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
-import { favoriteMechanic } from "@/_backend/api/profile";
 
 
 const Details = () => {
+  //#region constants
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const [mechanic, setMechanic] = useState<any>(null);
@@ -48,35 +47,6 @@ const Details = () => {
   const displayName =
     firstName || lastName ? `${firstName} ${lastName}`.trim() : null;
   const [hours, setHours] = useState<Record<string, string>>();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { userId } = await getCurrentUser();
-        const attrs = await fetchUserAttributes();
-        const email = attrs.email;
-        if (!email) {
-          throw new Error(
-            'No email on the Cognito profile (check pool/app-client readable attributes).'
-          );
-        }
-
-        const userData = await readUserProfile(userId, email);
-        setUserID(userId);
-        setIsAuthenticated(attrs.userType == 'Mechanic');
-        setFirstName(userData.firstName ?? '');
-        setLastName(userData.lastName ?? '');
-        setIsAuthenticated(true);
-      } catch (e: any) {
-        console.log('Details: Error loading user data:', e);
-        console.log('Details: Error message:', e?.message);
-        setFirstName('');
-        setLastName('');
-        setIsAuthenticated(false);
-      }
-    })();
-  }, []);
-
   const [query, setQuery] = useState('');
   const [visible, setVisible] = useState(false);
   const [Verified, setVerified] = useState(false);
@@ -86,8 +56,11 @@ const Details = () => {
   const [asMechanic, setAsMechanic] = useState(true); // for testing
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading] = useState(true);
+  const [claimRequest, setClaimRequest] = useState(false);
   const [editVisible, setEditVisible] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  //#endregion
+
 
   const handleChoice = (
     flag: boolean,
@@ -100,6 +73,47 @@ const Details = () => {
       setter('');
     }
   };
+
+  //#region useeffects
+  useEffect(() => {
+      (async () => {
+        try {
+          const { userId } = await getCurrentUser();
+          const attrs = await fetchUserAttributes();
+          console.log("attrs",attrs)
+          const email = attrs.email;
+          if (!email) {
+            throw new Error(
+              'No email on the Cognito profile (check pool/app-client readable attributes).'
+            );
+          }
+          const isMechanic = attrs.locale == 'Mechanic';
+          if(isMechanic){
+            setAsMechanic(isMechanic);
+            setUserID(userId);
+            const name = attrs.name?.split(" ");
+            if (name){
+              setFirstName(name[0]);
+              setLastName(name[1]);
+            }
+          }
+          else{
+            const userData = await readUserProfile(userId, email);
+            setUserID(userId);
+            setFirstName(userData.firstName ?? '');
+            setLastName(userData.lastName ?? '');
+          }
+          
+          setIsAuthenticated(true);
+        } catch (e: any) {
+          console.log('Details: Error loading user data:', e);
+          console.log('Details: Error message:', e?.message);
+          setFirstName('');
+          setLastName('');
+          setIsAuthenticated(false);
+        }
+      })();
+    }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,10 +128,9 @@ const Details = () => {
       setLoading(true);
       try {
         // 1. Mechanic details
-        console.log('id', id);
+       
         const mech = await getMechanicById(String(id));
         setMechanic(mech as any);
-
         if (mech) {
           setHours({
             Mon: mech.Hours[0],
@@ -179,13 +192,23 @@ const Details = () => {
     fetchData();
   }, [id]);
 
+  useEffect(()=>{
+    
+    if(mechanic){
+      console.log("owner",mechanic.ownerId);
+      setClaimed(mechanic.Certified && mechanic.ownerId == userID)
+    } 
+},[mechanic, userID])
+
+  //#endregion
+
   // temporary for testing
   const claim = async () => {
     setTimeout(() => {
       let temp = Math.random();
-      setClaimed(temp < 0.5);
+      setClaimRequest(true);
       setClaimLoading(false);
-    }, 5000);
+    }, 1000);
   };
 
   if (loading) {
@@ -325,7 +348,7 @@ const Details = () => {
               <Text className="smallTextBold mb-[6]">
                 Reviews: {reviews.length}
               </Text>
-              {isAuthenticated && asMechanic && (
+              {(isClaimed  || !mechanic.Certified && isAuthenticated && asMechanic) && (
                 <Pressable
                   onPress={async () => {
                     /**
@@ -339,7 +362,7 @@ const Details = () => {
                      */
                     if (!isClaimed) {
                       setClaimVisibile(true);
-                      await claim();
+                      await claim()
                     }
                   }}
                 >
@@ -369,7 +392,7 @@ const Details = () => {
             {isClaimed && (
               <TouchableOpacity onPress={() => setEditVisible(true)}>
                 <icons.editIcon
-                  style={{ height: 50, width: 50, marginTop: 10 }}
+                  style={{ height: 50, width: 50, marginTop: 25, marginLeft: 15,}}
                 />
               </TouchableOpacity>
             )}
@@ -760,12 +783,12 @@ const Details = () => {
                 <View className="flex-1 items-center justify-center">
                   <ActivityIndicator size="large" />
                 </View>
-              ) : isClaimed ? (
-                <Text className="buttonTextBlack">Claim Succesful</Text>
+              ) : claimRequest ? (
+                <Text className="buttonTextBlack text-center">Request sent to claim shop</Text>
               ) : (
                 //Add ways to ask for help
-                <Text className="text-dangerDarkRed buttonTextBlack">
-                  Failed to Claim
+                <Text className="text-dangerDarkRed buttonTextBlack text-center">
+                  Failed to send a request
                 </Text>
               )}
             </View>

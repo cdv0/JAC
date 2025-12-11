@@ -49,6 +49,7 @@ type day ={
 type schedule = Record<string, day>;
 
 const ShopManager = ({visible, onClose, mode='add',data}:props) => { 
+  //#region Constants
   const phoneInput = useRef<PhoneInput>(null);
   const [shop, setShop] =useState<shop>({
           name:'',
@@ -72,7 +73,12 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
       'Saturday':{ start:'', end:''},
       'Sunday':{ start:'', end:''},
     })
-
+   const [query, setQuery] = useState('')
+  const [error, setError] = useState(false);
+  const validServices = validSet;
+  const [confirmvisible, setConfirmVisible] = useState(false);
+    //#endregion
+    
   useEffect(()=>{
     if(mode == 'add'){
       setDays({
@@ -136,6 +142,7 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
     }
     
     setQuery('')
+    setError(false);
     }, [visible])
 
   const setHours = () =>{
@@ -234,10 +241,6 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
     )
     
   }
-  const [query, setQuery] = useState('')
-  const [error, setError] = useState(false);
-  const validServices = validSet;
-  const [confirmvisible, setConfirmVisible] = useState(false);
   return (
     <Modal isVisible={visible} style={{flex:1, margin:0}} >
         <SafeAreaView className='w-full h-full bg-white' style={{alignSelf:'center'}}>
@@ -346,7 +349,7 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
           )}   
           <View className='flex-row self-center gap-20'>
               <NormalButton text='Cancel' variant='cancel' onClick={()=>{onClose();}} />
-              <NormalButton text={mode=='add'?'add':'Save'} variant='primary' onClick={()=>{
+              <NormalButton text={mode=='add'?'Add':'Save'} variant='primary' onClick={()=>{
                                                                         
                                                                         if (shop.name =='' || shop.address==''){
                                                                           setError(true);
@@ -370,8 +373,30 @@ const ShopManager = ({visible, onClose, mode='add',data}:props) => {
                 </Text>
                 <View className='flex-row self-center gap-[5%] mt-[15%]'>
                   <NormalButton text='No' variant='cancel' onClick={()=>{setConfirmVisible(false);}} />
-                  <NormalButton text='Yes' variant='primary' onClick={()=>{
+                  <NormalButton text='Yes' variant='primary' onClick={async ()=>{
                                                                               //call some add/edit shop function here
+                                                                              if (mode == 'add'){
+                                                                              const response = await fetch(process.env["EXPO_PUBLIC_CREATE_MECHANIC"] as string, {
+                                                                                method: "POST",
+                                                                                headers: {
+                                                                                  "Content-Type": "application/json",
+                                                                                },
+                                                                                body: JSON.stringify({
+                                                                                  body: shop
+                                                                                }),
+                                                                                }).catch(()=>console.log("something happened"))
+                                                                              }else{ 
+                                                                              const response = await fetch(process.env["EXPO_PUBLIC_UPDATE_MECHANIC"] as string, {
+                                                                                method: "POST",
+                                                                                headers: {
+                                                                                  "Content-Type": "application/json",
+                                                                                },
+                                                                                body: JSON.stringify({
+                                                                                  body: shop
+                                                                                })
+                                                                              }).catch(()=>console.log("something happened"))
+                                                                            }
+
                                                                               setConfirmVisible(false);
                                                                               onClose();
                                                                               
