@@ -31,6 +31,7 @@ import { Float } from 'react-native/Libraries/Types/CodegenTypesNamespace';
 
 
 const Details = () => {
+  //#region constants
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const [mechanic, setMechanic] = useState<any>(null);
@@ -46,38 +47,6 @@ const Details = () => {
   const displayName =
     firstName || lastName ? `${firstName} ${lastName}`.trim() : null;
   const [hours, setHours] = useState<Record<string, string>>();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { userId } = await getCurrentUser();
-        const attrs = await fetchUserAttributes();
-        const email = attrs.email;
-        if (!email) {
-          throw new Error(
-            'No email on the Cognito profile (check pool/app-client readable attributes).'
-          );
-        }
-        else if(userID){
-          setUserID(userID)
-        }
-
-        const userData = await readUserProfile(userId, email);
-        setUserID(userId);
-        setIsAuthenticated(attrs.userType == 'Mechanic');
-        setFirstName(userData.firstName ?? '');
-        setLastName(userData.lastName ?? '');
-        setIsAuthenticated(true);
-      } catch (e: any) {
-        console.log('Details: Error loading user data:', e);
-        console.log('Details: Error message:', e?.message);
-        setFirstName('');
-        setLastName('');
-        setIsAuthenticated(false);
-      }
-    })();
-  }, []);
-
   const [query, setQuery] = useState('');
   const [visible, setVisible] = useState(false);
   const [Verified, setVerified] = useState(false);
@@ -87,8 +56,11 @@ const Details = () => {
   const [asMechanic, setAsMechanic] = useState(true); // for testing
   const [claimVisibile, setClaimVisibile] = useState(false);
   const [claimLoading, setClaimLoading] = useState(true);
+  const [claimRequest, setClaimRequest] = useState(false);
   const [editVisible, setEditVisible] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  //#endregion
+
 
   const handleChoice = (
     flag: boolean,
@@ -101,6 +73,47 @@ const Details = () => {
       setter('');
     }
   };
+
+  //#region useeffects
+  useEffect(() => {
+      (async () => {
+        try {
+          const { userId } = await getCurrentUser();
+          const attrs = await fetchUserAttributes();
+          console.log("attrs",attrs)
+          const email = attrs.email;
+          if (!email) {
+            throw new Error(
+              'No email on the Cognito profile (check pool/app-client readable attributes).'
+            );
+          }
+          const isMechanic = attrs.locale == 'Mechanic';
+          if(isMechanic){
+            setAsMechanic(isMechanic);
+            setUserID(userId);
+            const name = attrs.name?.split(" ");
+            if (name){
+              setFirstName(name[0]);
+              setLastName(name[1]);
+            }
+          }
+          else{
+            const userData = await readUserProfile(userId, email);
+            setUserID(userId);
+            setFirstName(userData.firstName ?? '');
+            setLastName(userData.lastName ?? '');
+          }
+          
+          setIsAuthenticated(true);
+        } catch (e: any) {
+          console.log('Details: Error loading user data:', e);
+          console.log('Details: Error message:', e?.message);
+          setFirstName('');
+          setLastName('');
+          setIsAuthenticated(false);
+        }
+      })();
+    }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,10 +128,9 @@ const Details = () => {
       setLoading(true);
       try {
         // 1. Mechanic details
-        console.log('id', id);
+       
         const mech = await getMechanicById(String(id));
         setMechanic(mech as any);
-
         if (mech) {
           setHours({
             Mon: mech.Hours[0],
@@ -185,13 +197,15 @@ const Details = () => {
       setClaimed(mechanic.Certified && userID== mechanic.ownerid)
 },[mechanic, userID])
 
+  //#endregion
+
   // temporary for testing
   const claim = async () => {
     setTimeout(() => {
       let temp = Math.random();
-      setClaimed(temp < 0.5);
+      setClaimRequest(true);
       setClaimLoading(false);
-    }, 5000);
+    }, 1000);
   };
 
   if (loading) {
@@ -345,7 +359,7 @@ const Details = () => {
                      */
                     if (!isClaimed) {
                       setClaimVisibile(true);
-                      await claim();
+                      await claim()
                     }
                   }}
                 >
@@ -766,12 +780,12 @@ const Details = () => {
                 <View className="flex-1 items-center justify-center">
                   <ActivityIndicator size="large" />
                 </View>
-              ) : isClaimed ? (
-                <Text className="buttonTextBlack">Claim Succesful</Text>
+              ) : claimRequest ? (
+                <Text className="buttonTextBlack text-center">Request sent to claim shop</Text>
               ) : (
                 //Add ways to ask for help
-                <Text className="text-dangerDarkRed buttonTextBlack">
-                  Failed to Claim
+                <Text className="text-dangerDarkRed buttonTextBlack text-center">
+                  Failed to send a request
                 </Text>
               )}
             </View>
