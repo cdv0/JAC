@@ -193,8 +193,11 @@ const Details = () => {
   }, [id]);
 
   useEffect(()=>{
-    if(mechanic)
-      setClaimed(mechanic.Certified && userID== mechanic.ownerid)
+    
+    if(mechanic){
+      console.log("owner",mechanic.ownerId);
+      setClaimed(mechanic.Certified && mechanic.ownerId == userID)
+    } 
 },[mechanic, userID])
 
   //#endregion
@@ -345,7 +348,7 @@ const Details = () => {
               <Text className="smallTextBold mb-[6]">
                 Reviews: {reviews.length}
               </Text>
-              {isClaimed  || isAuthenticated && asMechanic && (
+              {(isClaimed  || !mechanic.Certified && isAuthenticated && asMechanic) && (
                 <Pressable
                   onPress={async () => {
                     /**
@@ -389,7 +392,7 @@ const Details = () => {
             {isClaimed && (
               <TouchableOpacity onPress={() => setEditVisible(true)}>
                 <icons.editIcon
-                  style={{ height: 50, width: 50, marginTop: 10 }}
+                  style={{ height: 50, width: 50, marginTop: 25, marginLeft: 15,}}
                 />
               </TouchableOpacity>
             )}
