@@ -4,7 +4,7 @@ import {
   uploadProfilePicture,
   type File,
 } from '@/_backend/api/fileUpload'
-import { deleteAccount, readUserProfile, getProfilePicture } from '@/_backend/api/profile'
+import { deleteAccount, getProfilePicture, readUserProfile } from '@/_backend/api/profile'
 import NormalButton from '@/app/components/NormalButton'
 import ShopManager from '@/app/components/ShopManager'
 import {
@@ -283,11 +283,11 @@ export default function Account() {
             <View className="flex flex-col gap-4 mt-10">
               <Pressable onPress={() => setEditShop(true)}>
                 <Text className="p-2 text-lg font-extrabold text-black bg-white border-2 border-secondary rounded-xl">
-                  Edit Mechanic Shop
+                  Add Mechanic Shop
                 </Text>
               </Pressable>
               <ShopManager
-                mode="edit"
+                mode="add"
                 visible={editShop}
                 onClose={() => setEditShop(false)}
               />
